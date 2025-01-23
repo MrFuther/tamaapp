@@ -1,0 +1,143 @@
+/* Global Styles */
+body {
+  background-color: #f8f9fa; /* Latar belakang utama */
+  color: #343a40; /* Warna teks utama */
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar */
+.sidebar {
+  background-color: #16AFBD;
+  border-right: 1px solid #ffffff;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar Logo */
+.sidebar-logo {
+  padding: 10px 10px; /* Jarak atas dan samping */
+  display: none;
+  align-items: center;
+  margin: 5px auto; /* Sejajarkan vertikal */
+}
+
+.sidebar-logo img {
+  height: 40px; /* Tinggi logo */
+  display: flex;
+  width: auto; /* Menjaga proporsi logo */
+  border-radius: 5px; /* Tambahkan sedikit rounded corner jika diperlukan */
+}
+
+.sidebar-logo .app-name {
+  font-family: 'Font Awesome 6 Free', sans-serif; /* Font family */
+  font-size: 18px; /* Ukuran font */
+  font-weight: 600; /* Ketebalan teks */
+  color: #ffffff; /* Warna teks putih (atau ubah sesuai kebutuhan) */
+  margin-left: 2px; /* Jarak antara logo dan teks */
+}
+
+/* Sidebar Collapse */
+.sidebar.collapsed {
+  width: 70px;
+}
+
+/* Navigation Links in Sidebar */
+.sidebar .nav-link {
+  color: #343a40;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #f1f1f1;
+  border-radius: 5px;
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+.sidebar.collapsed .nav-link span {
+  display: none;
+}
+
+/* Sidebar Collapse Logo */
+.sidebar.collapsed .sidebar-logo {
+  display: flex;
+  padding: 2px 6px;
+  margin: 5px auto;
+}
+
+.sidebar.collapsed .sidebar-logo .app-name {
+  display: none;
+}
+
+/* Toggle Button */
+#toggle-sidebar {
+  width: 100%;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: #343a40;
+  cursor: pointer;
+  padding: 10px;
+}
+
+#toggle-sidebar:hover {
+  background-color: #f1f1f1;
+}
+
+/* Content */
+.content {
+  margin-left: 240px;
+  transition: margin-left 0.3s ease;
+}
+
+.content.collapsed {
+  margin-left: 70px;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Active Link in Sidebar */
+.nav-link.active {
+  background-color: #138f9f; /* Warna latar belakang untuk menu aktif */
+  color: #ffffff; /* Warna teks untuk menu aktif */
+  border-radius: 5px; /* Tambahkan sudut membulat */
+}
+
+.nav-link.active i {
+  color: #ffffff; /* Warna ikon untuk menu aktif */
+}
+
+/* Badge Premium */
+.badge-premium {
+  background-color: #ffc107;
+  color: #343a40;
+}
+
+/* Card Styles */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Headings */
+h5 {
+  font-weight: bold;
+  margin-bottom: 20px;
+}

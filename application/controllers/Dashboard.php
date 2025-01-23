@@ -15,4 +15,25 @@ class Dashboard extends CI_Controller {
         $data['user'] = $this->session->userdata();
         $this->load->view('dashboard/index', $data);
     }
+
+    // Master Report
+    public function report() {
+        $data['title'] = 'Report';
+        $data['user'] = $this->session->userdata();
+        $this->load->view('dashboard/report', $data);
+    }
+
+    // Master Data
+    public function data() {
+        $data['title'] = 'Data';
+        $data['user'] = $this->session->userdata();
+        $this->load->view('dashboard/data', $data);
+    }
+
+    // Manage User
+    public function manage_user() {
+        $data['title'] = 'Manage User';
+        $data['user'] = $this->session->userdata();
+        $this->load->view('dashboard/manage_user', $data);
+    }
 }

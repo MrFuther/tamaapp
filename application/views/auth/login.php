@@ -94,8 +94,10 @@
         }
         .bumn-logo {
             position: absolute;
+            max-width: 100%;
+            height: auto;
             top: 20px;
-            left: 20px;
+            left: 700px;
             height: 40px;
         }
         @media (max-width: 768px) {
