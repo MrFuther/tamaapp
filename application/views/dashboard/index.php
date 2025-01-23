@@ -213,6 +213,8 @@
         );
     }
 
+    
+
     // Render Components
     ReactDOM.render(<LineChartComponent />, document.getElementById("line-chart-root"));
     ReactDOM.render(<SegmentationChartComponent />, document.getElementById("segmentation-chart-root"));
