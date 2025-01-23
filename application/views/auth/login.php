@@ -94,10 +94,35 @@
         }
         .bumn-logo {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            height: 40px;
+            top: 28px;
+            left: 800px;
+            max-width: 140px; /* Membatasi lebar maksimum */
+            height: auto; /* Menjaga proporsi */
         }
+
+        .logo-it {
+            position: absolute;
+            top: 30px;
+            right: 35px;
+            max-width: 70px;
+            height: auto;
+        }
+
+        .logo-soekarno {
+            position: absolute;
+            top: 28px;
+            right: 100px;
+            max-width: 140px;
+            height: auto;
+        }
+        .injourney-logo{
+            position: absolute;
+            top: 34px;
+            right: 235px;
+            max-width: 100px; /* Membatasi lebar maksimum */
+            height: auto; /* Menjaga proporsi */
+        }
+
         @media (max-width: 768px) {
             .login-image {
                 display: none;
@@ -118,6 +143,10 @@
         <!-- Right side - Login Form -->
         <div class="login-form">
             <img src="<?php echo base_url('assets/images/bumn-logo.png'); ?>" alt="BUMN Logo" class="bumn-logo">
+            <img src="<?php echo base_url('assets/images/logo-it.png'); ?>" alt="IT Logo" class="logo-it">
+            <img src="<?php echo base_url('assets/images/logo-soekarno.png'); ?>" alt="SOEKARNO logo" class="logo-soekarno">
+            <img src="<?php echo base_url('assets/images/injourney-logo.png'); ?>" alt="INJOURNEY logo" class="injourney-logo">
+            
             
             <div class="login-box">
                 <div class="logo-container">
