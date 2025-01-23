@@ -93,6 +93,26 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+        // Fungsi untuk toggle sidebar
+        document.getElementById('toggle-sidebar').addEventListener('click', function () {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+
+            const content = document.querySelector('.content');
+            content.classList.toggle('collapsed'); // Update content margin when sidebar is collapsed
+
+            const icon = this.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+</script>
 <script src="<?php echo base_url('assets/js/dashboard.js'); ?>"></script>
 </body>
 </html>

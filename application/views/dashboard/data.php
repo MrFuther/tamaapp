@@ -49,18 +49,72 @@
         </li>
         <?php endif; ?>
     </ul>
+    <button class="btn btn-outline-secondary mt-auto" id="toggle-sidebar">
+        <i class="fas fa-chevron-left"></i>
+    </button>
 </div>
 
-<div class="content">
+<<div class="content">
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
             <h5 class="navbar-brand mb-0">Hallo, <?php echo $user['username']; ?></h5>
             <span class="badge badge-premium">as <?php echo ucfirst($user['role']); ?></span>
+
+            <!-- Dropdown for Logout -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <?php echo $user['username']; ?>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </nav>
     <div class="container mt-4">
         <!-- Main dashboard content goes here -->
     </div>
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to logout?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+        // Fungsi untuk toggle sidebar
+        document.getElementById('toggle-sidebar').addEventListener('click', function () {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+
+            const content = document.querySelector('.content');
+            content.classList.toggle('collapsed'); // Update content margin when sidebar is collapsed
+
+            const icon = this.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+</script>
+<script src="<?php echo base_url('assets/js/dashboard.js'); ?>"></script>
 </body>
 </html>
