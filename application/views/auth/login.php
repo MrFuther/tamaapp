@@ -94,18 +94,10 @@
         }
         .bumn-logo {
             position: absolute;
-<<<<<<< HEAD
-            max-width: 100%;
-            height: auto;
-            top: 20px;
-            left: 700px;
-            height: 40px;
-=======
             top: 28px;
             left: 800px;
             max-width: 140px; /* Membatasi lebar maksimum */
             height: auto; /* Menjaga proporsi */
->>>>>>> 5ef15d454aaa4a8974e42240bee18e653c81dda3
         }
 
         .logo-it {
