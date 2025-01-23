@@ -45,7 +45,8 @@ body {
 
 /* Sidebar Collapse */
 .sidebar.collapsed {
-  width: 70px;
+  width: 70px;  /* Lebar sidebar saat kolaps */
+  padding: 20px 0;
 }
 
 /* Navigation Links in Sidebar */
@@ -53,21 +54,36 @@ body {
   color: #343a40;
   display: flex;
   align-items: center;
-  padding: 10px 15px;
-  transition: background-color 0.3s ease;
+  padding: 10px 15px;  /* Padding antara ikon dan teks */
+  border-radius: 5px;
+  transition: background-color 0.3s ease, padding-left 0.3s ease;
 }
 
 .sidebar .nav-link:hover {
-  background-color: #f1f1f1;
-  border-radius: 5px;
+  background-color: #138f9f;  /* Warna saat hover */
+  padding-left: 25px;  /* Menggeser teks ke kanan saat hover */
 }
 
 .sidebar .nav-link i {
-  margin-right: 10px;
+  margin-right: 15px;  /* Memberikan jarak antara ikon dan teks */
+  font-size: 18px;  /* Ukuran ikon yang konsisten */
+}
+
+.sidebar .nav-link.active {
+  background-color: #138f9f;  /* Warna latar belakang untuk item aktif */
+  color: #ffffff;
+}
+
+.sidebar .nav-link.active i {
+  color: #000000;  /* Warna ikon untuk item aktif */
 }
 
 .sidebar.collapsed .nav-link span {
-  display: none;
+  display: none;  /* Sembunyikan teks saat sidebar dikolaps */
+}
+
+.sidebar.collapsed .nav-link i {
+  margin: 0 auto;
 }
 
 /* Sidebar Collapse Logo */
@@ -110,25 +126,29 @@ body {
 .navbar {
   background-color: #ffffff;
   border-bottom: 1px solid #e9ecef;
+  padding: 10px 20px;
+  z-index: 1000;  /* Pastikan navbar berada di atas sidebar */
 }
 
 /* Active Link in Sidebar */
 .nav-link.active {
   background-color: #138f9f; /* Warna latar belakang untuk menu aktif */
-  color: #ffffff; /* Warna teks untuk menu aktif */
+  color: #000000; /* Warna teks untuk menu aktif */
   border-radius: 5px; /* Tambahkan sudut membulat */
 }
 
 .nav-link.active i {
-  color: #ffffff; /* Warna ikon untuk menu aktif */
+  color: #000000; /* Warna ikon untuk menu aktif */
 }
 
 /* Badge Premium */
 .badge-premium {
   background-color: #ffc107;
   color: #343a40;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 12px;
 }
-
 /* Card Styles */
 .card {
   border: none;

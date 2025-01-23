@@ -3,10 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAMA Dashboard</title>
+    <title>Dashboard with React Chart</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<?php echo base_url('assets/css/dashboard.css'); ?>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .progress-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            margin-bottom: 20px;
+        }
+
+        .progress-box .progress-label {
+            font-weight: bold;
+        }
+
+        .date-range {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .date-range input {
+            width: 45%;
+        }
+    </style>
 </head>
 <body>
 <div class="sidebar d-flex flex-column p-3">
@@ -74,19 +97,39 @@
             </ul>
         </div>
     </nav>
+    <!-- Progress Box and Date Range -->
     <div class="container mt-4">
-    <div class="row">
-        <!-- Line Chart -->
-        <div class="col-lg-8 mb-4">
-            <div class="card p-4" id="line-chart-root"></div>
+        <div class="progress-box">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="progress-label">Aktual: 1896</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="progress-label">Target: 2500</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="progress-label">Progress: 75.84%</div>
+                </div>
+            </div>
         </div>
-        <!-- Segmentation Data -->
-        <div class="col-lg-4 mb-4">
-            <div class="card p-4" id="segmentation-chart-root"></div>
+
+        <!-- Date Range Selector -->
+        <div class="date-range mb-4">
+            <input type="date" id="startDate" class="form-control" placeholder="Tanggal Mulai">
+            <input type="date" id="endDate" class="form-control" placeholder="Tanggal Akhir">
         </div>
-        <!-- Satisfaction Gauge -->
-        <div class="col-lg-4 mb-4">
-            <div class="card p-4" id="satisfaction-gauge-root"></div>
+
+        <div class="row">
+            <!-- Total Experiments Chart -->
+            <div class="col-lg-6">
+                <h4>Total Experiments</h4>
+                <canvas id="totalExperimentsChart"></canvas> <!-- Canvas for Bar Chart -->
+            </div>
+            <!-- Average Experiments per Member Chart -->
+            <div class="col-lg-6">
+                <h4>Average Experiments per Member</h4>
+                <canvas id="avgExperimentsChart"></canvas> <!-- Canvas for Line Chart -->
+            </div>
         </div>
     </div>
 
@@ -221,23 +264,78 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-        // Fungsi untuk toggle sidebar
-        document.getElementById('toggle-sidebar').addEventListener('click', function () {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('collapsed');
+    // Fungsi untuk toggle sidebar
+    document.getElementById('toggle-sidebar').addEventListener('click', function () {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('collapsed');
 
-            const content = document.querySelector('.content');
-            content.classList.toggle('collapsed'); // Update content margin when sidebar is collapsed
+        const content = document.querySelector('.content');
+        content.classList.toggle('collapsed'); // Update content margin when sidebar is collapsed
 
-            const icon = this.querySelector('i');
-            if (sidebar.classList.contains('collapsed')) {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
-            } else {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
+        const icon = this.querySelector('i');
+        if (sidebar.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-left');
+            icon.classList.add('fa-chevron-right');
+        } else {
+            icon.classList.remove('fa-chevron-right');
+            icon.classList.add('fa-chevron-left');
+        }
+    });
+</script>
+<script>
+// Data for Bar Chart (Total Experiments)
+const totalExperimentsData = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [{
+        label: 'Total Experiments',
+        data: [1896, 2000, 2100, 2300, 2500, 2200, 2400],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+    }]
+};
+
+// Data for Line Chart (Average Experiments per Member)
+const avgExperimentsData = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [{
+        label: 'Average Experiments per Member',
+        data: [65.4, 70.2, 72.1, 75.3, 68.9, 74.6, 72.8],
+        fill: false,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        tension: 0.1
+    }]
+};
+
+// Create the Bar Chart for Total Experiments
+const ctx1 = document.getElementById('totalExperimentsChart').getContext('2d');
+const totalExperimentsChart = new Chart(ctx1, {
+    type: 'bar',
+    data: totalExperimentsData,
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
             }
-        });
+        }
+    }
+});
+
+// Create the Line Chart for Average Experiments per Member
+const ctx2 = document.getElementById('avgExperimentsChart').getContext('2d');
+const avgExperimentsChart = new Chart(ctx2, {
+    type: 'line',
+    data: avgExperimentsData,
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
 </script>
 <script src="<?php echo base_url('assets/js/dashboard.js'); ?>"></script>
 </body>
