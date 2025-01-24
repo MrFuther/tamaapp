@@ -60,6 +60,17 @@
         <div class="container-fluid">
             <h5 class="navbar-brand mb-0">Hallo, <?php echo $user['username']; ?></h5>
             <span class="badge badge-premium">as <?php echo ucfirst($user['role']); ?></span>
+            <!-- Dropdown for Logout -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <?php echo $user['username']; ?>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </nav>
 

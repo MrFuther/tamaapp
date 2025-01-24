@@ -54,7 +54,7 @@
     </button>
 </div>
 
-<<div class="content">
+<div class="content">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
