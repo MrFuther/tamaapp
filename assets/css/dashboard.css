@@ -161,3 +161,52 @@ h5 {
   font-weight: bold;
   margin-bottom: 20px;
 }
+
+/* Table Styles */
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin: 20px;
+}
+.table > thead {
+  background-color: #f8f9fa;
+}
+.table > thead th {
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: #495057;
+}
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+.btn-action {
+  padding: 5px 10px;
+  margin: 0 3px;
+}
+.page-title {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.badge-shift {
+  font-size: 0.85rem;
+  padding: 5px 10px;
+}
+.badge-pagi {
+  background-color: #4CAF50;
+}
+.badge-malam {
+  background-color: #2196F3;
+}
+.table-custom > thead {
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: #495057;
+}
