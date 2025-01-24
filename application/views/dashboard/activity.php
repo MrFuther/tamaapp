@@ -112,7 +112,7 @@
                     <td>2013</td>
                     <td>€ 99,225</td>
                     <td>
-                        <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
                         <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                     </td>
@@ -124,7 +124,7 @@
                     <td>2012</td>
                     <td>€ 89,241</td>
                     <td>
-                        <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
                         <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                     </td>
@@ -136,7 +136,7 @@
                     <td>2010</td>
                     <td>€ 92,144</td>
                     <td>
-                        <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
                         <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                     </td>
@@ -148,7 +148,7 @@
                     <td>2013</td>
                     <td>€ 49,990</td>
                     <td>
-                        <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
                         <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                     </td>
@@ -160,7 +160,7 @@
                     <td>2015</td>
                     <td>€ 69,201</td>
                     <td>
-                        <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
                         <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
                         <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                     </td>
