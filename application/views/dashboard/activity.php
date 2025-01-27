@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAMA Apps</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<?php echo base_url('assets/css/dashboard.css'); ?>">
 </head>
@@ -60,7 +61,10 @@
         <div class="container-fluid">
             <h5 class="navbar-brand mb-0">Hallo, <?php echo $user['username']; ?></h5>
             <span class="badge badge-premium">as <?php echo ucfirst($user['role']); ?></span>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 98b7b536ebb6ce6658945ff8a6d212f7a61324bf
             <!-- Dropdown for Logout -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
@@ -93,82 +97,60 @@
 
     <!-- Tabel Activity -->
     <div class="container mt-4">
-        <h3>Employee List</h3>
-        <table class="table table-striped" id="activityTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Job Position</th>
-                    <th>Since</th>
-                    <th>Salary</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Andrew Mike</td>
-                    <td>Developer</td>
-                    <td>2013</td>
-                    <td>€ 99,225</td>
-                    <td>
-                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
-                        <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>John Doe</td>
-                    <td>Designer</td>
-                    <td>2012</td>
-                    <td>€ 89,241</td>
-                    <td>
-                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
-                        <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Alex Mike</td>
-                    <td>Designer</td>
-                    <td>2010</td>
-                    <td>€ 92,144</td>
-                    <td>
-                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
-                        <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>Mike Monday</td>
-                    <td>Marketing</td>
-                    <td>2013</td>
-                    <td>€ 49,990</td>
-                    <td>
-                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
-                        <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>Paul Dickens</td>
-                    <td>Communication</td>
-                    <td>2015</td>
-                    <td>€ 69,201</td>
-                    <td>
-                        <button class="btn btn-info btn-sm"><i class="fa fa-print" aria-hidden="true"></i></button>
-                        <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <h3 class="text-2xl font-semibold mb-4">Employee List</h3>
+    <table class="min-w-full table-auto bg-white shadow-lg rounded-lg">
+        <thead class="bg-gray-800 text-white">
+            <tr>
+                <th class="px-4 py-2 text-left">No.</th>
+                <th class="px-4 py-2 text-left">Nama</th>
+                <th class="px-4 py-2 text-left">Shift</th>
+                <th class="px-4 py-2 text-left">Personil</th>
+                <th class="px-4 py-2 text-left">Lokasi</th>
+                <th class="px-4 py-2 text-left">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2">1</td>
+                <td class="px-4 py-2">Tatang</td>
+                <td class="px-4 py-2">Pagi</td>
+                <td class="px-4 py-2">Nunung</td>
+                <td class="px-4 py-2">Lantai 8</td>
+                <td class="px-4 py-2">
+                    <button class="bg-blue-500 text-white px-2 py-1 rounded mr-2"><i class="fa fa-print"></i></button>
+                    <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2"><i class="fas fa-edit"></i></button>
+                    <button class="bg-red-500 text-white px-2 py-1 rounded"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2">2</td>
+                <td class="px-4 py-2">Nunung</td>
+                <td class="px-4 py-2">Pagi</td>
+                <td class="px-4 py-2">Tatang</td>
+                <td class="px-4 py-2">Lantai 8</td>
+                <td class="px-4 py-2">
+                    <button class="bg-blue-500 text-white px-2 py-1 rounded mr-2"><i class="fa fa-print"></i></button>
+                    <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2"><i class="fas fa-edit"></i></button>
+                    <button class="bg-red-500 text-white px-2 py-1 rounded"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2">3</td>
+                <td class="px-4 py-2">Sumargo</td>
+                <td class="px-4 py-2">Malam</td>
+                <td class="px-4 py-2">Yanto</td>
+                <td class="px-4 py-2">Lantai 2</td>
+                <td class="px-4 py-2">
+                    <button class="bg-blue-500 text-white px-2 py-1 rounded mr-2"><i class="fa fa-print"></i></button>
+                    <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2"><i class="fas fa-edit"></i></button>
+                    <button class="bg-red-500 text-white px-2 py-1 rounded"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+            <!-- Add more rows as needed -->
+        </tbody>
+    </table>
     </div>
+
 
     <!-- Modal for Add Activity -->
     <div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
@@ -220,23 +202,28 @@
                                 <option value="Person 3">Personil 3</option>
                             </select>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3"> 
                             <label for="photo" class="form-label">Ambil Foto</label>
                             <div class="row">
+								<!-- Ambil foto perangkat -->
                                 <div class="col">
-                                    <input class="form-control" type="file" id="devicePhoto" accept="image/*">
-                                    <label class="form-label">Perangkat</label>
-                                </div>
-                                <div class="col">
-                                    <input class="form-control" type="file" id="locationPhoto" accept="image/*">
-                                    <label class="form-label">Lokasi Perangkat</label>
-                                </div>
-                                <div class="col">
-                                    <input class="form-control" type="file" id="personnelPhoto" accept="image/*">
-                                    <label class="form-label">Teknisi yang Bertugas</label>
-                                </div>
-                            </div>
-                        </div>
+                                <input class="form-control" type="file" id="devicePhoto" accept="image/*" capture="environment">
+								<label class="form-label">Perangkat</label>
+								</div>
+
+							<!-- Ambil foto lokasi perangkat -->
+								<div class="col">
+								<input class="form-control" type="file" id="locationPhoto" accept="image/*" capture="environment">
+								<label class="form-label">Lokasi Perangkat</label>
+								</div>
+
+							<!-- Ambil foto teknisi -->
+								<div class="col">
+								<input class="form-control" type="file" id="personnelPhoto" accept="image/*" capture="environment">
+								<label class="form-label">Teknisi yang Bertugas</label>
+								</div>
+							</div>
+						</div>
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="confirmData">
                             <label class="form-check-label" for="confirmData">Anda menyatakan bahwa data yang Anda isikan adalah benar adanya</label>
@@ -252,6 +239,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-confirm">
             <div class="modal-content">
@@ -269,6 +257,26 @@
             </div>
         </div>
     </div>
+=======
+    <!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to logout?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+>>>>>>> 98b7b536ebb6ce6658945ff8a6d212f7a61324bf
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

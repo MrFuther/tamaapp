@@ -35,7 +35,6 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            position: relative;
         }
         .login-box {
             background: white;
@@ -93,25 +92,33 @@
             cursor: pointer;
             color: #666;
         }
-        .logo-bumn {
+        .bumn-logo {
             position: absolute;
             top: 28px;
-            left: 30px;
+            right: 585px;
+            max-width: 140px; /* Membatasi lebar maksimum */
+            height: auto; /* Menjaga proporsi */
         }
-        .logo-bumn img {
-            height: 80px;
+        .logo-it {
+            position: absolute;
+            top: 30px;
+            right: 35px;
+            max-width: 70px;
+            height: auto;
         }
-        .logo-group {
+        .logo-soekarno {
             position: absolute;
             top: 28px;
-            right: 30px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
+            right: 100px;
+            max-width: 140px;
+            height: auto;
         }
-        .logo-group img {
-            height: 60px;
-            max-width: 100px;
+        .injourney-logo{
+            position: absolute;
+            top: 34px;
+            right: 235px;
+            max-width: 100px; /* Membatasi lebar maksimum */
+            height: auto; /* Menjaga proporsi */
         }
         @media (max-width: 768px) {
             .login-image {
@@ -132,17 +139,11 @@
         
         <!-- Right side - Login Form -->
         <div class="login-form">
-            <!-- BUMN Logo on the left -->
-            <div class="logo-bumn">
-                <img src="<?php echo base_url('assets/images/bumn-logo.png'); ?>" alt="BUMN Logo">
-            </div>
+            <img src="<?php echo base_url('assets/images/bumn-logo.png'); ?>" alt="BUMN Logo" class="bumn-logo">
+            <img src="<?php echo base_url('assets/images/logo-it.png'); ?>" alt="IT Logo" class="logo-it">
+            <img src="<?php echo base_url('assets/images/logo-soekarno.png'); ?>" alt="SOEKARNO logo" class="logo-soekarno">
+            <img src="<?php echo base_url('assets/images/injourney-logo.png'); ?>" alt="INJOURNEY logo" class="injourney-logo">
             
-            <!-- Other Logos on the right -->
-            <div class="logo-group">
-                <img src="<?php echo base_url('assets/images/injourney-logo.png'); ?>" alt="INJOURNEY Logo">
-                <img src="<?php echo base_url('assets/images/logo-soekarno.png'); ?>" alt="Soekarno Logo">
-                <img src="<?php echo base_url('assets/images/logo-it.png'); ?>" alt="IT Logo">
-            </div>
             
             <div class="login-box">
                 <div class="logo-container">
@@ -184,7 +185,7 @@
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
 
-        togglePassword.addEventListener('click', function () {
+        togglePassword.addEventListener('click', function (e) {
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
             this.classList.toggle('fa-eye');
