@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAMA Activity Module</title>
+    <title>TAMA Apps</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<?php echo base_url('assets/css/dashboard.css'); ?>">
@@ -60,6 +60,18 @@
         <div class="container-fluid">
             <h5 class="navbar-brand mb-0">Hallo, <?php echo $user['username']; ?></h5>
             <span class="badge badge-premium">as <?php echo ucfirst($user['role']); ?></span>
+
+            <!-- Dropdown for Logout -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <?php echo $user['username']; ?>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </nav>
 
@@ -196,7 +208,6 @@
                             <select class="form-select" id="shift" required>
                                 <option selected>Pilih Shift</option>
                                 <option value="Morning">Pagi</option>
-                                <option value="Afternoon">Sore</option>
                                 <option value="Night">Malam</option>
                             </select>
                         </div>
@@ -236,6 +247,24 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                     <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
                 </div>
             </div>
         </div>
