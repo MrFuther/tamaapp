@@ -126,23 +126,23 @@
 
         <!-- Tab 2: Device Info -->
         <div class="tab-pane fade" id="device-tab-pane" role="tabpanel" aria-labelledby="device-tab">
-            <h5>Device Type & Device ID</h5>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Device Type</th>
-                        <th>Device ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($records['devices'] as $device): ?>
-                    <tr>
-                        <td><?= $device['device_type']; ?></td>
-                        <td><?= $device['device_id']; ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <h5>Device Type & Device ID</h5>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Device Type</th>
+                    <th>Device ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($devices as $device): ?>
+                <tr>
+                    <td><?= $device['device_type']; ?></td>
+                    <td><?= $device['device_id']; ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
             <form action="<?= base_url('MasterData/addDevice'); ?>" method="post">
                 <div class="mb-3">
                     <label for="location_id" class="form-label">Location</label>

@@ -47,6 +47,11 @@ class MasterDataModel extends CI_Model
         return $this->db->get('device_info')->result_array();
     }
 
+    public function getAllDevices()
+    {
+    return $this->db->get('device_info')->result_array(); // Ambil semua data dari tabel device_info
+    }
+
     /**
      * Add a new device
      */

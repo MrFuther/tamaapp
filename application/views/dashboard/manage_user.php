@@ -87,7 +87,7 @@
     <!-- User Table -->
     <div class="table-responsive">
         <table class="table table-hover align-middle shadow-sm rounded">
-            <thead class="table-light">
+            <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Username</th>

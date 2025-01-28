@@ -61,10 +61,6 @@
         <div class="container-fluid">
             <h5 class="navbar-brand mb-0">Hallo, <?php echo $user['username']; ?></h5>
             <span class="badge badge-premium">as <?php echo ucfirst($user['role']); ?></span>
-<<<<<<< HEAD
-
-=======
->>>>>>> 98b7b536ebb6ce6658945ff8a6d212f7a61324bf
             <!-- Dropdown for Logout -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
@@ -81,10 +77,6 @@
 
     <!-- Button and Search Bar Section -->
     <div class="container mt-4 d-flex justify-content-between align-items-center">
-        <!-- Tombol Tambah -->
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">
-            <i class="fas fa-plus-circle"></i> Tambah
-        </button>
 
         <!-- Tombol Search -->
         <div class="input-group" style="max-width: 300px;">
@@ -97,58 +89,67 @@
 
     <!-- Tabel Activity -->
     <div class="container mt-4">
-    <h3 class="text-2xl font-semibold mb-4">Employee List</h3>
-    <table class="min-w-full table-auto bg-white shadow-lg rounded-lg">
-        <thead class="bg-gray-800 text-white">
-            <tr>
-                <th class="px-4 py-2 text-left">No.</th>
-                <th class="px-4 py-2 text-left">Nama</th>
-                <th class="px-4 py-2 text-left">Shift</th>
-                <th class="px-4 py-2 text-left">Personil</th>
-                <th class="px-4 py-2 text-left">Lokasi</th>
-                <th class="px-4 py-2 text-left">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-b hover:bg-gray-50">
-                <td class="px-4 py-2">1</td>
-                <td class="px-4 py-2">Tatang</td>
-                <td class="px-4 py-2">Pagi</td>
-                <td class="px-4 py-2">Nunung</td>
-                <td class="px-4 py-2">Lantai 8</td>
-                <td class="px-4 py-2">
-                    <button class="bg-blue-500 text-white px-2 py-1 rounded mr-2"><i class="fa fa-print"></i></button>
-                    <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2"><i class="fas fa-edit"></i></button>
-                    <button class="bg-red-500 text-white px-2 py-1 rounded"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-            <tr class="border-b hover:bg-gray-50">
-                <td class="px-4 py-2">2</td>
-                <td class="px-4 py-2">Nunung</td>
-                <td class="px-4 py-2">Pagi</td>
-                <td class="px-4 py-2">Tatang</td>
-                <td class="px-4 py-2">Lantai 8</td>
-                <td class="px-4 py-2">
-                    <button class="bg-blue-500 text-white px-2 py-1 rounded mr-2"><i class="fa fa-print"></i></button>
-                    <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2"><i class="fas fa-edit"></i></button>
-                    <button class="bg-red-500 text-white px-2 py-1 rounded"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-            <tr class="border-b hover:bg-gray-50">
-                <td class="px-4 py-2">3</td>
-                <td class="px-4 py-2">Sumargo</td>
-                <td class="px-4 py-2">Malam</td>
-                <td class="px-4 py-2">Yanto</td>
-                <td class="px-4 py-2">Lantai 2</td>
-                <td class="px-4 py-2">
-                    <button class="bg-blue-500 text-white px-2 py-1 rounded mr-2"><i class="fa fa-print"></i></button>
-                    <button class="bg-yellow-500 text-white px-2 py-1 rounded mr-2"><i class="fas fa-edit"></i></button>
-                    <button class="bg-red-500 text-white px-2 py-1 rounded"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table>
+        <h3 class="text-2xl font-semibold mb-4">Activity List</h3>
+        
+        <!-- Filter -->
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="filterDate" class="form-label">Filter Tanggal</label>
+                    <input type="date" name="tanggal" id="filterDate" class="form-control" value="<?= $this->input->get('tanggal'); ?>">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Tombol Tambah -->
+        <div class="d-flex justify-content-start mb-3">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">
+                <i class="fas fa-plus-circle"></i> Tambah
+            </button>
+        </div>
+
+        <!-- Tabel Full Bootstrap -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle shadow-sm rounded">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th class="text-center">Tanggal</th>
+                        <th class="text-center">Lokasi</th>
+                        <th class="text-center">Device</th>
+                        <th class="text-center">Shift</th>
+                        <th class="text-center">Personil</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($activities as $index => $activity): ?>
+                    <tr>
+                        <td class="text-center"><?= $index + 1; ?></td>
+                        <td class="text-center"><?= $activity['tanggal']; ?></td>
+                        <td class="text-center"><?= $activity['lokasi']; ?></td>
+                        <td class="text-center"><?= $activity['device']; ?></td>
+                        <td class="text-center"><?= $activity['shift']; ?></td>
+                        <td class="text-center"><?= $activity['personil']; ?></td>
+                        <td class="text-center">
+                            <a href="<?= base_url('activity/delete/' . $activity['id']); ?>" class="btn btn-danger btn-sm mx-1">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                            <a href="#" class="btn btn-warning btn-sm mx-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="#" class="btn btn-success btn-sm mx-1">
+                                <i class="fas fa-print"></i> Print
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 
@@ -161,75 +162,86 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Form Start -->
-                    <form>
+                    <form action="<?= base_url('activity/add'); ?>" method="post" enctype="multipart/form-data">
+                        <!-- Tanggal -->
                         <div class="mb-3">
-                            <label for="date" class="form-label">Tanggal</label>
-                            <input type="date" class="form-control" id="date" required>
+                            <label for="tanggal" class="form-label">Tanggal</label>
+                            <input type="date" class="form-control" id="tanggal" name="tanggal" required>
                         </div>
+
+                        <!-- Lokasi -->
                         <div class="mb-3">
-                            <label for="location" class="form-label">Lokasi</label>
-                            <select class="form-select" id="location" required>
-                                <option selected>Pilih Lokasi</option>
-                                <option value="Location 1">Lokasi 1</option>
-                                <option value="Location 2">Lokasi 2</option>
-                                <option value="Location 3">Lokasi 3</option>
+                            <label for="lokasi" class="form-label">Lokasi</label>
+                            <select class="form-select" id="lokasi" name="lokasi" required>
+                                <option selected disabled>Pilih Lokasi</option>
+                                <?php foreach ($locations as $location): ?>
+                                <option value="<?= $location['location_name']; ?>"><?= $location['location_name']; ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
+
+                        <!-- Device Type -->
                         <div class="mb-3">
-                            <label for="device" class="form-label">Device</label>
-                            <select class="form-select" id="device" required>
-                                <option selected>Pilih Device</option>
-                                <option value="Device 1">Device 1</option>
-                                <option value="Device 2">Device 2</option>
-                                <option value="Device 3">Device 3</option>
+                            <label for="device_type" class="form-label">Device Type</label>
+                            <select class="form-select" id="device_type" name="device_type" required>
+                                <option selected disabled>Pilih Device Type</option>
+                                <?php foreach ($device_types as $device_type): ?>
+                                <option value="<?= $device_type['device_type']; ?>"><?= $device_type['device_type']; ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
+
+                        <!-- Device ID (Dynamic based on Device Type) -->
+                        <div class="mb-3">
+                            <label for="device_id" class="form-label">Device ID</label>
+                            <select class="form-select" id="device_id" name="device" required>
+                                <option selected disabled>Pilih Device ID</option>
+                                <?php foreach ($devices as $device): ?>
+                                <option value="<?= $device['device_id']; ?>"><?= $device['device_id']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <!-- Shift -->
                         <div class="mb-3">
                             <label for="shift" class="form-label">Shift</label>
-                            <select class="form-select" id="shift" required>
-                                <option selected>Pilih Shift</option>
-                                <option value="Morning">Pagi</option>
-                                <option value="Night">Malam</option>
+                            <select class="form-select" id="shift" name="shift" required>
+                                <option selected disabled>Pilih Shift</option>
+                                <?php foreach ($shifts as $shift): ?>
+                                <option value="<?= $shift; ?>"><?= $shift; ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
+
+                        <!-- Personil -->
                         <div class="mb-3">
                             <label for="personnel" class="form-label">Personil</label>
-                            <select class="form-select" id="personnel" required>
-                                <option selected>Pilih Personil</option>
-                                <option value="Person 1">Personil 1</option>
-                                <option value="Person 2">Personil 2</option>
-                                <option value="Person 3">Personil 3</option>
+                            <select class="form-select" id="personnel" name="personnel[]" multiple required>
+                                <?php foreach ($personnel as $person): ?>
+                                <option value="<?= $person['personnel']; ?>"><?= $person['personnel']; ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="mb-3"> 
-                            <label for="photo" class="form-label">Ambil Foto</label>
-                            <div class="row">
-								<!-- Ambil foto perangkat -->
-                                <div class="col">
-                                <input class="form-control" type="file" id="devicePhoto" accept="image/*" capture="environment">
-								<label class="form-label">Perangkat</label>
-								</div>
 
-							<!-- Ambil foto lokasi perangkat -->
-								<div class="col">
-								<input class="form-control" type="file" id="locationPhoto" accept="image/*" capture="environment">
-								<label class="form-label">Lokasi Perangkat</label>
-								</div>
+                        <!-- Foto -->
+                        <div class="mb-3">
+                            <label for="devicePhoto" class="form-label">Foto Perangkat</label>
+                            <input type="file" class="form-control" id="devicePhoto" name="devicePhoto" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label for="locationPhoto" class="form-label">Foto Lokasi</label>
+                            <input type="file" class="form-control" id="locationPhoto" name="locationPhoto" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label for="personnelPhoto" class="form-label">Foto Teknisi</label>
+                            <input type="file" class="form-control" id="personnelPhoto" name="personnelPhoto" accept="image/*">
+                        </div>
 
-							<!-- Ambil foto teknisi -->
-								<div class="col">
-								<input class="form-control" type="file" id="personnelPhoto" accept="image/*" capture="environment">
-								<label class="form-label">Teknisi yang Bertugas</label>
-								</div>
-							</div>
-						</div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="confirmData">
-                            <label class="form-check-label" for="confirmData">Anda menyatakan bahwa data yang Anda isikan adalah benar adanya</label>
+                        <!-- Submit -->
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
-                    <!-- Form End -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -239,7 +251,6 @@
         </div>
     </div>
 
-<<<<<<< HEAD
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-confirm">
             <div class="modal-content">
@@ -257,30 +268,41 @@
             </div>
         </div>
     </div>
-=======
+
     <!-- Logout Confirmation Modal -->
-<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-confirm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to logout?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
->>>>>>> 98b7b536ebb6ce6658945ff8a6d212f7a61324bf
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#device_type').change(function () {
+    const deviceType = $(this).val();
+
+        $.getJSON('<?= base_url("activity/getDevicesByType"); ?>', { device_type: deviceType }, function (data) {
+            $('#device_id').empty().append('<option selected disabled>Pilih Device ID</option>');
+            data.forEach(function (device) {
+                $('#device_id').append(`<option value="${device.device_id}">${device.device_id}</option>`);
+            });
+        });
+    });
+</script>
 <script>
     // Fungsi untuk toggle sidebar
     document.getElementById('toggle-sidebar').addEventListener('click', function () {

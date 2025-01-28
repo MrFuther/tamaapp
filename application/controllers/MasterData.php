@@ -22,10 +22,8 @@ class MasterData extends CI_Controller
         $data['user'] = $this->session->userdata();
         $data['users'] = $this->MasterDataModel->getUsers(); // Fetch personnel list
         $data['locations'] = $this->LocationModel->getAllLocations();
-        $data['records'] = [
-            'devices' => $this->DeviceModel->getDevicesByLocation(null), // Fetch all devices
-            'shifts' => $this->ShiftPersonelModel->getAllShiftPersonnel()      // Fetch all shifts
-            ];
+        $data['devices'] = $this->MasterDataModel->getAllDevices();
+        $data['records'] = ['shifts' => $this->ShiftPersonelModel->getAllShiftPersonnel()];
         $this->load->view('dashboard/master_data', $data);
     }
 
@@ -51,7 +49,7 @@ class MasterData extends CI_Controller
     public function addShiftPersonnel()
     {
         $input = $this->input->post();
-        $this->ShiftPersonnelModel->addShiftPersonnel([
+        $this->ShiftPersonelModel->addShiftPersonnel([
             'shift' => $input['shift'],
             'personnel' => implode(',', $input['personnel']) // Convert personnel array to string
         ]);
