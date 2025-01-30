@@ -142,9 +142,9 @@
                                             <label for="role" class="form-label">Select Role</label>
                                             <select name="role" id="role" class="form-select" required>
                                                 <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                                <option value="manager" <?php echo $user['role'] == 'manager' ? 'selected' : ''; ?>>Manager</option>
+                                                <option value="management" <?php echo $user['role'] == 'managemement' ? 'selected' : ''; ?>>Management</option>
                                                 <option value="supervisor" <?php echo $user['role'] == 'supervisor' ? 'selected' : ''; ?>>Supervisor</option>
-                                                <option value="technician" <?php echo $user['role'] == 'technician' ? 'selected' : ''; ?>>Technician</option>
+                                                <option value="teknisi" <?php echo $user['role'] == 'teknisi' ? 'selected' : ''; ?>>Teknisi</option>
                                             </select>
                                         </div>
                                         <div class="modal-footer">
