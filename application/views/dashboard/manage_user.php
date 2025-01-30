@@ -133,7 +133,7 @@
                         <div class="modal fade" id="updateRoleModal-<?php echo $user['id']; ?>" tabindex="-1" aria-labelledby="updateRoleModalLabel-<?php echo $user['id']; ?>" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <form action="<?php echo base_url('usercontroller/update_role/'.$user['id']); ?>" method="POST">
+                                    <form action="<?php echo base_url('manageuser/update_role/'.$user['id']); ?>" method="POST">
                                         <div class="modal-header">
                                             <h5 class="modal-title">Update Role</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -169,7 +169,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <a href="<?php echo base_url('usercontroller/delete_user/'.$user['id']); ?>" class="btn btn-danger">Delete</a>
+                                        <a href="<?php echo base_url('ManageUser/delete_user/'.$user['id']); ?>" class="btn btn-danger">Delete</a>
                                     </div>
                                 </div>
                             </div>

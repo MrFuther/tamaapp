@@ -51,7 +51,7 @@ class MasterData extends CI_Controller
     public function addShiftPersonnel()
     {
         $input = $this->input->post();
-        $this->ShiftPersonnelModel->addShiftPersonnel([
+        $this->ShiftPersonelModel->addShiftPersonnel([
             'shift' => $input['shift'],
             'personnel' => implode(',', $input['personnel']) // Convert personnel array to string
         ]);
