@@ -210,3 +210,6 @@ h5 {
   font-size: 0.9rem;
   color: #495057;
 }
+thead.table-dark th {
+  color: white !important; /* Warna teks menjadi putih */
+}
