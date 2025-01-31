@@ -2,6 +2,51 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMA Apps</title>
+    <!-- plugins:css -->
+  
+    <link rel="stylesheet" href="<?php echo base_url('vendors/feather/feather.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('vendors/css/vendor.bundle.base.css'); ?>">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+    <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
+  <!-- endinject -->
+    <link rel="shortcut icon" href="<?php echo base_url('images/favicon.png'); ?>" />
+    <style>
+        .progress-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            margin-bottom: 20px;
+        }
+
+        .progress-box .progress-label {
+            font-weight: bold;
+        }
+
+        .date-range {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .date-range input {
+            width: 45%;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+        <a class="navbar-brand brand-logo mr-5" href="<?php echo base_url('index.html'); ?>"><img src="assets/images/tama-logo.png" class="mr-2" alt="logo"/></a>
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -96,6 +141,7 @@
           </li>
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+              <img src="images/faces/face28.jpg" alt="profile"/>
               <i class="ti-user mx-0"></i> <?php echo $user['username']; ?>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
@@ -120,7 +166,20 @@
         </button>
       </div>
     </nav>
-    <!-- partial -->
+<div class="content">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <h5 class="navbar-brand mb-0">Hallo, <?php echo $user['username']; ?></h5>
+            <span class="badge badge-premium">as <?php echo ucfirst($user['role']); ?></span>
+
+            <!-- Dropdown for Logout -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <?php echo $user['username']; ?>
+
+     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
       <div class="theme-setting-wrapper">
@@ -240,6 +299,7 @@
                     <a class="nav-link" href="<?php echo base_url('dashboard'); ?>">
                     <i class="icon-grid menu-icon"></i>
                     <span class="menu-title">Dashboard</span>
+>>>>>>> e74c5de5b23d2ee965b81ec22f27b18386f04166
                     </a>
                 </li>
                 <li class="nav-item">
