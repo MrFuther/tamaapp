@@ -142,7 +142,11 @@
                                             <label for="role" class="form-label">Select Role</label>
                                             <select name="role" id="role" class="form-select" required>
                                                 <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+
                                                 <option value="management" <?php echo $user['role'] == 'management' ? 'selected' : ''; ?>>Management</option>
+
+                                                <option value="management" <?php echo $user['role'] == 'managemement' ? 'selected' : ''; ?>>Management</option>
+
                                                 <option value="supervisor" <?php echo $user['role'] == 'supervisor' ? 'selected' : ''; ?>>Supervisor</option>
                                                 <option value="teknisi" <?php echo $user['role'] == 'teknisi' ? 'selected' : ''; ?>>Teknisi</option>
                                             </select>
@@ -220,7 +224,6 @@
             </div>
         </div>
     </div>
-    
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-confirm">
