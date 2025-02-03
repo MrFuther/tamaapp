@@ -356,144 +356,111 @@
                                     </div>
                                 </div>
 
-                                <!-- Delete Confirmation Modal -->
-                                <div class="modal fade" id="deleteUserModal-<?php echo $user['id']; ?>" tabindex="-1" aria-labelledby="deleteUserModalLabel-<?php echo $user['id']; ?>" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Delete User</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Are you sure you want to delete the user <strong><?php echo $user['username']; ?></strong>?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <a href="<?php echo base_url('manageuser/delete_user/'.$user['id']); ?>" class="btn btn-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No users found.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                    </table>
-                  </div>
-                  <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form action="<?php echo base_url('manageuser/add_user'); ?>" method="POST">
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteUserModal-<?php echo $user['id']; ?>" tabindex="-1" aria-labelledby="deleteUserModalLabel-<?php echo $user['id']; ?>" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                                        <h5 class="modal-title">Delete User</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Username</label>
-                                            <input type="text" name="username" id="username" class="form-control" placeholder="Enter username" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="password" class="form-label">Password</label>
-                                            <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="role" class="form-label">Role</label>
-                                            <select name="role" id="role" class="form-control" required>
-                                                <option value="admin">Admin</option>
-                                                <option value="manager">Manager</option>
-                                                <option value="supervisor">Supervisor</option>
-                                                <option value="technician">Technician</option>
-                                            </select>
-                                        </div>
+                                        Are you sure you want to delete the user <strong><?php echo $user['username']; ?></strong>?
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Add User</button>
+                                        <a href="<?php echo base_url('manageuser/delete_user/'.$user['id']); ?>" class="btn btn-danger">Delete</a>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
-                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:../../partials/_footer.html -->
-        <footer class="footer">
-          <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021.  Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ml-1"></i></span>
-          </div>
-        </footer>
-        <!-- partial -->
-      </div>
-      <!-- main-panel ends -->
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="text-center">No users found.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
-    <div id="logoutModal" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Konfirmasi Logout</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Apakah Anda yakin ingin logout?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-primary" onclick="logout()">Logout</button>
-          </div>
+
+<!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="<?php echo base_url('manageuser/add_user'); ?>" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" name="username" id="username" class="form-control" placeholder="Enter username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select name="role" id="role" class="form-control" required>
+                                <option value="admin">Admin</option>
+                                <option value="management">Manager</option>
+                                <option value="supervisor">Supervisor</option>
+                                <option value="teknisi">Technician</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add User</button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
-    </div>  
-    <!-- page-body-wrapper ends -->
-  </div>
-  <!-- container-scroller -->
-  <script>
-    function showLogoutConfirmation() {
-    // Menampilkan modal
-    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
-    modal.show();
-    }
+    </div>
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+        // Fungsi untuk toggle sidebar
+        document.getElementById('toggle-sidebar').addEventListener('click', function () {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
 
-    function logout() {
-    // Implementasi logika logout di sini
-    alert("Anda telah logout.");
-    // Redirect ke halaman login atau halaman utama setelah logout
-    window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
-    }
-  </script>
-  <!-- plugins:js -->
-  <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <script src="<?php echo base_url('vendors/chart.js/Chart.min.js'); ?>"></script>
-  <script src="<?php echo base_url('vendors/datatables.net/jquery.dataTables.js'); ?>"></script>
-  <script src="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.js'); ?>"></script>
-  <script src="<?php echo base_url('js/dataTables.select.min.js'); ?>"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+            const content = document.querySelector('.content');
+            content.classList.toggle('collapsed'); // Update content margin when sidebar is collapsed
 
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="<?php echo base_url('js/off-canvas.js'); ?>"></script>
-  <script src="<?php echo base_url('js/hoverable-collapse.js'); ?>"></script>
-  <script src="<?php echo base_url('js/template.js'); ?>"></script>
-  <script src="<?php echo base_url('js/settings.js'); ?>"></script>
-  <script src="<?php echo base_url('js/todolist.js'); ?>"></script>
-  <!-- endinject -->
-  <!-- Custom js for this page-->
-  <script src="<?php echo base_url('js/dashboard.js'); ?>"></script>
-  <script src="<?php echo base_url('js/Chart.roundedBarCharts.js'); ?>"></script>
-  <!-- End custom js for this page-->
+            const icon = this.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+</script>
+<script src="<?php echo base_url('assets/js/dashboard.js'); ?>"></script>
 </body>
 
 </html>
