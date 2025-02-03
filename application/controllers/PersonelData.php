@@ -10,26 +10,26 @@ class PersonelData extends CI_Controller
             redirect('auth');
         }
         $this->load->model('MasterDataModel');
-        $this->load->model('ShiftPersonelModel');
+        $this->load->model('PersonelModel');
     }
 
     // Display the Master Data page
     public function index()
     {
-        $data['title'] = 'MasterData';
+        $data['title'] = 'PersonelData';
         $data['user'] = $this->session->userdata();
         $data['users'] = $this->MasterDataModel->getUsers(); // Fetch personnel list
-        $data['records'] = ['shifts' => $this->ShiftPersonelModel->getAllShiftPersonnel()];
-        $this->load->view('dashboard/master_data', $data);
+        $data['shifts'] = $this->PersonelModel->getAllShiftPersonnel();
+        $this->load->view('personel_data', $data);
     }
 
     public function addShiftPersonnel()
     {
         $input = $this->input->post();
-        $this->ShiftPersonelModel->addShiftPersonnel([
+        $this->PersonelModel->addShiftPersonnel([
             'shift' => $input['shift'],
             'personnel' => implode(',', $input['personnel']) // Convert personnel array to string
         ]);
-        redirect('MasterData');
+        redirect('PersonelData');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class MasterData extends CI_Controller
+class DeviceData extends CI_Controller
 {
     public function __construct()
     {
@@ -10,17 +10,19 @@ class MasterData extends CI_Controller
             redirect('auth');
         }
         $this->load->model('MasterDataModel');
+        $this->load->model('LocationModel');
         $this->load->model('DeviceModel');
     }
 
     // Display the Master Data page
     public function index()
     {
-        $data['title'] = 'MasterData';
+        $data['title'] = 'DeviceData';
         $data['user'] = $this->session->userdata();
         $data['users'] = $this->MasterDataModel->getUsers(); // Fetch personnel list
         $data['devices'] = $this->MasterDataModel->getAllDevices();
-        $this->load->view('dashboard/master_data', $data);
+        $data['locations'] = $this->LocationModel->getAllLocations();
+        $this->load->view('device_data', $data);
     }
 
     public function addDevice()
@@ -31,6 +33,6 @@ class MasterData extends CI_Controller
             'device_type' => $input['device_type'],
             'device_id' => $input['device_id'],
         ]);
-        redirect('MasterData');
+        redirect('DeviceData');
     }
 }

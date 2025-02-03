@@ -260,9 +260,9 @@
                     </a>
                     <div class="collapse" id="auth">
                     <ul class="nav flex-column sub-menu">
-                        <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Location Data </a></li>
-                        <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Devices Data </a></li>
-                        <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Personel Data </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('locationdata'); ?>"> Location Data </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('devicedata'); ?>"> Devices Data </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('personeldata'); ?>"> Personel Data </a></li>
                     </ul>
                     </div>
                 </li>

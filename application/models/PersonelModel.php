@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class ShiftPersonelModel extends CI_Model
+class PersonelModel extends CI_Model
 {
     /**
      * Get all shift and personnel data

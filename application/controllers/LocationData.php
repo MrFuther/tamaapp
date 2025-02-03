@@ -20,7 +20,7 @@ class LocationData extends CI_Controller
         $data['user'] = $this->session->userdata();
         $data['users'] = $this->MasterDataModel->getUsers(); // Fetch personnel list
         $data['locations'] = $this->LocationModel->getAllLocations();
-        $this->load->view('dashboard/master_data', $data);
+        $this->load->view('location_data', $data);
     }
 
     // Add a new record
@@ -28,6 +28,6 @@ class LocationData extends CI_Controller
     {
         $input = $this->input->post();
         $this->LocationModel->addLocation(['location_name' => $input['location_name']]);
-        redirect('MasterData');
+        redirect('LocationData');
     }
 }
