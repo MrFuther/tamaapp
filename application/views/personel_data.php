@@ -315,8 +315,7 @@
                                 <div class="mb-3">
                                     <label for="shift" class="form-label">Shift</label>
                                     <select class="form-select" id="shift" name="shift" required>
-                                        <option value="Pagi">Pagi</option>
-                                        <option value="Siang">Siang</option>
+                                        <option value="Pagi">Pagi</option>                                       
                                         <option value="Malam">Malam</option>
                                     </select>
                                 </div>

@@ -314,7 +314,7 @@
                                 <a href="#" class="btn btn-warning btn-sm mx-1">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="#" class="btn btn-success btn-sm mx-1">
+                                <a href="<?= base_url('activity/print_pdf/' . $activity['id']); ?>" class="btn btn-success btn-sm mx-1">
                                     <i class="fas fa-print"></i> Print
                                 </a>
                             </td>
