@@ -324,7 +324,7 @@
                     </table>
                   </div>
                   <div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
+                    <div class="modal-dialog custom-modal">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="addActivityModalLabel">Tambah Aktivitas</h5>
@@ -408,13 +408,10 @@
 
                                     <!-- Submit -->
                                     <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </div>
                     </div>
