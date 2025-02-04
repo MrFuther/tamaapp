@@ -439,28 +439,43 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-        // Fungsi untuk toggle sidebar
-        document.getElementById('toggle-sidebar').addEventListener('click', function () {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('collapsed');
+    function showLogoutConfirmation() {
+    // Menampilkan modal
+    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    modal.show();
+    }
 
-            const content = document.querySelector('.content');
-            content.classList.toggle('collapsed'); // Update content margin when sidebar is collapsed
+    function logout() {
+    // Implementasi logika logout di sini
+    alert("Anda telah logout.");
+    // Redirect ke halaman login atau halaman utama setelah logout
+    window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
+    }
+  </script>
+<!-- plugins:js -->
+<script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <script src="<?php echo base_url('vendors/chart.js/Chart.min.js'); ?>"></script>
+  <script src="<?php echo base_url('vendors/datatables.net/jquery.dataTables.js'); ?>"></script>
+  <script src="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.js'); ?>"></script>
+  <script src="<?php echo base_url('js/dataTables.select.min.js'); ?>"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 
-            const icon = this.querySelector('i');
-            if (sidebar.classList.contains('collapsed')) {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-right');
-            } else {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-left');
-            }
-        });
-</script>
-<script src="<?php echo base_url('assets/js/dashboard.js'); ?>"></script>
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="<?php echo base_url('js/off-canvas.js'); ?>"></script>
+  <script src="<?php echo base_url('js/hoverable-collapse.js'); ?>"></script>
+  <script src="<?php echo base_url('js/template.js'); ?>"></script>
+  <script src="<?php echo base_url('js/settings.js'); ?>"></script>
+  <script src="<?php echo base_url('js/todolist.js'); ?>"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <script src="<?php echo base_url('js/dashboard.js'); ?>"></script>
+  <script src="<?php echo base_url('js/Chart.roundedBarCharts.js'); ?>"></script>
+  <!-- End custom js for this page-->
 </body>
 
 </html>

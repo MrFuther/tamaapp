@@ -314,7 +314,7 @@
                                 <a href="#" class="btn btn-warning btn-sm mx-1">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="#" class="btn btn-success btn-sm mx-1">
+                                <a href="<?= base_url('activity/print_pdf/' . $activity['id']); ?>" class="btn btn-success btn-sm mx-1">
                                     <i class="fas fa-print"></i> Print
                                 </a>
                             </td>
@@ -408,13 +408,10 @@
 
                                     <!-- Submit -->
                                     <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </div>
                     </div>

@@ -41,12 +41,29 @@ class ActivityModel extends CI_Model
 
     public function getShifts()
     {
-        return ['Pagi', 'Siang', 'Malam'];
+        return ['Pagi', 'Malam'];
     }
 
     public function getPersonnel()
     {
         return $this->db->get('shift_personnel')->result_array();
+    }
+
+    public function get_activity_by_id($id) {
+        // Menulis query untuk mengambil data berdasarkan ID
+        $this->db->select('*'); // Memilih semua kolom
+        $this->db->from('activities'); // Tabel tempat data disimpan (sesuaikan nama tabelnya)
+        $this->db->where('id', $id); // Kondisi untuk mencari berdasarkan ID
+
+        // Menjalankan query dan mengembalikan hasilnya
+        $query = $this->db->get();
+
+        // Jika data ditemukan, mengembalikan hasilnya
+        if ($query->num_rows() > 0) {
+            return $query->row_array(); // Mengembalikan data dalam bentuk array
+        } else {
+            return null; // Jika tidak ditemukan data, mengembalikan null
+        }
     }
 
 }
