@@ -7,43 +7,57 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="<?php echo base_url('assets/images/tama-logo.png'); ?>" >
+
     <style>
         body {
-            background-color: #ffffff;
-            height: 100vh;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('<?php echo base_url("assets/images/bglogin.svg"); ?>');
+            background-size: cover;
+            background-position: center;
         }
         .login-container {
             display: flex;
-            height: 100vh;
-        }
-        .login-image {
-            flex: 1;
-            background-color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
             padding: 40px;
-        }
-        .login-image img {
-            max-width: 100%;
-            height: auto;
-        }
-        .login-form {
-            flex: 1;
-            background-color: #8BC34A;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 900px;
+            color: white;
             position: relative;
         }
+        .login-container .login-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container .login-image h2 {
+            font-size: 50px;
+            text-align: center;
+        }
+        .logo-group {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .logo-group img {
+            height: 50px;
+        }
         .login-box {
-            background: white;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.2);
             padding: 30px;
             border-radius: 10px;
-            max-width: 400px;
-            margin: 0 auto;
-            width: 100%;
+            backdrop-filter: blur(10px);
         }
         .logo-container {
             text-align: center;
@@ -54,32 +68,36 @@
             margin-bottom: 15px;
         }
         .logo-text {
-            color: #333;
-            font-size: 14px;
+            color: white;
+            font-size: 18px;
             margin-top: 10px;
         }
         .form-control {
             border-radius: 5px;
             padding: 12px;
             margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid #ccc;
+            color: white;
         }
         .btn-login {
-            background-color: #2196F3;
+            background: linear-gradient(to right, #006CB6, #15afbd);
             border: none;
             padding: 12px;
             border-radius: 5px;
             color: white;
             font-weight: 500;
             width: 100%;
+            transition: background 0.3s;
         }
         .btn-login:hover {
-            background-color: #1976D2;
+            background: linear-gradient(to left, #006CB6, #15afbd);
         }
         .remember-me {
             margin-bottom: 15px;
         }
         .form-check-label {
-            color: #666;
+            color: white;
             font-size: 14px;
         }
         .password-toggle {
@@ -91,89 +109,74 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #666;
+            color: #ccc;
         }
-        .logo-bumn {
-            position: absolute;
-            top: 20px;
-            left: 30px;
+        .social-links {
+            text-align: center;
+            margin-top: 20px;
         }
-        .logo-bumn img {
-            height: 80px;
+        .social-links a {
+            color: white;
+            font-size: 20px;
+            margin: 0 10px;
+            transition: color 0.3s;
         }
-        .logo-group {
-            position: absolute;
-            top: 28px;
-            right: 30px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .social-links a:hover {
+            color: #FEB47B;
         }
-        .logo-group img {
-            height: 60px;
-            max-width: 100px;
-        }
-        @media (max-width: 768px) {
-            .login-image {
-                display: none;
-            }
-            .login-form {
-                padding: 20px;
-            }
+        .lorem-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: white;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <!-- Left side - Illustration -->
-        <div class="login-image">
-            <img src="<?php echo base_url('assets/images/login-illustration.png'); ?>" alt="Login Illustration">
+        <!-- Logos on the top-left -->
+        <div class="logo-group">
+            <img src="<?php echo base_url('assets/images/bumn-logo.png'); ?>" alt="BUMN Logo">
+            <img src="<?php echo base_url('assets/images/injourney-logo.png'); ?>" alt="INJOURNEY Logo">
+            <img src="<?php echo base_url('assets/images/logo-soekarno.png'); ?>" alt="Soekarno Logo">
+            <img src="<?php echo base_url('assets/images/logo-it.png'); ?>" alt="IT Logo">
         </div>
-        
-        <!-- Right side - Login Form -->
-        <div class="login-form">
-            <!-- BUMN Logo on the left -->
-            <div class="logo-bumn">
-                <img src="<?php echo base_url('assets/images/bumn-logo.png'); ?>" alt="BUMN Logo">
+
+        <!-- Left side - Welcome text -->
+        <div class="login-image">
+            <h2>Welcome!</h2>
+        </div>
+
+        <!-- Right side - Login form -->
+        <div class="login-box">
+            <div class="logo-container">
+                <img src="<?php echo base_url('assets/images/tama-logo.png'); ?>" alt="TAMA Logo">
+                <div class="logo-text">
+                    Technical Activity<br>
+                    Maintenance Assistant
+                </div>
             </div>
-            
-            <!-- Other Logos on the right -->
-            <div class="logo-group">
-                <img src="<?php echo base_url('assets/images/injourney-logo.png'); ?>" alt="INJOURNEY Logo">
-                <img src="<?php echo base_url('assets/images/logo-soekarno.png'); ?>" alt="Soekarno Logo">
-                <img src="<?php echo base_url('assets/images/logo-it.png'); ?>" alt="IT Logo">
-            </div>
-            
-            <div class="login-box">
-                <div class="logo-container">
-                    <img src="<?php echo base_url('assets/images/tama-logo.png'); ?>" alt="TAMA Logo">
-                    <div class="logo-text">
-                        Technical Activity<br>
-                        Maintenance Assistant
+
+            <form id="loginForm" action="<?php echo base_url('auth/login'); ?>" method="post">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required autofocus>
+                </div>
+                <div class="mb-3 password-toggle">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    <i class="fas fa-eye-slash" id="togglePassword"></i>
+                </div>
+                <div class="remember-me">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe" name="remember_me">
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
                     </div>
                 </div>
+                <button type="submit" class="btn btn-login">Submit</button>
+            </form>
 
-                <form id="loginForm" action="<?php echo base_url('auth/login'); ?>" method="post">
-                    <div class="mb-3">
-                        <input type="text" class="form-control" id="username" name="username" 
-                               placeholder="Username" required>
-                    </div>
-                    <div class="mb-3 password-toggle">
-                        <input type="password" class="form-control" id="password" name="password" 
-                               placeholder="Password" required>
-                        <i class="fas fa-eye-slash" id="togglePassword"></i>
-                    </div>
-                    <div class="remember-me">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="rememberMe" name="remember_me">
-                            <label class="form-check-label" for="rememberMe">
-                                Remember me
-                            </label>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-login">Login</button>
-                </form>
-            </div>
+
         </div>
     </div>
 
