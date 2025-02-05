@@ -242,9 +242,12 @@
                     </a>
                     <div class="collapse" id="auth">
                     <ul class="nav flex-column sub-menu">
-                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('locationdata'); ?>"> Location Data </a></li>
-                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('devicedata'); ?>"> Devices Data </a></li>
-                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('personeldata'); ?>"> Personel Data </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('unitkerja'); ?>"> Master Unit Kerja </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('subunitkerja'); ?>"> Master Sub Unit </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('grouparea'); ?>"> Master Group Area </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('subarea'); ?>"> Master Sub Area </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('groupdevice'); ?>"> Master Group Device </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('subdevice'); ?>"> Master Group Area </a></li>
                     </ul>
                     </div>
                 </li>
