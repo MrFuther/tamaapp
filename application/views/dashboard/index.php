@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAMA Apps</title>
     <!-- plugins:css -->
-  
+     
     <link rel="stylesheet" href="<?php echo base_url('vendors/feather/feather.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/css/vendor.bundle.base.css'); ?>">
@@ -129,25 +129,6 @@
      <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
-      <div class="theme-setting-wrapper">
-        <div id="settings-trigger"><i class="ti-settings"></i></div>
-        <div id="theme-settings" class="settings-panel">
-          <i class="settings-close ti-close"></i>
-          <p class="settings-heading">SIDEBAR SKINS</p>
-          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
-          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark</div>
-          <p class="settings-heading mt-2">HEADER SKINS</p>
-          <div class="color-tiles mx-0 px-4">
-            <div class="tiles success"></div>
-            <div class="tiles warning"></div>
-            <div class="tiles danger"></div>
-            <div class="tiles info"></div>
-            <div class="tiles dark"></div>
-            <div class="tiles default"></div>
-          </div>
-        </div>
-      </div>
-      
       <div id="right-sidebar" class="settings-panel">
         <i class="settings-close ti-close"></i>
         <ul class="nav nav-tabs border-top" id="setting-panel" role="tablist">
@@ -286,15 +267,13 @@
                   <h6 class="font-weight-normal mb-0">All systems are running smoothly! You've login as <?php echo ucfirst($user['role']); ?></h6>
                 </div>
                 <div class="col-12 col-xl-4">
-<<<<<<< HEAD
                  <div class="justify-content-end d-flex">
                   <div class="dropdown flex-md-grow-1 flex-xl-grow-0">
                     <button class="btn btn-sm btn-light bg-white dropdown-toggle" type="button" id="dropdownMenuDate2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                     <i class="mdi mdi-calendar"></i> Today (10 Jan 2021)
+                     <i class="mdi mdi-calendar"></i> Today (05 Februari 2025)
                     </button>
                   </div>
                  </div>
-=======
                 <div class="justify-content-end d-flex">
                     <div class="dropdown flex-md-grow-1 flex-xl-grow-0">
                         <div class="mb-3 d-flex">
@@ -310,11 +289,9 @@
                           </div>
                           </div>
                     </div>
->>>>>>> f2e47c0cc7f42f7d6d4c2349b7d89a2a460f5fce
                 </div>
             </div>
           </div>
-<<<<<<< HEAD
           <div class="row">
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card tale-bg">
@@ -335,8 +312,6 @@
               </div>
             </div>
             <div class="col-md-6 grid-margin transparent">
-=======
->>>>>>> f2e47c0cc7f42f7d6d4c2349b7d89a2a460f5fce
               <div class="row">
                 <div class="col-md-3 mb-4 stretch-card transparent">
                   <div class="card card-tale">
@@ -410,10 +385,7 @@
                 <div class="card-body">
                  <div class="d-flex justify-content-between">
                   <p class="card-title">Sales Report</p>
-<<<<<<< HEAD
                   <a href="#" class="text-info">View all</a>
-=======
->>>>>>> f2e47c0cc7f42f7d6d4c2349b7d89a2a460f5fce
                  </div>
                   <p class="font-weight-500">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
                   <div id="sales-legend" class="chartjs-legend mt-4 mb-2"></div>
@@ -421,7 +393,6 @@
                 </div>
               </div>
             </div>
-<<<<<<< HEAD
           </div>
           <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
@@ -936,8 +907,6 @@
                 </div>
               </div>
             </div>
-=======
->>>>>>> f2e47c0cc7f42f7d6d4c2349b7d89a2a460f5fce
           </div>
           <div class="row">
             <div class="col-md-12 grid-margin stretch-card">

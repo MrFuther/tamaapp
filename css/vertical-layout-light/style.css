@@ -15709,7 +15709,7 @@ button.bg-secondary:focus {
 }
 
 .bg-success, .swal2-modal .swal2-buttonswrapper .swal2-styled.swal2-confirm, .settings-panel .color-tiles .tiles.success {
-  background-color: #57B657 !important;
+  background-color: #4069f7 !important;
 }
 
 a.bg-success:hover, .swal2-modal .swal2-buttonswrapper a.swal2-styled.swal2-confirm:hover, .settings-panel .color-tiles a.tiles.success:hover, a.bg-success:focus, .swal2-modal .swal2-buttonswrapper a.swal2-styled.swal2-confirm:focus, .settings-panel .color-tiles a.tiles.success:focus,
@@ -29105,7 +29105,7 @@ div.tagsinput span.tag a {
   width: 12px;
   height: 12px;
   border-radius: 100%;
-  background: #006cb6;
+  background: #4069f7;
   top: 1px;
   border: 1px solid #ffffff;
 }
