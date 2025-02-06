@@ -26,7 +26,7 @@
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
-    <?php include 'navbar.php'; ?>
+    <?php include APPPATH . 'views\dashboard\navbar.php'; ?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
@@ -141,7 +141,7 @@
       </div>
       <!-- partial -->
       <!-- partial:partials/_sidebar.html -->
-      <?php include 'sidebar.php'; ?>
+      <?php include APPPATH . 'views\dashboard\sidebar.php'; ?>
       <!-- partial -->
       <div class="main-panel">
       <div class="content-wrapper">
