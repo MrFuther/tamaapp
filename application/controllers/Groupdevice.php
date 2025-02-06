@@ -10,6 +10,7 @@ class Groupdevice extends CI_Controller {
         }
         $this->load->model('m_groupdevice');  // Load model groupdevice
         $this->load->model('m_subunitkerja');  // Load model subunitkerja untuk dropdown
+        $this->load->model('m_unitkerja'); // Load model unitkerja untuk dropdown
     }
 
     public function index() {
@@ -18,6 +19,7 @@ class Groupdevice extends CI_Controller {
         $data['groupdevice'] = $this->m_groupdevice->get_all();
         // Mendapatkan daftar sub unit kerja untuk dropdown di form
         $data['subunitkerja'] = $this->m_subunitkerja->get_all();
+        $data['unitkerja'] = $this->m_unitkerja->get_all();
         // Load tampilan
         $this->load->view('masterdata/groupdevice', $data);
     }
@@ -26,7 +28,8 @@ class Groupdevice extends CI_Controller {
         // Ambil data dari form input
         $data = [
             'nama_pekerjaanunit' => $this->input->post('nama_pekerjaanunit'),
-            'id_subunit' => $this->input->post('id_subunit')
+            'id_subunit' => $this->input->post('id_subunit'),
+            'id_unitkerja' => $this->input->post('id_unitkerja') // Menambahkan unitkerja ke data yang disimpan
         ];
 
         if ($this->input->post('id_groupdevice')) {

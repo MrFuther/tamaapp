@@ -291,6 +291,7 @@
                                     <tr>
                                         <th>Nama Pekerjaan Unit</th>
                                         <th>Sub Unit Kerja</th>
+                                        <th>Unit Kerja</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -299,6 +300,7 @@
                                         <tr>
                                             <td><?= $group->nama_pekerjaanunit; ?></td>
                                             <td><?= $group->nama_subunit; ?></td>
+                                            <td><?= $group->nama_unitkerja; ?></td>
                                             <td>
                                                 <a href="<?= base_url('groupdevice/index/' . $group->id_groupdevice); ?>" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
@@ -333,6 +335,15 @@
                                                     <option value="">-- Select Sub Unit Kerja --</option>
                                                     <?php foreach ($subunitkerja as $subunit): ?>
                                                         <option value="<?= $subunit->id_subunit; ?>"><?= $subunit->nama_subunit; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="id_unitkerja" class="form-label">Unit Kerja</label>
+                                                <select class="form-control" id="id_unitkerja" name="id_unitkerja" required>
+                                                    <option value="">-- Select Unit Kerja --</option>
+                                                    <?php foreach ($unitkerja as $unit): ?>
+                                                        <option value="<?= $unit->id_unitkerja; ?>"><?= $unit->nama_unitkerja; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
