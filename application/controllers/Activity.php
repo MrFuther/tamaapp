@@ -12,7 +12,7 @@ class Activity extends CI_Controller
         $this->load->model('ActivityModel');
         $this->load->model('MasterDataModel');
         $this->load->library('upload'); // Load library untuk upload file
-        $this->load->library('tcpdf'); // Load library tcpdf
+        $this->load->library('tcpdf');
     }
 
     public function index()
@@ -142,8 +142,6 @@ class Activity extends CI_Controller
         // Output the PDF
         $pdf->Output($filename . '.pdf', 'I');
     }
-    
-    
 
     private function _uploadFile($fieldName)
     {

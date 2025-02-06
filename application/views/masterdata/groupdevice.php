@@ -26,7 +26,102 @@
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
-    
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+        <a class="navbar-brand brand-logo mr-5" href="<?php echo base_url('dashboard'); ?>"><img src="<?php echo base_url('assets/images/tama-logo.svg'); ?>" class="mr-2" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="<?php echo base_url('dashboard'); ?>"><img src="<?php echo base_url('assets/images/tama-logo.png'); ?>" alt="logo"/></a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+          <span class="icon-menu"></span>
+        </button>
+        <ul class="navbar-nav mr-lg-2">
+          <li class="nav-item nav-search d-none d-lg-block">
+            <div class="input-group">
+              <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+                <span class="input-group-text" id="search">
+                  <i class="icon-search"></i>
+                </span>
+              </div>
+              <input type="text" class="form-control" id="navbar-search-input" placeholder="Search now" aria-label="search" aria-describedby="search">
+            </div>
+          </li>
+        </ul>
+        <ul class="navbar-nav navbar-nav-right">
+          <li class="nav-item dropdown">
+            <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+              <i class="icon-bell mx-0"></i>
+              <span class="count"></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+              <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-success">
+                    <i class="ti-info-alt mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
+                  <p class="font-weight-light small-text mb-0 text-muted">
+                    Just now
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-warning">
+                    <i class="ti-settings mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <h6 class="preview-subject font-weight-normal">Settings</h6>
+                  <p class="font-weight-light small-text mb-0 text-muted">
+                    Private message
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-info">
+                    <i class="ti-user mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
+                  <p class="font-weight-light small-text mb-0 text-muted">
+                    2 days ago
+                  </p>
+                </div>
+              </a>
+            </div>
+          </li>
+          <li class="nav-item nav-profile dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+              <i class="ti-user mx-0"></i> <?php echo $user['username']; ?>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+              <a class="dropdown-item">
+                <i class="ti-settings text-primary"></i>
+                Settings
+              </a>
+              <a class="dropdown-item" href="#" onclick="showLogoutConfirmation()">
+                <i class="ti-power-off text-primary"></i>
+                Logout
+              </a>
+            </div>
+          </li>
+          <li class="nav-item nav-settings d-none d-lg-flex">
+            <a class="nav-link" href="#">
+              <i class="icon-ellipsis"></i>
+            </a>
+          </li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+          <span class="icon-menu"></span>
+        </button>
+      </div>
+    </nav>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
@@ -163,7 +258,7 @@
                     </a>
                     <div class="collapse" id="auth">
                     <ul class="nav flex-column sub-menu">
-                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('unitkerja'); ?>"> Master Unit Kerja </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('locationdata'); ?>"> Location Data </a></li>
                         <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('devicedata'); ?>"> Devices Data </a></li>
                         <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('personeldata'); ?>"> Personel Data </a></li>
                     </ul>
@@ -179,152 +274,82 @@
         </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
+      <div class="content-wrapper">
+        <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <h6 class="card-title">Activity</h6>
-                  <p class="card-description">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">
-                        <i class="fas fa-plus-circle"></i> Tambah
-                    </button>
-                  </p>
-                  <div class="table-responsive">
-                    <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center">No.</th>
-                            <th class="text-center">Tanggal</th>
-                            <th class="text-center">Lokasi</th>
-                            <th class="text-center">Device</th>
-                            <th class="text-center">Shift</th>
-                            <th class="text-center">Personil</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($activities as $index => $activity): ?>
-                        <tr>
-                            <td class="text-center"><?= $index + 1; ?></td>
-                            <td class="text-center"><?= $activity['tanggal']; ?></td>
-                            <td class="text-center"><?= $activity['lokasi']; ?></td>
-                            <td class="text-center"><?= $activity['device']; ?></td>
-                            <td class="text-center"><?= $activity['shift']; ?></td>
-                            <td class="text-center"><?= $activity['personil']; ?></td>
-                            <td class="text-center">
-                                <a href="<?= base_url('activity/delete/' . $activity['id']); ?>" class="btn btn-danger btn-sm mx-1">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
-                                <a href="#" class="btn btn-warning btn-sm mx-1">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a href="<?= base_url('activity/print_pdf/' . $activity['id']); ?>" class="btn btn-success btn-sm mx-1">
-                                    <i class="fas fa-print"></i> Print
-                                </a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                    </table>
-                  </div>
-                  <div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
-                    <div class="modal-dialog custom-modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="addActivityModalLabel">Tambah Aktivitas</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="<?= base_url('activity/add'); ?>" method="post" enctype="multipart/form-data">
-                                    <!-- Tanggal -->
-                                    <div class="mb-3">
-                                        <label for="tanggal" class="form-label">Tanggal</label>
-                                        <input type="date" class="form-control" id="tanggal" name="tanggal" required>
-                                    </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Group Device</h6>
+                        <p class="card-description">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGroupDeviceModal">
+                                <i class="fas fa-plus-circle"></i> Tambah
+                            </button>
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Pekerjaan Unit</th>
+                                        <th>Sub Unit Kerja</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($groupdevice as $group): ?>
+                                        <tr>
+                                            <td><?= $group->nama_pekerjaanunit; ?></td>
+                                            <td><?= $group->nama_subunit; ?></td>
+                                            <td>
+                                                <a href="<?= base_url('groupdevice/index/' . $group->id_groupdevice); ?>" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <a href="<?= base_url('groupdevice/delete/' . $group->id_groupdevice); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus group device ini?')">
+                                                    <i class="fas fa-trash-alt"></i> Hapus
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
 
-                                    <!-- Lokasi -->
-                                    <div class="mb-3">
-                                        <label for="lokasi" class="form-label">Lokasi</label>
-                                        <select class="form-select" id="lokasi" name="lokasi" required>
-                                            <option selected disabled>Pilih Lokasi</option>
-                                            <?php foreach ($locations as $location): ?>
-                                            <option value="<?= $location['location_name']; ?>"><?= $location['location_name']; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
+                        <!-- Modal untuk Tambah Group Device -->
+                        <div class="modal fade" id="addGroupDeviceModal" tabindex="-1" aria-labelledby="addGroupDeviceModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addGroupDeviceModalLabel">Tambah Group Device</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-
-                                    <!-- Device Type -->
-                                    <div class="mb-3">
-                                        <label for="device_type" class="form-label">Device Type</label>
-                                        <select class="form-select" id="device_type" name="device_type" required>
-                                            <option selected disabled>Pilih Device Type</option>
-                                            <?php foreach ($device_types as $device_type): ?>
-                                            <option value="<?= $device_type['device_type']; ?>"><?= $device_type['device_type']; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                    <div class="modal-body">
+                                        <form action="<?= base_url('groupdevice/save'); ?>" method="post" enctype="multipart/form-data">
+                                            <div class="mb-3">
+                                                <label for="nama_pekerjaanunit" class="form-label">Nama Pekerjaan Unit</label>
+                                                <input type="text" class="form-control" id="nama_pekerjaanunit" name="nama_pekerjaanunit" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="id_subunit" class="form-label">Sub Unit Kerja</label>
+                                                <select class="form-control" id="id_subunit" name="id_subunit" required>
+                                                    <option value="">-- Select Sub Unit Kerja --</option>
+                                                    <?php foreach ($subunitkerja as $subunit): ?>
+                                                        <option value="<?= $subunit->id_subunit; ?>"><?= $subunit->nama_subunit; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                            </div>
+                                        </form>
                                     </div>
-
-                                    <!-- Device ID (Dynamic based on Device Type) -->
-                                    <div class="mb-3">
-                                        <label for="device_id" class="form-label">Device ID</label>
-                                        <select class="form-select" id="device_id" name="device" required>
-                                            <option selected disabled>Pilih Device ID</option>
-                                            <?php foreach ($devices as $device): ?>
-                                            <option value="<?= $device['device_id']; ?>"><?= $device['device_id']; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <!-- Shift -->
-                                    <div class="mb-3">
-                                        <label for="shift" class="form-label">Shift</label>
-                                        <select class="form-select" id="shift" name="shift" required>
-                                            <option selected disabled>Pilih Shift</option>
-                                            <?php foreach ($shifts as $shift): ?>
-                                            <option value="<?= $shift; ?>"><?= $shift; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <!-- Personil -->
-                                    <div class="mb-3">
-                                        <label for="personnel" class="form-label">Personil</label>
-                                        <select class="form-select" id="personnel" name="personnel[]" multiple required>
-                                            <?php foreach ($personnel as $person): ?>
-                                            <option value="<?= $person['personnel']; ?>"><?= $person['personnel']; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <!-- Foto -->
-                                    <div class="mb-3">
-                                        <label for="devicePhoto" class="form-label">Foto Perangkat</label>
-                                        <input type="file" class="form-control" id="devicePhoto" name="devicePhoto" accept="image/*">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="locationPhoto" class="form-label">Foto Lokasi</label>
-                                        <input type="file" class="form-control" id="locationPhoto" name="locationPhoto" accept="image/*">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="personnelPhoto" class="form-label">Foto Teknisi</label>
-                                        <input type="file" class="form-control" id="personnelPhoto" name="personnelPhoto" accept="image/*">
-                                    </div>
-
-                                    <!-- Submit -->
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
+
                     </div>
-                  </div>
                 </div>
-              </div>
             </div>
-          </div>
+        </div>
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->
