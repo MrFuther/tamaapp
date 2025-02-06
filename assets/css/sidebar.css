@@ -1,0 +1,25 @@
+.sidebar {
+    padding-top: 20px; /* Menambahkan padding pada bagian atas sidebar */
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px; /* Menjaga jarak yang sama antara ikon dan teks */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, padding-left 0.3s ease;
+  }
+  
+  .nav-link i {
+    font-size: 18px; /* Menjaga ukuran ikon yang sama */
+    margin-right: 15px; /* Memberikan jarak yang konsisten antara ikon dan teks */
+  }
+  
+sidebar-logo img {
+    transform: none; /* Menghapus transformasi yang mungkin ada */
+}
+  
+  .sidebar .nav-link:hover {
+    background-color: #138f9f;
+    padding-left: 25px;
+  }
