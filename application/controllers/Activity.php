@@ -107,10 +107,9 @@ class Activity extends CI_Controller
         $pdf->SetFont('helvetica', '', 11);
 
         // Add content from database
-        $pdf->Ln(10);
+        $pdf->Ln(3);
         $pdf->Cell(50, 8, 'Tanggal / Bulan / Tahun:', 0, 0);
         $pdf->Cell(0, 8, $doc_date, 0, 1);
-
         $pdf->Cell(50, 8, 'Lokasi:', 0, 0);
         $pdf->Cell(0, 8, !empty($activity['lokasi']) ? $activity['lokasi'] : 'N/A', 0, 1);
 
@@ -123,17 +122,36 @@ class Activity extends CI_Controller
         $pdf->Cell(50, 8, 'Personil:', 0, 0);
         $pdf->Cell(0, 8, !empty($activity['personil']) ? $activity['personil'] : 'N/A', 0, 1);
 
-        $pdf->Ln(10);
-        
+        $pdf->Ln(5);
         $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 1, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 1, 'C');
+        $pdf->ln(5);
+        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
+        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
+        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 1, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 1, 'C');
+        $pdf->ln(5);
+        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
+        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
+        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 40, 'Foto', 1, 1, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
+        $pdf->Cell(60, 12, 'Deskripsi', 1, 1, 'C');
         // Add images
 
         // Generate filename
