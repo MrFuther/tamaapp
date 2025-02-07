@@ -206,13 +206,24 @@
                                         <input type="date" class="form-control" id="tanggal" name="tanggal" required>
                                     </div>
 
-                                    <!-- Lokasi -->
+                                    <!-- Group Area -->
                                     <div class="mb-3">
-                                        <label for="lokasi" class="form-label">Lokasi</label>
-                                        <select class="form-select" id="lokasi" name="lokasi" required>
-                                            <option selected disabled>Pilih Lokasi</option>
-                                            <?php foreach ($locations as $location): ?>
-                                            <option value="<?= $location['location_name']; ?>"><?= $location['location_name']; ?></option>
+                                        <label for="group_area" class="form-label">Group Area</label>
+                                        <select class="form-select" id="group_area" name="group_area" required>
+                                            <option selected disabled>Pilih Group Area</option>
+                                            <?php foreach ($group_areas as $group_area): ?>
+                                            <option value="<?= $group_area['id']; ?>"><?= $group_area['name']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <!-- Sub Area -->
+                                    <div class="mb-3">
+                                        <label for="sub_area" class="form-label">Sub Area</label>
+                                        <select class="form-select" id="sub_area" name="sub_area[]" multiple required>
+                                            <option selected disabled>Pilih Sub Area</option>
+                                            <?php foreach ($sub_areas as $sub_area): ?>
+                                            <option value="<?= $sub_area['id']; ?>"><?= $sub_area['name']; ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -336,6 +347,24 @@
     // Redirect ke halaman login atau halaman utama setelah logout
     window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
     }
+  </script>
+  <script>
+    $(document).ready(function() {
+        $('#group_area').change(function() {
+            var groupId = $(this).val();
+            $.ajax({
+                url: '<?= base_url('activity/get_sub_areas'); ?>', // Ganti dengan URL yang sesuai
+                type: 'POST',
+                data: {group_id: groupId},
+                success: function(response) {
+                    $('#sub_area').empty(); // Kosongkan sub_area
+                    $.each(response, function(index, sub_area) {
+                        $('#sub_area').append('<option value="' + sub_area.id + '">' + sub_area.name + '</option>');
+                    });
+                }
+            });
+        });
+    });
   </script>
   <!-- plugins:js -->
   <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>

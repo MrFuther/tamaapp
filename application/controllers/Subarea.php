@@ -25,13 +25,13 @@ class Subarea extends CI_Controller {
     public function save() {
         // Ambil data dari form input
         $data = [
-            'nama_subarea' => $this->input->post('nama_subarea'),
-            'id_grouparea' => $this->input->post('id_grouparea')
+            'sub_area_name' => $this->input->post('sub_area_name'),
+            'area_id' => $this->input->post('area_id')
         ];
 
-        if ($this->input->post('id_subgrouparea')) {
+        if ($this->input->post('sub_area_id')) {
             // Update sub area
-            $this->m_subarea->update($this->input->post('id_subgrouparea'), $data);
+            $this->m_subarea->update($this->input->post('sub_area_id'), $data);
         } else {
             // Insert sub area baru
             $this->m_subarea->insert($data);

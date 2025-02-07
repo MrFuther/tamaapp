@@ -66,4 +66,14 @@ class ActivityModel extends CI_Model
         }
     }
 
+    public function getSubAreasByGroup($group_id) {
+        // Mengambil sub-area berdasarkan group area
+        $this->db->select('id_subgrouparea AS id, nama_subarea AS name');
+        $this->db->from('ms_subgrouparea');
+        $this->db->where('id_grouparea', $group_id);
+        $query = $this->db->get();
+
+        // Mengembalikan hasil sebagai array
+        return $query->result_array();
+    }
 }

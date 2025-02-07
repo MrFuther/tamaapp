@@ -27,14 +27,14 @@ class Groupdevice extends CI_Controller {
     public function save() {
         // Ambil data dari form input
         $data = [
-            'nama_pekerjaanunit' => $this->input->post('nama_pekerjaanunit'),
+            'pek_unit_name' => $this->input->post('pek_unit_name'),
             'id_subunit' => $this->input->post('id_subunit'),
             'id_unitkerja' => $this->input->post('id_unitkerja') // Menambahkan unitkerja ke data yang disimpan
         ];
 
-        if ($this->input->post('id_groupdevice')) {
+        if ($this->input->post('pek_unit_id')) {
             // Update group device
-            $this->m_groupdevice->update($this->input->post('id_groupdevice'), $data);
+            $this->m_groupdevice->update($this->input->post('pek_unit_id'), $data);
         } else {
             // Insert group device baru
             $this->m_groupdevice->insert($data);

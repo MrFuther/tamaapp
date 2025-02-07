@@ -11,6 +11,7 @@ class Activity extends CI_Controller
         }
         $this->load->model('ActivityModel');
         $this->load->model('MasterDataModel');
+        $this->load->model('AreaModel');
         $this->load->library('upload'); // Load library untuk upload file
         $this->load->library('tcpdf');
     }
@@ -26,6 +27,7 @@ class Activity extends CI_Controller
         $data['device_types'] = $this->ActivityModel->getDeviceTypes();
         $data['shifts'] = $this->ActivityModel->getShifts();
         $data['personnel'] = $this->ActivityModel->getPersonnel();
+        $data['group_areas'] = $this->AreaModel->getAllGroupAreas();
         $this->load->view('dashboard/activity', $data);
     }
 
@@ -34,6 +36,16 @@ class Activity extends CI_Controller
         $input = $this->input->post();
 
         // Validasi input
+        if (!isset($input['group_area']) || empty($input['group_area'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Group Area is required']);
+            return;
+        }
+
+        if (!isset($input['sub_area']) || empty($input['sub_area'])) {
+            echo json_encode(['status' => 'error', 'message' => 'At least one Sub Area is required']);
+            return;
+        }
+
         if (!isset($input['device']) || empty($input['device'])) {
             echo json_encode(['status' => 'error', 'message' => 'Device is required']);
             return;
@@ -52,7 +64,8 @@ class Activity extends CI_Controller
         // Simpan data ke database
         $data = [
             'tanggal' => $input['tanggal'],
-            'lokasi' => $input['lokasi'],
+            'group_area' => $input['group_area'], // Menyimpan Group Area
+            'sub_area' => implode(',', $input['sub_area']), // Menggabungkan sub_area menjadi string
             'device' => $input['device'],
             'shift' => $input['shift'],
             'personil' => implode(', ', $input['personnel']),
@@ -76,6 +89,20 @@ class Activity extends CI_Controller
     $device_type = $this->input->get('device_type');
     $devices = $this->ActivityModel->getDevicesByType($device_type);
     echo json_encode($devices);
+    }
+    
+    
+    // Method untuk mendapatkan semua grup area
+    public function get_group_areas() {
+        $group_areas = $this->AreaModel->getAllGroupAreas(); // Implementasikan method ini di model Anda
+        echo json_encode($group_areas);
+    }
+
+    // Method untuk mendapatkan sub-area berdasarkan grup area
+    public function get_sub_areas() {
+        $group_id = $this->input->post('group_id');
+        $sub_areas = $this->AreaModel->getSubAreasByGroup($group_id); // Menggunakan method yang sudah Anda buat
+        echo json_encode($sub_areas);
     }
 
     public function print_pdf($id) {

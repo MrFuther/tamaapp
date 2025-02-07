@@ -22,13 +22,13 @@ class Unitkerja extends CI_Controller {
     public function save() {
         // Ambil data dari form input
         $data = [
-            'nama_unitkerja' => $this->input->post('nama_unitkerja'),
+            'unit_name' => $this->input->post('unit_name'),
             'inisial_unit' => $this->input->post('inisial_unit')
         ];
 
-        if ($this->input->post('id_unitkerja')) {
+        if ($this->input->post('unit_id')) {
             // Update unit kerja
-            $this->m_unitkerja->update($this->input->post('id_unitkerja'), $data);
+            $this->m_unitkerja->update($this->input->post('unit_id'), $data);
         } else {
             // Insert unit kerja baru
             $this->m_unitkerja->insert($data);
