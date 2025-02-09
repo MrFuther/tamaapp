@@ -10,18 +10,18 @@ public function __construct() {
 
 // Method untuk mendapatkan semua grup area
 public function getAllGroupAreas() {
-    $this->db->select('id_grouparea AS id, nama_grouparea AS name');
-    $this->db->from('ms_grouparea');
+    $this->db->select('area_id AS id, area_name AS name');
+    $this->db->from('ms_area');
     $query = $this->db->get();
 
     return $query->result_array();
 }
 
 // Method untuk mendapatkan sub-area berdasarkan group area
-public function getSubAreasByGroup($group_id) {
-    $this->db->select('id_subgrouparea AS id, nama_subarea AS name');
-    $this->db->from('ms_subgrouparea');
-    $this->db->where('id_grouparea', $group_id);
+public function getSubAreasByGroup($area_id) {
+    $this->db->select('sub_area_id AS id, sub_area_name AS name');
+    $this->db->from('ms_sub_area');
+    $this->db->where('gr_area_name', $area_id);
     $query = $this->db->get();
 
     return $query->result_array();

@@ -36,16 +36,6 @@ class Activity extends CI_Controller
         $input = $this->input->post();
 
         // Validasi input
-        if (!isset($input['group_area']) || empty($input['group_area'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Group Area is required']);
-            return;
-        }
-
-        if (!isset($input['sub_area']) || empty($input['sub_area'])) {
-            echo json_encode(['status' => 'error', 'message' => 'At least one Sub Area is required']);
-            return;
-        }
-
         if (!isset($input['device']) || empty($input['device'])) {
             echo json_encode(['status' => 'error', 'message' => 'Device is required']);
             return;
@@ -104,6 +94,72 @@ class Activity extends CI_Controller
         $sub_areas = $this->AreaModel->getSubAreasByGroup($group_id); // Menggunakan method yang sudah Anda buat
         echo json_encode($sub_areas);
     }
+
+    public function get_activity_data($activityId)
+    {
+        // Mengambil data aktivitas dan dokumentasi
+        $activity = $this->ActivityModel->get_activity_by_id($activityId);
+        $documentation = $this->ActivityModel->get_documentation_by_activity($activityId);
+
+        // Mengembalikan data dalam format JSON
+        echo json_encode([
+            'activity' => $activity,
+            'documentation' => $documentation
+        ]);
+    }
+
+    public function add_documentation()
+    {
+        // Cek apakah ada file foto yang diupload
+        if (empty($_FILES['newPhotos']['name'][0])) {
+            echo json_encode(['status' => 'error', 'message' => 'Minimal 3 foto harus diunggah.']);
+            return;
+        }
+
+        // Menyiapkan array untuk menyimpan nama file foto yang diupload
+        $newPhotos = [];
+
+        // Upload foto satu per satu
+        for ($i = 0; $i < count($_FILES['newPhotos']['name']); $i++) {
+            $_FILES['file']['name'] = $_FILES['newPhotos']['name'][$i];
+            $_FILES['file']['type'] = $_FILES['newPhotos']['type'][$i];
+            $_FILES['file']['tmp_name'] = $_FILES['newPhotos']['tmp_name'][$i];
+            $_FILES['file']['error'] = $_FILES['newPhotos']['error'][$i];
+            $_FILES['file']['size'] = $_FILES['newPhotos']['size'][$i];
+
+            // Mengatur konfigurasi upload
+            $config['upload_path'] = './uploads/';
+            $config['allowed_types'] = 'jpg|jpeg|png';
+            $config['max_size'] = 2048; // 2MB
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('file')) {
+                // Menyimpan nama file yang berhasil diupload
+                $newPhotos[] = $this->upload->data('file_name');
+            }
+        }
+
+        // Validasi apakah 3 foto sudah diupload
+        if (count($newPhotos) < 3) {
+            echo json_encode(['status' => 'error', 'message' => 'Minimal 3 foto harus diunggah.']);
+            return;
+        }
+
+        // Simpan data dokumentasi ke dalam database
+        $documentationData = [
+            'activity_id' => $this->input->post('activity_id'), // ID aktivitas terkait
+            'photo1' => $newPhotos[0],
+            'photo2' => $newPhotos[1],
+            'photo3' => $newPhotos[2],
+        ];
+
+        // Menyimpan dokumentasi ke dalam tabel
+        $this->db->insert('documentation', $documentationData);
+
+        // Mengembalikan respons sukses
+        echo json_encode(['status' => 'success', 'message' => 'Dokumentasi berhasil ditambahkan.']);
+    }
+
 
     public function print_pdf($id) {
         // Ambil data untuk PDF (modifikasi sesuai dengan logika aplikasi Anda)

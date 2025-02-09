@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/mdi/css/materialdesignicons.min.css'); ?>">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
@@ -155,40 +157,41 @@
                   </p>
                   <div class="table-responsive">
                     <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center">No.</th>
-                            <th class="text-center">Tanggal</th>
-                            <th class="text-center">Lokasi</th>
-                            <th class="text-center">Device</th>
-                            <th class="text-center">Shift</th>
-                            <th class="text-center">Personil</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($activities as $index => $activity): ?>
-                        <tr>
-                            <td class="text-center"><?= $index + 1; ?></td>
-                            <td class="text-center"><?= $activity['tanggal']; ?></td>
-                            <td class="text-center"><?= $activity['lokasi']; ?></td>
-                            <td class="text-center"><?= $activity['device']; ?></td>
-                            <td class="text-center"><?= $activity['shift']; ?></td>
-                            <td class="text-center"><?= $activity['personil']; ?></td>
-                            <td class="text-center">
-                                <a href="<?= base_url('activity/delete/' . $activity['id']); ?>" class="btn btn-danger btn-sm mx-1">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
-                                <a href="#" class="btn btn-warning btn-sm mx-1">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <a href="<?= base_url('activity/print_pdf/' . $activity['id']); ?>" class="btn btn-success btn-sm mx-1">
-                                    <i class="fas fa-print"></i> Print
-                                </a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
+                        <thead>
+                            <tr>
+                                <th class="text-center">No.</th>
+                                <th class="text-center">Tanggal</th>
+                                <th class="text-center">Lokasi</th>
+                                <th class="text-center">Device</th>
+                                <th class="text-center">Shift</th>
+                                <th class="text-center">Personil</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($activities as $index => $activity): ?>
+                            <tr>
+                                <td class="text-center"><?= $index + 1; ?></td>
+                                <td class="text-center"><?= $activity['tanggal']; ?></td>
+                                <td class="text-center"><?= $activity['lokasi']; ?></td>
+                                <td class="text-center"><?= $activity['device']; ?></td>
+                                <td class="text-center"><?= $activity['shift']; ?></td>
+                                <td class="text-center"><?= $activity['personil']; ?></td>
+                                <td class="text-center">
+                                    <a href="<?= base_url('activity/delete/' . $activity['id']); ?>" class="btn btn-danger btn-sm mx-1">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                    <!-- Tombol Edit untuk membuka modal -->
+                                    <button class="btn btn-warning btn-sm mx-1" onclick="editActivity(<?= $activity['id'] ?>)">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <a href="<?= base_url('activity/print_pdf/' . $activity['id']); ?>" class="btn btn-success btn-sm mx-1">
+                                        <i class="fas fa-print"></i> Print
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
                     </table>
                   </div>
                   <div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
@@ -270,32 +273,104 @@
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
-
-                                    <!-- Foto -->
-                                    <div class="mb-3">
-                                        <label for="devicePhoto" class="form-label">Foto Perangkat</label>
-                                        <input type="file" class="form-control" id="devicePhoto" name="devicePhoto" accept="image/*">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="locationPhoto" class="form-label">Foto Lokasi</label>
-                                        <input type="file" class="form-control" id="locationPhoto" name="locationPhoto" accept="image/*">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="personnelPhoto" class="form-label">Foto Teknisi</label>
-                                        <input type="file" class="form-control" id="personnelPhoto" name="personnelPhoto" accept="image/*">
-                                    </div>
-
-                                    <!-- Submit -->
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
                                 </form>
                             </div>
                         </div>
                     </div>
                   </div>
-                </div>
+                  <!-- Modal Edit Activity -->
+                  <div id="editModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="editModalLabel">Edit Activity</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                  </button>
+                              </div>
+                              <div class="modal-body">
+                                  <form id="editActivityForm" enctype="multipart/form-data">
+                                      <!-- Input fields for activity data -->
+                                      <div class="form-group">
+                                          <label for="tanggal">Tanggal</label>
+                                          <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+                                      </div>
+                                      <div class="form-group">
+                                          <label for="lokasi">Lokasi</label>
+                                          <input type="text" class="form-control" id="lokasi" name="lokasi" required>
+                                      </div>
+                                      <div class="form-group">
+                                          <label for="device">Device</label>
+                                          <input type="text" class="form-control" id="device" name="device" required>
+                                      </div>
+                                      <div class="form-group">
+                                          <label for="shift">Shift</label>
+                                          <select class="form-control" id="shift" name="shift" required>
+                                              <option value="Pagi">Pagi</option>
+                                              <option value="Malam">Malam</option>
+                                          </select>
+                                      </div>
+
+                                      <h5>Dokumentasi</h5>
+                                      <table class="table">
+                                          <thead>
+                                              <tr>
+                                                  <th>Foto 1</th>
+                                                  <th>Foto 2</th>
+                                                  <th>Foto 3</th>
+                                              </tr>
+                                          </thead>
+                                          <tbody id="documentationTable">
+                                              <!-- Existing photos will be inserted here dynamically -->
+                                          </tbody>
+                                      </table>
+
+                                      <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addDocumentationModal">
+                                          <i class="fas fa-plus-circle"></i> Tambah Dokumentasi
+                                      </button>
+                                      
+                                      <button type="submit" class="btn btn-success">Simpan</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- Modal Tambah Dokumentasi -->
+                  <div id="addDocumentationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addDocumentationModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="addDocumentationModalLabel">Tambah Dokumentasi</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                  <form id="addDocumentationForm" enctype="multipart/form-data">
+                                      <!-- Input untuk 3 foto -->
+                                      <div class="mb-3">
+                                          <label for="photo1" class="form-label">Foto 1</label>
+                                          <input type="file" class="form-control-file" id="photo1" name="newPhotos[]" required>
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="photo2" class="form-label">Foto 2</label>
+                                          <input type="file" class="form-control-file" id="photo2" name="newPhotos[]" required>
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="photo3" class="form-label">Foto 3</label>
+                                          <input type="file" class="form-control-file" id="photo3" name="newPhotos[]" required>
+                                      </div>
+
+                                      <button type="submit" class="btn btn-success">Tambah Dokumentasi</button>
+                                  </form>
+                              </div>
+                              <div class="modal-footer">
+                                  <!-- Tombol Kembali ke Modal Edit Activity -->
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editModal">
+                                      Kembali
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
             </div>
           </div>
@@ -347,6 +422,70 @@
     // Redirect ke halaman login atau halaman utama setelah logout
     window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
     }
+  </script>
+  <script>
+  // JavaScript untuk menangani klik tombol Edit dan menampilkan modal
+  function editActivity(activityId) {
+      $.ajax({
+          url: '<?= base_url('activity/get_activity_data') ?>/' + activityId,
+          method: 'GET',
+          dataType: 'json',
+          success: function(data) {
+              // Isi modal dengan data aktivitas
+              $('#tanggal').val(data.activity.tanggal);
+              $('#lokasi').val(data.activity.lokasi);
+              $('#device').val(data.activity.device);
+              $('#shift').val(data.activity.shift);
+
+              // Hapus baris dokumentasi yang lama
+              $('#documentationTable').empty();
+
+              // Masukkan foto-foto ke dalam tabel dokumentasi
+              data.documentation.forEach(function(photoRow) {
+                  $('#documentationTable').append(`
+                      <tr>
+                          <td><img src="<?= base_url('uploads/') ?>${photoRow.photo1}" width="100"></td>
+                          <td><img src="<?= base_url('uploads/') ?>${photoRow.photo2}" width="100"></td>
+                          <td><img src="<?= base_url('uploads/') ?>${photoRow.photo3}" width="100"></td>
+                      </tr>
+                  `);
+              });
+
+              // Tampilkan modal
+              $('#editModal').modal('show');
+          }
+      });
+  }
+  </script>
+  <script>
+    // Menangani submit form untuk menambahkan dokumentasi
+    $('#addDocumentationForm').submit(function(e) {
+        e.preventDefault();  // Menghentikan form submit default
+
+        var formData = new FormData(this);  // Ambil form data termasuk file foto
+
+        // Kirim data ke server menggunakan AJAX
+        $.ajax({
+            url: '<?= base_url('activity/add_documentation') ?>',  // Endpoint untuk menangani dokumentasi
+            method: 'POST',
+            data: formData,
+            contentType: false,  // Jangan set content-type secara manual, biarkan browser melakukannya
+            processData: false,  // Jangan memproses data sebelum dikirim (karena kita mengirim file)
+            success: function(response) {
+                console.log(response);  // Untuk debugging, lihat respons dari server
+                if (response.status === 'success') {
+                    alert('Dokumentasi berhasil ditambahkan!');
+                    $('#addDocumentationModal').modal('hide');  // Tutup modal jika sukses
+                    location.reload();  // Reload halaman untuk melihat data baru
+                } else {
+                    alert(response.message);  // Tampilkan pesan error jika gagal
+                }
+            },
+            error: function() {
+                alert('Terjadi kesalahan saat menyimpan dokumentasi.');
+            }
+        });
+    });
   </script>
   <script>
     $(document).ready(function() {

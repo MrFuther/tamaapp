@@ -16,5 +16,6 @@ $route['personeldata'] = 'personeldata/index';
 $route['m_user'] = 'manageuser/index';
 $route['get-group-areas'] = 'activity/get_group_areas';
 $route['get-sub-areas'] = 'activity/get_sub_areas';
+$route['activity/add_documentation'] = 'activity/add_documentation';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

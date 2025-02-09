@@ -49,28 +49,30 @@ class ActivityModel extends CI_Model
         return $this->db->get('shift_personnel')->result_array();
     }
 
-    public function get_activity_by_id($id) {
-        // Menulis query untuk mengambil data berdasarkan ID
-        $this->db->select('*'); // Memilih semua kolom
-        $this->db->from('activities'); // Tabel tempat data disimpan (sesuaikan nama tabelnya)
-        $this->db->where('id', $id); // Kondisi untuk mencari berdasarkan ID
+    public function get_activity_by_id($id)
+    {
+        $this->db->where('id', $id);
+        return $this->db->get('activities')->row_array();  // Menggunakan row_array() untuk mendapatkan satu hasil
+    }
 
-        // Menjalankan query dan mengembalikan hasilnya
-        $query = $this->db->get();
+    // Fungsi untuk mendapatkan dokumentasi berdasarkan ID aktivitas
+    public function get_documentation_by_activity($activity_id)
+    {
+        $this->db->where('activity_id', $activity_id);
+        return $this->db->get('documentation')->result_array();
+    }
 
-        // Jika data ditemukan, mengembalikan hasilnya
-        if ($query->num_rows() > 0) {
-            return $query->row_array(); // Mengembalikan data dalam bentuk array
-        } else {
-            return null; // Jika tidak ditemukan data, mengembalikan null
-        }
+    public function add_documentation($data)
+    {
+        // Menyimpan dokumentasi ke dalam database
+        return $this->db->insert('documentation', $data);
     }
 
     public function getSubAreasByGroup($group_id) {
         // Mengambil sub-area berdasarkan group area
-        $this->db->select('id_subgrouparea AS id, nama_subarea AS name');
-        $this->db->from('ms_subgrouparea');
-        $this->db->where('id_grouparea', $group_id);
+        $this->db->select('sub_area_id AS id, sub_area_name AS name');
+        $this->db->from('ms_sub_area');
+        $this->db->where('area_id', $group_id);
         $query = $this->db->get();
 
         // Mengembalikan hasil sebagai array
