@@ -11,6 +11,7 @@ class Activity extends CI_Controller
         }
         $this->load->model('ActivityModel');
         $this->load->model('MasterDataModel');
+        $this->load->model('AreaModel');
         $this->load->library('upload'); // Load library untuk upload file
         $this->load->library('tcpdf');
     }
@@ -26,6 +27,7 @@ class Activity extends CI_Controller
         $data['device_types'] = $this->ActivityModel->getDeviceTypes();
         $data['shifts'] = $this->ActivityModel->getShifts();
         $data['personnel'] = $this->ActivityModel->getPersonnel();
+        $data['group_areas'] = $this->AreaModel->getAllGroupAreas();
         $this->load->view('dashboard/activity', $data);
     }
 
@@ -52,7 +54,8 @@ class Activity extends CI_Controller
         // Simpan data ke database
         $data = [
             'tanggal' => $input['tanggal'],
-            'lokasi' => $input['lokasi'],
+            'group_area' => $input['group_area'], // Menyimpan Group Area
+            'sub_area' => implode(',', $input['sub_area']), // Menggabungkan sub_area menjadi string
             'device' => $input['device'],
             'shift' => $input['shift'],
             'personil' => implode(', ', $input['personnel']),
@@ -77,6 +80,86 @@ class Activity extends CI_Controller
     $devices = $this->ActivityModel->getDevicesByType($device_type);
     echo json_encode($devices);
     }
+    
+    
+    // Method untuk mendapatkan semua grup area
+    public function get_group_areas() {
+        $group_areas = $this->AreaModel->getAllGroupAreas(); // Implementasikan method ini di model Anda
+        echo json_encode($group_areas);
+    }
+
+    // Method untuk mendapatkan sub-area berdasarkan grup area
+    public function get_sub_areas() {
+        $group_id = $this->input->post('group_id');
+        $sub_areas = $this->AreaModel->getSubAreasByGroup($group_id); // Menggunakan method yang sudah Anda buat
+        echo json_encode($sub_areas);
+    }
+
+    public function get_activity_data($activityId)
+    {
+        // Mengambil data aktivitas dan dokumentasi
+        $activity = $this->ActivityModel->get_activity_by_id($activityId);
+        $documentation = $this->ActivityModel->get_documentation_by_activity($activityId);
+
+        // Mengembalikan data dalam format JSON
+        echo json_encode([
+            'activity' => $activity,
+            'documentation' => $documentation
+        ]);
+    }
+
+    public function add_documentation()
+    {
+        // Cek apakah ada file foto yang diupload
+        if (empty($_FILES['newPhotos']['name'][0])) {
+            echo json_encode(['status' => 'error', 'message' => 'Minimal 3 foto harus diunggah.']);
+            return;
+        }
+
+        // Menyiapkan array untuk menyimpan nama file foto yang diupload
+        $newPhotos = [];
+
+        // Upload foto satu per satu
+        for ($i = 0; $i < count($_FILES['newPhotos']['name']); $i++) {
+            $_FILES['file']['name'] = $_FILES['newPhotos']['name'][$i];
+            $_FILES['file']['type'] = $_FILES['newPhotos']['type'][$i];
+            $_FILES['file']['tmp_name'] = $_FILES['newPhotos']['tmp_name'][$i];
+            $_FILES['file']['error'] = $_FILES['newPhotos']['error'][$i];
+            $_FILES['file']['size'] = $_FILES['newPhotos']['size'][$i];
+
+            // Mengatur konfigurasi upload
+            $config['upload_path'] = './uploads/';
+            $config['allowed_types'] = 'jpg|jpeg|png';
+            $config['max_size'] = 2048; // 2MB
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('file')) {
+                // Menyimpan nama file yang berhasil diupload
+                $newPhotos[] = $this->upload->data('file_name');
+            }
+        }
+
+        // Validasi apakah 3 foto sudah diupload
+        if (count($newPhotos) < 3) {
+            echo json_encode(['status' => 'error', 'message' => 'Minimal 3 foto harus diunggah.']);
+            return;
+        }
+
+        // Simpan data dokumentasi ke dalam database
+        $documentationData = [
+            'activity_id' => $this->input->post('activity_id'), // ID aktivitas terkait
+            'photo1' => $newPhotos[0],
+            'photo2' => $newPhotos[1],
+            'photo3' => $newPhotos[2],
+        ];
+
+        // Menyimpan dokumentasi ke dalam tabel
+        $this->db->insert('documentation', $documentationData);
+
+        // Mengembalikan respons sukses
+        echo json_encode(['status' => 'success', 'message' => 'Dokumentasi berhasil ditambahkan.']);
+    }
+
 
     public function print_pdf($id) {
         // Ambil data untuk PDF (modifikasi sesuai dengan logika aplikasi Anda)

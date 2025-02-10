@@ -22,12 +22,12 @@ class Grouparea extends CI_Controller {
     public function save() {
         // Ambil data dari form input
         $data = [
-            'nama_grouparea' => $this->input->post('nama_grouparea')
+            'area_name' => $this->input->post('area_name')
         ];
 
-        if ($this->input->post('id_grouparea')) {
+        if ($this->input->post('area_id')) {
             // Update group area
-            $this->m_grouparea->update($this->input->post('id_grouparea'), $data);
+            $this->m_grouparea->update($this->input->post('area_id'), $data);
         } else {
             // Insert group area baru
             $this->m_grouparea->insert($data);

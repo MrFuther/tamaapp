@@ -25,13 +25,13 @@ class Subdevice extends CI_Controller {
     public function save() {
         // Ambil data dari form input
         $data = [
-            'nama_subdevice' => $this->input->post('nama_subdevice'),
-            'id_groupdevice' => $this->input->post('id_groupdevice')
+            'sub_device_name' => $this->input->post('sub_device_name'),
+            'pek_unit_id' => $this->input->post('pek_unit_id')
         ];
 
-        if ($this->input->post('id_subgroupdevice')) {
+        if ($this->input->post('sub_device_id')) {
             // Update sub device
-            $this->m_subdevice->update($this->input->post('id_subgroupdevice'), $data);
+            $this->m_subdevice->update($this->input->post('sub_device_id'), $data);
         } else {
             // Insert sub device baru
             $this->m_subdevice->insert($data);

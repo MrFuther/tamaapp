@@ -25,12 +25,12 @@ class Subunitkerja extends CI_Controller {
     public function save() {
         // Ambil data dari form input
         $data = [
-            'nama_subunit' => $this->input->post('nama_subunit'),
-            'id_unitkerja' => $this->input->post('id_unitkerja')
+            'subunit_pek_name' => $this->input->post('subunit_pek_name'),
+            'unit_id' => $this->input->post('unit_id')
         ];
 
-        if ($this->input->post('id_subunit')) {
-            // Update sub unit kerja
+        if ($this->input->post('subunit_id')) {
+            // Update sub unit kerja   
             $this->m_subunitkerja->update($this->input->post('id_subunit'), $data);
         } else {
             // Insert sub unit kerja baru
