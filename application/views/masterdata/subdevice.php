@@ -159,7 +159,7 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Sub Device</th>
+                                        <th>Nama Sub Device</th>
                                         <th>Group Device</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -167,13 +167,13 @@
                                 <tbody>
                                     <?php foreach ($subdevice as $sub): ?>
                                         <tr>
-                                            <td><?= $sub->nama_subdevice; ?></td>
-                                            <td><?= $sub->nama_pekerjaanunit; ?></td>
+                                            <td><?= $sub->sub_device_name; ?></td>
+                                            <td><?= $sub->pek_unit_name; ?></td>
                                             <td>
-                                                <a href="<?= base_url('subdevice/index/' . $sub->id_subgroupdevice); ?>" class="btn btn-warning btn-sm">
+                                                <a href="<?= base_url('subdevice/index/' . $sub->sub_device_id); ?>" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
-                                                <a href="<?= base_url('subdevice/delete/' . $sub->id_subgroupdevice); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus sub device ini?')">
+                                                <a href="<?= base_url('subdevice/delete/' . $sub->sub_device_id); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus sub device ini?')">
                                                     <i class="fas fa-trash-alt"></i> Hapus
                                                 </a>
                                             </td>

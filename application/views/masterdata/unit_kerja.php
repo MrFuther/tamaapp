@@ -167,13 +167,13 @@
                                 <tbody>
                                     <?php foreach ($unitkerja as $kerja): ?>
                                         <tr>
-                                            <td><?= $kerja->nama_unitkerja; ?></td>
+                                            <td><?= $kerja->unit_name; ?></td>
                                             <td><?= $kerja->inisial_unit; ?></td>
                                             <td>
-                                                <a href="<?= base_url('unitkerja/edit/' . $kerja->id_unitkerja); ?>" class="btn btn-warning btn-sm">
+                                                <a href="<?= base_url('unitkerja/edit/' . $kerja->unit_id); ?>" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
-                                                <a href="<?= base_url('unitkerja/delete/' . $kerja->id_unitkerja); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus unit kerja ini?')">
+                                                <a href="<?= base_url('unitkerja/delete/' . $kerja->unit_id); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus unit kerja ini?')">
                                                     <i class="fas fa-trash-alt"></i> Hapus
                                                 </a>
                                             </td>

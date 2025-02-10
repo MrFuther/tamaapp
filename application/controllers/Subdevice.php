@@ -26,7 +26,8 @@ class Subdevice extends CI_Controller {
         // Ambil data dari form input
         $data = [
             'sub_device_name' => $this->input->post('sub_device_name'),
-            'pek_unit_id' => $this->input->post('pek_unit_id')
+            'pek_unit_id' => $this->input->post('pek_unit_id'),
+            'pek_unit_name' => $this->input->post('pek_unit_name')
         ];
 
         if ($this->input->post('sub_device_id')) {

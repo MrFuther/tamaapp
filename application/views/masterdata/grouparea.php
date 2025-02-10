@@ -166,12 +166,12 @@
                                 <tbody>
                                     <?php foreach ($grouparea as $group): ?>
                                         <tr>
-                                            <td><?= $group->nama_grouparea; ?></td>
+                                            <td><?= $group->area_name; ?></td>
                                             <td>
-                                                <a href="<?= base_url('grouparea/index/' . $group->id_grouparea); ?>" class="btn btn-warning btn-sm">
+                                                <a href="<?= base_url('grouparea/index/' . $group->area_id); ?>" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
-                                                <a href="<?= base_url('grouparea/delete/' . $group->id_grouparea); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus group area ini?')">
+                                                <a href="<?= base_url('grouparea/delete/' . $group->area_id); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus group area ini?')">
                                                     <i class="fas fa-trash-alt"></i> Hapus
                                                 </a>
                                             </td>

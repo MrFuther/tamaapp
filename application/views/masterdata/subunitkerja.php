@@ -167,13 +167,13 @@
                                 <tbody>
                                     <?php foreach ($subunitkerja as $subunit): ?>
                                         <tr>
-                                            <td><?= $subunit->nama_subunit; ?></td>
-                                            <td><?= $subunit->nama_unitkerja; ?></td>
+                                            <td><?= $subunit->subunit_pek_name; ?></td>
+                                            <td><?= $subunit->inisial_unit_kerja; ?></td>
                                             <td>
-                                                <a href="<?= base_url('subunitkerja/index/' . $subunit->id_subunit); ?>" class="btn btn-warning btn-sm">
+                                                <a href="<?= base_url('subunitkerja/index/' . $subunit->subunit_id); ?>" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
-                                                <a href="<?= base_url('subunitkerja/delete/' . $subunit->id_subunit); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus sub unit kerja ini?')">
+                                                <a href="<?= base_url('subunitkerja/delete/' . $subunit->subunit_id); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus sub unit kerja ini?')">
                                                     <i class="fas fa-trash-alt"></i> Hapus
                                                 </a>
                                             </td>

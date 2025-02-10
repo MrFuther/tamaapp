@@ -26,7 +26,8 @@ class Subarea extends CI_Controller {
         // Ambil data dari form input
         $data = [
             'sub_area_name' => $this->input->post('sub_area_name'),
-            'area_id' => $this->input->post('area_id')
+            'area_id' => $this->input->post('area_id'),
+            'gr_area_name' => $this->input->post('gr_area_name'),
         ];
 
         if ($this->input->post('sub_area_id')) {

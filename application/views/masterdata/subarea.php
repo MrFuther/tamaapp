@@ -167,13 +167,13 @@
                                 <tbody>
                                     <?php foreach ($subarea as $sub): ?>
                                         <tr>
-                                            <td><?= $sub->nama_subarea; ?></td>
-                                            <td><?= $sub->nama_grouparea; ?></td>
+                                            <td><?= $sub->sub_area_name; ?></td>
+                                            <td><?= $sub->gr_area_name; ?></td>
                                             <td>
-                                                <a href="<?= base_url('subarea/index/' . $sub->id_subgrouparea); ?>" class="btn btn-warning btn-sm">
+                                                <a href="<?= base_url('subarea/index/' . $sub->sub_area_id); ?>" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
-                                                <a href="<?= base_url('subarea/delete/' . $sub->id_subgrouparea); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus sub area ini?')">
+                                                <a href="<?= base_url('subarea/delete/' . $sub->sub_area_id); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus sub area ini?')">
                                                     <i class="fas fa-trash-alt"></i> Hapus
                                                 </a>
                                             </td>

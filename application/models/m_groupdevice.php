@@ -11,10 +11,6 @@ class M_groupdevice extends CI_Model {
 
     // Mendapatkan semua group device
     public function get_all() {
-        $this->db->select('ms_groupdevices.*, ms_subunitkerja.nama_subunit, ms_unitkerja.nama_unitkerja');
-        $this->db->join('ms_subunitkerja', 'ms_groupdevice.id_subunit = ms_subunitkerja.id_subunit', 'left');
-        $this->db->join('ms_unitkerja', 'ms_groupdevice.id_unitkerja = ms_unitkerja.id_unitkerja', 'left');
-        $this->db->where('ms_groupdevice.is_active', 1);
         return $this->db->get($this->table)->result();  // Mengembalikan data sebagai objek
     }
 

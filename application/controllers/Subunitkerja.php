@@ -26,7 +26,8 @@ class Subunitkerja extends CI_Controller {
         // Ambil data dari form input
         $data = [
             'subunit_pek_name' => $this->input->post('subunit_pek_name'),
-            'unit_id' => $this->input->post('unit_id')
+            'unit_id' => $this->input->post('unit_id'),
+            'initial_unit_kerja' => $this->input->post('initial_unit_kerja')
         ];
 
         if ($this->input->post('subunit_id')) {

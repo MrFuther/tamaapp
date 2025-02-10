@@ -168,14 +168,14 @@
                                 <tbody>
                                     <?php foreach ($groupdevice as $group): ?>
                                         <tr>
-                                            <td><?= $group->nama_pekerjaanunit; ?></td>
-                                            <td><?= $group->nama_subunit; ?></td>
-                                            <td><?= $group->nama_unitkerja; ?></td>
+                                            <td><?= $group->pek_unit_name; ?></td>
+                                            <td><?= $group->subunit_pek_name; ?></td>
+                                            <td><?= $group->inisial_unit_kerja; ?></td>
                                             <td>
-                                                <a href="<?= base_url('groupdevice/index/' . $group->id_groupdevice); ?>" class="btn btn-warning btn-sm">
+                                                <a href="<?= base_url('groupdevice/index/' . $group->pek_unit_id); ?>" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </a>
-                                                <a href="<?= base_url('groupdevice/delete/' . $group->id_groupdevice); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus group device ini?')">
+                                                <a href="<?= base_url('groupdevice/delete/' . $group->pek_unit_id); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus group device ini?')">
                                                     <i class="fas fa-trash-alt"></i> Hapus
                                                 </a>
                                             </td>
