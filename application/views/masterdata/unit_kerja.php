@@ -70,70 +70,6 @@
               </form>
             </div>
             <div class="list-wrapper px-3">
-              <ul class="d-flex flex-column-reverse todo-list">
-                <li>
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox">
-                      Team review meeting at 3.00 PM
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li>
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox">
-                      Prepare for presentation
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li>
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox">
-                      Resolve all the low priority tickets due today
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li class="completed">
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox" checked>
-                      Schedule meeting for next week
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li class="completed">
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox" checked>
-                      Project review
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-              </ul>
-            </div>
-            <h4 class="px-3 text-muted mt-5 font-weight-light mb-0">Events</h4>
-            <div class="events pt-4 px-3">
-              <div class="wrapper d-flex mb-2">
-                <i class="ti-control-record text-primary mr-2"></i>
-                <span>Feb 11 2018</span>
-              </div>
-              <p class="mb-0 font-weight-thin text-gray">Creating component page build a js</p>
-              <p class="text-gray mb-0">The total number of sessions</p>
-            </div>
-            <div class="events pt-4 px-3">
-              <div class="wrapper d-flex mb-2">
-                <i class="ti-control-record text-primary mr-2"></i>
-                <span>Feb 7 2018</span>
-              </div>
-              <p class="mb-0 font-weight-thin text-gray">Meeting with Alisa</p>
-              <p class="text-gray mb-0 ">Call Sarah Graves</p>
             </div>
           </div>
           <!-- To do section tab ends -->
@@ -170,9 +106,14 @@
                                             <td><?= $kerja->unit_name; ?></td>
                                             <td><?= $kerja->inisial_unit; ?></td>
                                             <td>
-                                                <a href="<?= base_url('unitkerja/edit/' . $kerja->unit_id); ?>" class="btn btn-warning btn-sm">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
+                                            <button type="button" class="btn btn-warning btn-sm edit-unit-btn" 
+                                                    data-id="<?= $kerja->unit_id; ?>" 
+                                                    data-name="<?= $kerja->unit_name; ?>" 
+                                                    data-inisial="<?= $kerja->inisial_unit; ?>"
+                                                    data-bs-toggle="modal" data-bs-target="#editUnitKerja">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+
                                                 <a href="<?= base_url('unitkerja/delete/' . $kerja->unit_id); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus unit kerja ini?')">
                                                     <i class="fas fa-trash-alt"></i> Hapus
                                                 </a>
@@ -182,6 +123,34 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <div class="modal fade" id="editUnitKerja" tabindex="-1" aria-labelledby="editUnitKerjaLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="editUnitKerjaLabel">Edit Unit Kerja</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="<?= base_url('unitkerja/update') ?>" method="POST">
+              <input type="hidden" id="unit_id" name="unit_id"> <!-- ID Unit Kerja -->
+              <div class="modal-body">
+                  <div class="form-group">
+                      <label for="edit_nama_unitkerja">Nama Unit Kerja</label>
+                      <input type="text" class="form-control" id="edit_nama_unitkerja" name="nama_unitkerja" required>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit_inisial_unit">Inisial Unit Kerja</label>
+                      <input type="text" class="form-control" id="edit_inisial_unit" name="inisial_unit" required>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                  <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+              </div>
+          </form>
+        </div>
+    </div>
+</div>
 
                         <!-- Modal untuk Tambah Unit Kerja -->
                         <div class="modal fade" id="addUnitKerjaModal" tabindex="-1" aria-labelledby="addUnitKerjaModalLabel" aria-hidden="true">
@@ -215,6 +184,22 @@
             </div>
         </div>
        </div>
+
+       <script>
+$(document).ready(function () {
+    $(".edit-unit-btn").on("click", function () {
+        let unitId = $(this).data("id");
+        let unitName = $(this).data("name");
+        let inisialUnit = $(this).data("inisial");
+
+        // Masukkan data ke dalam modal edit
+        $("#editUnitKerja #unit_id").val(unitId);
+        $("#editUnitKerja #edit_nama_unitkerja").val(unitName);
+        $("#editUnitKerja #edit_inisial_unit").val(inisialUnit);
+    });
+});
+</script>
+
         <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->
         <footer class="footer">
