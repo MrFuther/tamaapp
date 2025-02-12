@@ -209,7 +209,6 @@ class Activity extends CI_Controller
         $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-<<<<<<< HEAD
         $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
         $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
         $pdf->Cell(60, 30, 'Foto', 1, 1, 'C');
@@ -240,34 +239,6 @@ class Activity extends CI_Controller
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
-=======
-        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 1, 'C');
-        $pdf->ln(5);
-        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 1, 'C');
-        $pdf->ln(5);
-        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 40, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 12, 'Deskripsi', 1, 1, 'C');
->>>>>>> 5c5a891966cd9ab1e089e11d23c7e6c2f4c3044b
         // Add images
 
         // Generate filename

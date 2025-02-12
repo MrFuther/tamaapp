@@ -12,7 +12,7 @@ class Auth extends CI_Controller {
     }
 
     public function index() {
-        if($this->session->userdata('logged_in')) {
+        if ($this->session->userdata('logged_in')) {
             redirect('dashboard');
         }
         $this->load->view('auth/login');
@@ -22,20 +22,19 @@ class Auth extends CI_Controller {
         $this->form_validation->set_rules('username', 'Username', 'required|trim');
         $this->form_validation->set_rules('password', 'Password', 'required');
 
-        if($this->form_validation->run() == FALSE) {
+        if ($this->form_validation->run() == FALSE) {
             $this->load->view('auth/login');
         } else {
             $username = $this->input->post('username');
             $password = $this->input->post('password');
 
             // Cek apakah user terdaftar
-            $user_exists = $this->Auth_model->check_user_exists($username);
-            
-            if(!$user_exists) {
+            if (!$this->Auth_model->check_user_exists($username)) {
                 $response = array(
                     'status' => 'error',
                     'message' => 'User is not registered. Please contact administrator'
                 );
+                log_message('error', 'Login failed: User does not exist');
                 echo json_encode($response);
                 return;
             }
@@ -43,7 +42,7 @@ class Auth extends CI_Controller {
             // Cek login
             $user = $this->Auth_model->check_login($username, $password);
 
-            if($user) {
+            if ($user) {
                 $data = array(
                     'user_id' => $user->id,
                     'username' => $user->username,
@@ -51,24 +50,28 @@ class Auth extends CI_Controller {
                     'logged_in' => TRUE
                 );
                 $this->session->set_userdata($data);
-                
+
                 $response = array(
                     'status' => 'success',
                     'message' => 'Login successful'
                 );
+                log_message('info', 'User logged in: ' . $username . ', Role: ' . $user->role);
                 echo json_encode($response);
             } else {
                 $response = array(
                     'status' => 'error',
-                    'message' => 'Password wrong!'
+                    'message' => 'Password is incorrect'
                 );
+                log_message('error', 'Login failed: Incorrect password for username ' . $username);
                 echo json_encode($response);
             }
         }
     }
 
     public function logout() {
+        $username = $this->session->userdata('username');
         $this->session->sess_destroy();
+        log_message('info', 'User logged out: ' . $username);
         redirect('auth');
     }
 }
