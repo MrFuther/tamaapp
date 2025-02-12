@@ -41,6 +41,45 @@ class Unitkerja extends CI_Controller {
         // Redirect ke halaman utama
         redirect('unitkerja');
     }
+    public function update()
+{
+    // Ambil ID Unit Kerja dari form (bukan dari parameter)
+    $unit_id = $this->input->post('unit_id');
+
+    // Validasi input form
+    $this->form_validation->set_rules('unit_name', 'Nama Unit Kerja', 'required');
+    $this->form_validation->set_rules('inisial_unit', 'Inisial Unit', 'required');
+
+    if ($this->form_validation->run() == FALSE) {
+        // Jika validasi gagal, kembalikan ke halaman dengan pesan error
+        $this->session->set_flashdata('error', 'Data tidak valid, silakan periksa kembali.');
+        redirect('unitkerja');
+    } else {
+        // Ambil data dari form
+        $unit_name = $this->input->post('unit_name');
+        $inisial_unit = $this->input->post('inisial_unit');
+
+        // Data yang akan diupdate
+        $data = array(
+            'unit_name' => $unit_name,
+            'inisial_unit' => $inisial_unit
+        );
+
+        // Panggil model untuk update data berdasarkan unit_id
+        $this->load->m_unitkerja;
+        $update = $this->m_unitkerja->update();
+
+        if ($update) {
+            // Jika berhasil
+            $this->session->set_flashdata('success', 'Unit kerja berhasil diperbarui!');
+        } else {
+            // Jika gagal
+            $this->session->set_flashdata('error', 'Terjadi kesalahan saat memperbarui data.');
+        }
+        redirect('unitkerja');
+    }
+}
+
 
     public function delete($id) {
         // Hapus unit kerja (soft delete)

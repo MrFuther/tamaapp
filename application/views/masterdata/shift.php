@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="<?php echo base_url('vendors/feather/feather.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/css/vendor.bundle.base.css'); ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/mdi/css/materialdesignicons.min.css'); ?>">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
@@ -26,7 +26,7 @@
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
-    <?php include 'navbar.php'; ?>
+    <?php include APPPATH . 'views\dashboard\navbar.php'; ?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
@@ -141,7 +141,7 @@
       </div>
       <!-- partial -->
       <!-- partial:partials/_sidebar.html -->
-      <?php include 'sidebar.php'; ?>
+      <?php include APPPATH . 'views\dashboard\sidebar.php'; ?>
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
@@ -149,127 +149,89 @@
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title">Activity Management</h6>
+                  <h6 class="card-title">Shift Kerja</h6>
                   <p class="card-description">
-                  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
+                  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahShiftModal">Tambah Shift</button>
                   </p>
                   <div class="table-responsive">
-                    <table class="table table-striped">
-                      <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>ID Aktivitas</th>
-                        <th>Personel</th>
-                        <th>Shift</th>
-                        <th>Jam Kerja</th>
-                        <th>Tanggal Kegiatan</th>
-                        <th>Aksi</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <?php foreach ($activities as $index => $activity): ?>
-                          <tr>
-                              <td><?= $index + 1; ?></td>
-                              <td><?= $activity->id_activity; ?></td>
-                              <td>
-                                  <?php foreach ($activity->users as $user): ?>
-                                      <span class="badge bg-info"><?= $user->username; ?></span>
-                                  <?php endforeach; ?>
-                              </td>
-                              <td><?= $activity->nama_shift; ?></td>
-                              <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
-                              <td><?= $activity->tanggal_kegiatan; ?></td>
-                              <td>
-                                  <button class="btn btn-success btn-sm">Ceklist</button>
-                                  <button class="btn btn-info btn-sm">Dokumentasi</button>
-                                  <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
-                              </td>
-                          </tr>
-                      <?php endforeach; ?>
-                      </tbody>
+                    <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Shift</th>
+                            <th>Jam Mulai</th>
+                            <th>Jam Selesai</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($shifts as $index => $shift): ?>
+                            <tr>
+                                <td><?= $index + 1; ?></td>
+                                <td><?= $shift->nama_shift; ?></td>
+                                <td><?= $shift->jam_mulai; ?></td>
+                                <td><?= $shift->jam_selesai; ?></td>
+                                <td>
+                                    <a href="<?= base_url('shift/edit/'.$shift->id_shift); ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="<?= base_url('shift/delete/'.$shift->id_shift); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus shift ini?')">Hapus</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
                     </table>
-                  </div>
-                  <!-- Modal Tambah Aktivitas -->
-                  <div class="modal fade" id="tambahActivityModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title">Tambah Aktivitas</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form action="<?= base_url('activity/add'); ?>" method="POST">
-                          <div class="modal-body">
-                            <div class="mb-3">
-                              <label class="form-label">Pilih Personel</label>
-                              <select class="form-control" name="personel_id" required>
-                              <option value="">-- Pilih Personel --</option>
-                                <?php foreach ($personel as $p): ?>
-                                    <option value="<?= $p->id_personel; ?>"><?= $p->usernames; ?></option>
-                                <?php endforeach; ?>>
-                              </select>
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Pilih Shift</label>
-                              <select class="form-control" name="shift_id" required>
-                                <?php foreach ($shifts as $shift): ?>
-                                  <option value="<?= $shift->id_shift; ?>">
-                                      <?= $shift->nama_shift; ?> (<?= $shift->jam_mulai; ?> - <?= $shift->jam_selesai; ?>)
-                                  </option>
-                                <?php endforeach; ?>
-                              </select>
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Tanggal Kegiatan</label>
-                              <input type="date" class="form-control" name="tanggal_kegiatan" required>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                          </div>
-                        </form>
-                      </div>
+                </div>
+
+                <!-- Modal Tambah Shift -->
+                <div class="modal fade" id="tambahShiftModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tambah Shift Kerja</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                  </div>
-              </div>
+                    <form action="<?= base_url('shift/add'); ?>" method="POST">
+                        <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nama Shift</label>
+                            <input type="text" class="form-control" name="nama_shift" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Jam Mulai</label>
+                            <input type="time" class="form-control" name="jam_mulai" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Jam Selesai</label>
+                            <input type="time" class="form-control" name="jam_selesai" required>
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                </div>
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
+                </div>
             </div>
-          </div>
         </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:../../partials/_footer.html -->
-        <footer class="footer">
-          <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021.  Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ml-1"></i></span>
-          </div>
-        </footer>
-        <!-- partial -->
-      </div>
-      <!-- main-panel ends -->
     </div>
-    <div id="logoutModal" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Konfirmasi Logout</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Apakah Anda yakin ingin logout?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-primary" onclick="logout()">Logout</button>
-          </div>
-        </div>
-      </div>
-    </div>  
-    <!-- page-body-wrapper ends -->
-  </div>
-  <!-- container-scroller -->
-  <script>
+</div>
+<script>
     function showLogoutConfirmation() {
     // Menampilkan modal
     var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
@@ -283,8 +245,8 @@
     window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
     }
   </script>
-  <!-- plugins:js -->
-  <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
+<!-- plugins:js -->
+<script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
   <script src="<?php echo base_url('vendors/chart.js/Chart.min.js'); ?>"></script>
