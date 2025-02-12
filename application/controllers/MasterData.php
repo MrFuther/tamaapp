@@ -10,9 +10,11 @@ class MasterData extends CI_Controller
             redirect('auth');
         }
 
-        if($this->session->userdata('role') !== 'admin'){
-            show_error('You do not have permission to access this page.', 403, 'Forbidden');
+        if ($this->session->userdata('role') !== 'admin') {
+            // Jika bukan admin, arahkan ke halaman khusus "Tidak Memiliki Izin"
+            redirect(base_url('errors/forbidden'));
         }
+
         $this->load->model('MasterDataModel');
         $this->load->model('LocationModel');
         $this->load->model('DeviceModel');
@@ -59,4 +61,5 @@ class MasterData extends CI_Controller
         ]);
         redirect('MasterData');
     }
+    
 }

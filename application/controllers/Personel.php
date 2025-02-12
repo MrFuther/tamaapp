@@ -9,6 +9,11 @@ class Personel extends CI_Controller {
             redirect('auth');
         }
         $this->load->model('PersonelModel');
+        if ($this->session->userdata('role') !== 'admin') {
+            // Jika bukan admin, arahkan ke halaman khusus "Tidak Memiliki Izin"
+            redirect(base_url('errors/forbidden'));
+        }
+
     }
 
     public function index() {

@@ -13,8 +13,8 @@ class Grouparea extends CI_Controller {
 
         // Cek apakah user memiliki role "admin"
         if ($this->session->userdata('role') !== 'admin') {
-            // Jika bukan admin, arahkan ke halaman tidak memiliki izin
-            show_error('You do not have permission to access this page.', 403, 'Forbidden');
+            // Jika bukan admin, arahkan ke halaman khusus "Tidak Memiliki Izin"
+            redirect(base_url('errors/forbidden'));
         }
 
         $this->load->model('m_grouparea');  // Load model grouparea
