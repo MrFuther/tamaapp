@@ -417,17 +417,10 @@
                       </div>
                     </div>
                  
-        <!-- partial:partials/_footer.html -->
-        <footer class="footer">
-          <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2025. Created by IT Non Public.  All rights reserved.</span>
-          </div>
-          <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Distributed by <a href="https://www.instagram.com/itnp_cgk" target="_blank">ITNP-CGK</a></span> 
-          </div>
-        </footer> 
+      
+        
        
-      <!-- main-panel ends -->
+    <!-- main-panel ends -->
     </div>
     <div id="logoutModal" class="modal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
