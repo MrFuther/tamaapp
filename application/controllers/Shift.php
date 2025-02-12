@@ -8,6 +8,12 @@ class Shift extends CI_Controller {
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
+
+        if ($this->session->userdata('role') !== 'admin') {
+            // Jika bukan admin, arahkan ke halaman tidak memiliki izin
+            show_error('You do not have permission to access this page.', 403, 'Forbidden');
+        }
+        
         $this->load->model('ShiftModel');
     }
 
