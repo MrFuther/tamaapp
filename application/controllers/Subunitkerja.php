@@ -8,6 +8,10 @@ class Subunitkerja extends CI_Controller {
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
+
+        if($this->session->userdata('role') !== 'admin'){
+            show_error('You do not have permission to access this page.', 403, 'Forbidden');
+        }
         $this->load->model('m_subunitkerja');  // Load model subunitkerja
         $this->load->model('m_unitkerja');     // Load model unitkerja untuk menampilkan unit kerja
     }
