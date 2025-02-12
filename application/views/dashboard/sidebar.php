@@ -30,6 +30,8 @@
                         <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('subarea'); ?>"> Master Sub Area </a></li>
                         <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('groupdevice'); ?>"> Master Group Device </a></li>
                         <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('subdevice'); ?>"> Master Sub Device </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('shift'); ?>"> Master Shift Data </a></li>
+                        <li class="nav-item"> <a class="nav-link" href="<?php echo base_url('personel'); ?>"> Master Personel Data </a></li>
                     </ul>
                     </div>
                 </li>
