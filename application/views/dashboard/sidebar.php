@@ -35,7 +35,7 @@
                             <li class="nav-item"> <a class="nav-link" href="<?= base_url('personel'); ?>"> Master Personel Data </a></li>
                         </ul>
                         </div>
-                    </li>
+                    </li> 
                 <?php endif; ?>
 
                 <?php if ($this->session->userdata('role') == 'admin'): ?>
