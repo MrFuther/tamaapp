@@ -181,7 +181,7 @@
                               <td><?= $activity->tanggal_kegiatan; ?></td>
                               <td>
                                   <button class="btn btn-success btn-sm">Ceklist</button>
-                                  <button class="btn btn-info btn-sm">Dokumentasi</button>
+                                  <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#documentationModal" onclick="loadDocumentation(<?= $activity->id_activity; ?>)">Dokumentasi</button>
                                   <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
                               </td>
                           </tr>
@@ -230,6 +230,132 @@
                         </form>
                       </div>
                     </div>
+                  </div>
+                  <!-- Modal Dokumentasi -->
+                  <div class="modal fade" id="documentationModal" tabindex="-1" aria-labelledby="documentationModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-lg">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="documentationModalLabel">Dokumentasi Aktivitas</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                  <!-- Form Dokumentasi -->
+                                  <form action="<?= base_url('activity/save_documentation'); ?>" method="POST" enctype="multipart/form-data">
+                                      <input type="hidden" name="activity_id" value="<?= $activity->id_activity; ?>">
+
+                                      <!-- Row untuk Data Aktivitas -->
+                                      <div class="row">
+                                          <div class="col-md-6">
+                                              <div class="mb-3">
+                                                  <strong>Data Personel:</strong>
+                                                  <p> <?php foreach ($activity->users as $user): ?>
+                                                          <span class="badge bg-info"><?= $user->username; ?></span>
+                                                      <?php endforeach; ?>
+                                                  </p>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <strong>Shift:</strong>
+                                                  <p><?= $activity->nama_shift; ?></p>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <strong>Jam Kerja:</strong>
+                                                  <p><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></p>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <strong>Tanggal Kegiatan:</strong>
+                                                  <p><?= $activity->tanggal_kegiatan; ?></p>
+                                              </div>
+                                          </div>
+
+                                          <div class="col-md-6">
+                                              <div class="mb-3">
+                                                  <strong>Data Dokumentasi Preventive Maintenance</strong>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label for="laporan" class="form-label">Kelompok Laporan</label>
+                                                  <select class="form-control" id="laporan" name="laporan" required>
+                                                      <option value="harian">Harian</option>
+                                                      <option value="mingguan">Mingguan</option>
+                                                      <option value="bulanan">Bulanan</option>
+                                                  </select>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label for="area" class="form-label">Area</label>
+                                                  <select class="form-control" id="area" name="area" required>
+                                                      <?php foreach ($areas as $area): ?>
+                                                          <option value="<?= $area->area_id; ?>"><?= $area->area_name; ?></option>
+                                                      <?php endforeach; ?>
+                                                  </select>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label for="group_device" class="form-label">Group Device</label>
+                                                  <select class="form-control" id="group_device" name="group_device" required>
+                                                      <?php foreach ($group_devices as $group): ?>
+                                                          <option value="<?= $group->pek_unit_id; ?>"><?= $group->pek_unit_name; ?></option>
+                                                      <?php endforeach; ?>
+                                                  </select>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label for="sub_device" class="form-label">Sub Device</label>
+                                                  <select class="form-control" id="sub_device" name="sub_device" required>
+                                                      <?php foreach ($sub_devices as $sub_device): ?>
+                                                          <option value="<?= $sub_device->sub_device_id; ?>"><?= $sub_device->sub_device_name; ?></option>
+                                                      <?php endforeach; ?>
+                                                  </select>
+                                              </div>
+                                              <div class="mb-3">
+                                                  <label for="device" class="form-label">Nama Device</label>
+                                                  <select class="form-control" id="device" name="device" required>
+                                                      <?php foreach ($devices as $device): ?>
+                                                          <option value="<?= $device->device_hidn_id; ?>"><?= $device->device_hidn_name; ?></option>
+                                                      <?php endforeach; ?>
+                                                  </select>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <button type="button" class="btn btn-info" onclick="openUploadPhoto('<?= $activity->documentation ? $activity->documentation->id_documentation : ''; ?>')">
+                                          Upload Foto
+                                      </button>
+                                      <div class="mt-3">
+                                          <h6>Foto Dokumentasi:</h6>
+                                          <div class="row" id="photoContainer">
+                                              <!-- Foto akan dimuat di sini -->
+                                          </div>
+                                      </div>
+                                      <button type="submit" class="btn btn-primary">Simpan Dokumentasi</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- Modal Upload Foto -->
+                  <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="uploadPhotoModalLabel">Upload Foto Dokumentasi</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <form id="uploadPhotoForm" enctype="multipart/form-data">
+                                  <div class="modal-body">
+                                      <input type="hidden" name="documentation_id" id="documentation_id">
+                                      <div class="mb-3">
+                                          <label for="photos" class="form-label">Pilih Foto</label>
+                                          <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*" required>
+                                      </div>
+                                      <div class="mb-3">
+                                          <label for="photo_description" class="form-label">Deskripsi Foto</label>
+                                          <textarea class="form-control" id="photo_description" name="description" rows="3"></textarea>
+                                      </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                      <button type="submit" class="btn btn-primary">Upload</button>
+                                  </div>
+                              </form>
+                          </div>
+                      </div>
                   </div>
               </div>
             </div>
@@ -281,6 +407,76 @@
     alert("Anda telah logout.");
     // Redirect ke halaman login atau halaman utama setelah logout
     window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
+    }
+  </script>
+  <script>
+    $(document).ready(function() {
+        $('#uploadPhotoForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            
+            $.ajax({
+                url: '<?= base_url("activity/upload_photos"); ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    var result = JSON.parse(response);
+                    if(result.success) {
+                        alert(result.message);
+                        $('#uploadPhotoModal').modal('hide');
+                        $('#documentationModal').modal('show');
+                        // Refresh foto jika diperlukan
+                        loadPhotos($('#documentation_id').val());
+                    } else {
+                        alert('Gagal upload foto: ' + result.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Terjadi kesalahan: ' + error);
+                }
+            });
+        });
+    });
+
+    function loadPhotos(documentationId) {
+      if(!documentationId) return;
+      
+      $.ajax({
+          url: '<?= base_url("activity/get_photos/"); ?>' + documentationId,
+          type: 'GET',
+          success: function(response) {
+              let photoHtml = '';
+              response.photos.forEach(function(photo) {
+                  photoHtml += `
+                      <div class="col-md-4 mb-3">
+                          <div class="card">
+                              <img src="<?= base_url(); ?>${photo.file_path}" class="card-img-top" alt="Documentation Photo">
+                              <div class="card-body">
+                                  <p class="card-text small">${photo.description}</p>
+                                  <button class="btn btn-danger btn-sm" onclick="deletePhoto(${photo.id_photo})">
+                                      Hapus
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  `;
+              });
+              $('#photoContainer').html(photoHtml);
+          }
+      });
+    }
+
+    function openUploadPhoto(documentationId) {
+    if (!documentationId) {
+        alert('Silakan buat dokumentasi terlebih dahulu sebelum upload foto');
+        return;
+    }
+    $('#documentation_id').val(documentationId);
+    $('#documentationModal').modal('hide');
+    $('#uploadPhotoModal').modal('show');
     }
   </script>
   <!-- plugins:js -->
