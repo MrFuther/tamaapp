@@ -8,6 +8,11 @@ class Report extends CI_Controller {
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
+        if ($this->session->userdata('role') !== 'admin') {
+            // Jika bukan admin, arahkan ke halaman khusus "Tidak Memiliki Izin"
+            redirect(base_url('errors/forbidden'));
+        }
+
     }
 
     // Halaman Master Report

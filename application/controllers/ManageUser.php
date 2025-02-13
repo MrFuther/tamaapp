@@ -8,6 +8,11 @@ class ManageUser extends CI_Controller {
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
+
+        if ($this->session->userdata('role') !== 'admin') {
+            // Jika bukan admin, arahkan ke halaman khusus "Tidak Memiliki Izin"
+            redirect(base_url('forbidden'));
+        }
         $this->load->model('UserModel'); // Load the User model
     }
 

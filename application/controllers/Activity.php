@@ -196,9 +196,9 @@ class Activity extends CI_Controller
         $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 30, 'Foto1', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto2', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto3', 1, 1, 'C');
+        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
+        $pdf->Cell(60, 30, 'Foto', 1, 1, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');

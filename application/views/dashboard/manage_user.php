@@ -290,39 +290,7 @@
             </div>
         </div>
     </div>
-    <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-confirm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to logout?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    function showLogoutConfirmation() {
-    // Menampilkan modal
-    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
-    modal.show();
-    }
-
-    function logout() {
-    // Implementasi logika logout di sini
-    alert("Anda telah logout.");
-    // Redirect ke halaman login atau halaman utama setelah logout
-    window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
-    }
-  </script>
+    
 <!-- plugins:js -->
 <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->

@@ -14153,7 +14153,7 @@ input[type="button"].btn-block {
 .badge {
   display: inline-block;
   padding: 0.25em 0.4em;
-  font-size: 75%;
+  font-size: 50%;
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -19700,7 +19700,7 @@ code {
 /* Footer */
 .footer {
   background: #F5F7FF;
-  padding: 30px 2.45rem;
+  padding: 13px 2.45rem;
   transition: all 0.25s ease;
   -moz-transition: all 0.25s ease;
   -webkit-transition: all 0.25s ease;
@@ -20901,7 +20901,7 @@ code {
 }
 
 .btn.btn-sm, .btn-group-sm > .btn, .fc .btn-group-sm > button, .ajax-upload-dragdrop .btn-group-sm > .ajax-file-upload, .swal2-modal .swal2-buttonswrapper .btn-group-sm > .swal2-styled, .wizard > .actions .btn-group-sm > a, .fc button, .ajax-upload-dragdrop .btn-sm.ajax-file-upload, .ajax-upload-dragdrop .fc button.ajax-file-upload, .fc .ajax-upload-dragdrop button.ajax-file-upload, .swal2-modal .swal2-buttonswrapper .btn-sm.swal2-styled, .swal2-modal .swal2-buttonswrapper .fc button.swal2-styled, .fc .swal2-modal .swal2-buttonswrapper button.swal2-styled, .wizard > .actions a.btn-sm {
-  font-size: 0.812rem;
+  font-size: 0.612rem;
   border-radius: 15px;
 }
 
@@ -24607,7 +24607,7 @@ dl li {
   border-top: 0;
   border-bottom-width: 1px;
   font-weight: 600;
-  font-size: .875rem;
+  font-size: .675rem;
 }
 
 .table thead th i, .jsgrid .jsgrid-table thead th i {
@@ -24625,7 +24625,7 @@ dl li {
 
 .table td,
 .jsgrid .jsgrid-table td {
-  font-size: 0.875rem;
+  font-size: 0.675rem;
 }
 
 .table td img, .jsgrid .jsgrid-table td img {
@@ -28422,7 +28422,6 @@ div.tagsinput span.tag a {
   flex-direction: row;
   padding-left: 0;
   padding-right: 0;
-  padding-top: 60px;
 }
 
 .page-body-wrapper.full-page-wrapper {

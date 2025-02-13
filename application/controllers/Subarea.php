@@ -8,6 +8,10 @@ class Subarea extends CI_Controller {
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
+
+        if($this->session->userdata('role') !== 'admin'){
+            show_error('You do not have permission to access this page.', 403, 'Forbidden');
+        }
         $this->load->model('m_subarea');  // Load model subarea
         $this->load->model('m_grouparea'); // Load model grouparea untuk dropdown
     }
