@@ -9,8 +9,9 @@ class ManageUser extends CI_Controller {
             redirect('auth');
         }
 
-        if($this->session->userdata('role') !== 'admin'){
-            show_error('You do not have permission to access this page.', 403, 'Forbidden');
+        if ($this->session->userdata('role') !== 'admin') {
+            // Jika bukan admin, arahkan ke halaman khusus "Tidak Memiliki Izin"
+            redirect(base_url('forbidden'));
         }
         $this->load->model('UserModel'); // Load the User model
     }
