@@ -90,42 +90,71 @@ class Activity extends CI_Controller
     
         $this->load->library('upload', $config);
         
-        $files = $_FILES;
-        $count = count($_FILES['photos']['name']);
-        $success_count = 0;
+        // Array untuk menyimpan nama file yang diupload
+        $uploaded_files = [];
         
-        for($i=0; $i<$count; $i++) {
-            if(!empty($files['photos']['name'][$i])) {
-                $_FILES['photo']['name'] = $files['photos']['name'][$i];
-                $_FILES['photo']['type'] = $files['photos']['type'][$i];
-                $_FILES['photo']['tmp_name'] = $files['photos']['tmp_name'][$i];
-                $_FILES['photo']['error'] = $files['photos']['error'][$i];
-                $_FILES['photo']['size'] = $files['photos']['size'][$i];
+        // Upload foto perangkat
+        if (!empty($_FILES['foto_perangkat']['name'])) {
+            $_FILES['file']['name'] = $_FILES['foto_perangkat']['name'];
+            $_FILES['file']['type'] = $_FILES['foto_perangkat']['type'];
+            $_FILES['file']['tmp_name'] = $_FILES['foto_perangkat']['tmp_name'];
+            $_FILES['file']['error'] = $_FILES['foto_perangkat']['error'];
+            $_FILES['file']['size'] = $_FILES['foto_perangkat']['size'];
     
-                if($this->upload->do_upload('photo')) {
-                    $upload_data = $this->upload->data();
-                    
-                    // Simpan data foto ke database
-                    $photo_data = [
-                        'id_documentation' => $id_documentation,
-                        'file_name' => $upload_data['file_name'],
-                        'file_path' => 'uploads/documentation/' . $upload_data['file_name'],
-                        'description' => $description
-                    ];
-                    
-                    if($this->ActivityModel->add_documentation_photo($photo_data)) {
-                        $success_count++;
-                    }
-                }
+            if ($this->upload->do_upload('file')) {
+                $upload_data = $this->upload->data();
+                $uploaded_files['foto_perangkat'] = 'uploads/documentation/' . $upload_data['file_name'];
             }
         }
         
-        $response = [
-            'success' => ($success_count > 0),
-            'message' => "$success_count foto berhasil diupload"
-        ];
+        // Upload foto lokasi
+        if (!empty($_FILES['foto_lokasi']['name'])) {
+            $_FILES['file']['name'] = $_FILES['foto_lokasi']['name'];
+            $_FILES['file']['type'] = $_FILES['foto_lokasi']['type'];
+            $_FILES['file']['tmp_name'] = $_FILES['foto_lokasi']['tmp_name'];
+            $_FILES['file']['error'] = $_FILES['foto_lokasi']['error'];
+            $_FILES['file']['size'] = $_FILES['foto_lokasi']['size'];
+    
+            if ($this->upload->do_upload('file')) {
+                $upload_data = $this->upload->data();
+                $uploaded_files['foto_lokasi'] = 'uploads/documentation/' . $upload_data['file_name'];
+            }
+        }
         
-        echo json_encode($response);
+        // Upload foto teknisi
+        if (!empty($_FILES['foto_teknisi']['name'])) {
+            $_FILES['file']['name'] = $_FILES['foto_teknisi']['name'];
+            $_FILES['file']['type'] = $_FILES['foto_teknisi']['type'];
+            $_FILES['file']['tmp_name'] = $_FILES['foto_teknisi']['tmp_name'];
+            $_FILES['file']['error'] = $_FILES['foto_teknisi']['error'];
+            $_FILES['file']['size'] = $_FILES['foto_teknisi']['size'];
+    
+            if ($this->upload->do_upload('file')) {
+                $upload_data = $this->upload->data();
+                $uploaded_files['foto_teknisi'] = 'uploads/documentation/' . $upload_data['file_name'];
+            }
+        }
+        
+        // Jika semua foto berhasil diupload
+        if (count($uploaded_files) === 3) {
+            $photo_data = [
+                'id_documentation' => $id_documentation,
+                'foto_perangkat' => $uploaded_files['foto_perangkat'],
+                'foto_lokasi' => $uploaded_files['foto_lokasi'],
+                'foto_teknisi' => $uploaded_files['foto_teknisi'],
+                'description' => $description
+            ];
+            
+            if ($this->ActivityModel->add_documentation_photo($photo_data)) {
+                $this->session->set_flashdata('message', 'Foto dokumentasi berhasil diupload');
+            } else {
+                $this->session->set_flashdata('error', 'Gagal menyimpan data foto ke database');
+            }
+        } else {
+            $this->session->set_flashdata('error', 'Gagal mengupload beberapa foto');
+        }
+        
+        redirect('activity');
     }
     
     public function get_photos($documentation_id) {
@@ -214,18 +243,6 @@ class Activity extends CI_Controller
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
-
-        $pdf->Ln(10);
-        
-        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
         // Add images
 
         // Generate filename
@@ -235,3 +252,4 @@ class Activity extends CI_Controller
         $pdf->Output($filename . '.pdf', 'I');
     }
 }
+?>

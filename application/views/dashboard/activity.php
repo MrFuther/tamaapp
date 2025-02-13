@@ -62,7 +62,78 @@
         <div class="tab-content" id="setting-content">
           <div class="tab-pane fade show active scroll-wrapper" id="todo-section" role="tabpanel" aria-labelledby="todo-section">
             <div class="add-items d-flex px-3 mb-0">
+              <form class="form w-100">
+                <div class="form-group d-flex">
+                  <input type="text" class="form-control todo-list-input" placeholder="Add To-do">
+                  <button type="submit" class="add btn btn-primary todo-list-add-btn" id="add-task">Add</button>
+                </div>
+              </form>
+            </div>
+            <div class="list-wrapper px-3">
+              <ul class="d-flex flex-column-reverse todo-list">
+                <li>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input class="checkbox" type="checkbox">
+                      Team review meeting at 3.00 PM
+                    </label>
+                  </div>
+                  <i class="remove ti-close"></i>
+                </li>
+                <li>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input class="checkbox" type="checkbox">
+                      Prepare for presentation
+                    </label>
+                  </div>
+                  <i class="remove ti-close"></i>
+                </li>
+                <li>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input class="checkbox" type="checkbox">
+                      Resolve all the low priority tickets due today
+                    </label>
+                  </div>
+                  <i class="remove ti-close"></i>
+                </li>
+                <li class="completed">
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input class="checkbox" type="checkbox" checked>
+                      Schedule meeting for next week
+                    </label>
+                  </div>
+                  <i class="remove ti-close"></i>
+                </li>
+                <li class="completed">
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input class="checkbox" type="checkbox" checked>
+                      Project review
+                    </label>
+                  </div>
+                  <i class="remove ti-close"></i>
+                </li>
               </ul>
+            </div>
+            <h4 class="px-3 text-muted mt-5 font-weight-light mb-0">Events</h4>
+            <div class="events pt-4 px-3">
+              <div class="wrapper d-flex mb-2">
+                <i class="ti-control-record text-primary mr-2"></i>
+                <span>Feb 11 2018</span>
+              </div>
+              <p class="mb-0 font-weight-thin text-gray">Creating component page build a js</p>
+              <p class="text-gray mb-0">The total number of sessions</p>
+            </div>
+            <div class="events pt-4 px-3">
+              <div class="wrapper d-flex mb-2">
+                <i class="ti-control-record text-primary mr-2"></i>
+                <span>Feb 7 2018</span>
+              </div>
+              <p class="mb-0 font-weight-thin text-gray">Meeting with Alisa</p>
+              <p class="text-gray mb-0 ">Call Sarah Graves</p>
             </div>
           </div>
           <!-- To do section tab ends -->
@@ -74,6 +145,13 @@
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
+          <!-- Tambahkan di bagian atas konten -->
+          <?php if($this->session->flashdata('message')): ?>
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  <?= $this->session->flashdata('message'); ?>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+          <?php endif; ?>
           <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
@@ -266,16 +344,28 @@
                                   <h5 class="modal-title" id="uploadPhotoModalLabel">Upload Foto Dokumentasi</h5>
                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
-                              <form id="uploadPhotoForm" enctype="multipart/form-data">
+                              <form action="<?= base_url('activity/upload_photos'); ?>" method="POST" enctype="multipart/form-data">
                                   <div class="modal-body">
                                       <input type="hidden" name="documentation_id" id="documentation_id">
+                                      
                                       <div class="mb-3">
-                                          <label for="photos" class="form-label">Pilih Foto</label>
-                                          <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*" required>
+                                          <label for="foto_perangkat" class="form-label">Foto Perangkat</label>
+                                          <input type="file" class="form-control" id="foto_perangkat" name="foto_perangkat" accept="image/*" required>
                                       </div>
+
                                       <div class="mb-3">
-                                          <label for="photo_description" class="form-label">Deskripsi Foto</label>
-                                          <textarea class="form-control" id="photo_description" name="description" rows="3"></textarea>
+                                          <label for="foto_lokasi" class="form-label">Foto Lokasi</label>
+                                          <input type="file" class="form-control" id="foto_lokasi" name="foto_lokasi" accept="image/*" required>
+                                      </div>
+
+                                      <div class="mb-3">
+                                          <label for="foto_teknisi" class="form-label">Foto Teknisi</label>
+                                          <input type="file" class="form-control" id="foto_teknisi" name="foto_teknisi" accept="image/*" required>
+                                      </div>
+
+                                      <div class="mb-3">
+                                          <label for="description" class="form-label">Deskripsi</label>
+                                          <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                                       </div>
                                   </div>
                                   <div class="modal-footer">
@@ -292,6 +382,12 @@
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021.  Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ml-1"></i></span>
+          </div>
+        </footer>
         <!-- partial -->
       </div>
       <!-- main-panel ends -->
@@ -333,73 +429,16 @@
     }
   </script>
   <script>
-    $(document).ready(function() {
-        $('#uploadPhotoForm').on('submit', function(e) {
-            e.preventDefault();
-            
-            var formData = new FormData(this);
-            
-            $.ajax({
-                url: '<?= base_url("activity/upload_photos"); ?>',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    var result = JSON.parse(response);
-                    if(result.success) {
-                        alert(result.message);
-                        $('#uploadPhotoModal').modal('hide');
-                        $('#documentationModal').modal('show');
-                        // Refresh foto jika diperlukan
-                        loadPhotos($('#documentation_id').val());
-                    } else {
-                        alert('Gagal upload foto: ' + result.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('Terjadi kesalahan: ' + error);
-                }
-            });
-        });
-    });
-
-    function loadPhotos(documentationId) {
-      if(!documentationId) return;
-      
-      $.ajax({
-          url: '<?= base_url("activity/get_photos/"); ?>' + documentationId,
-          type: 'GET',
-          success: function(response) {
-              let photoHtml = '';
-              response.photos.forEach(function(photo) {
-                  photoHtml += `
-                      <div class="col-md-4 mb-3">
-                          <div class="card">
-                              <img src="<?= base_url(); ?>${photo.file_path}" class="card-img-top" alt="Documentation Photo">
-                              <div class="card-body">
-                                  <p class="card-text small">${photo.description}</p>
-                                  <button class="btn btn-danger btn-sm" onclick="deletePhoto(${photo.id_photo})">
-                                      Hapus
-                                  </button>
-                              </div>
-                          </div>
-                      </div>
-                  `;
-              });
-              $('#photoContainer').html(photoHtml);
-          }
-      });
-    }
-
     function openUploadPhoto(documentationId) {
-    if (!documentationId) {
-        alert('Silakan buat dokumentasi terlebih dahulu sebelum upload foto');
-        return;
-    }
-    $('#documentation_id').val(documentationId);
-    $('#documentationModal').modal('hide');
-    $('#uploadPhotoModal').modal('show');
+        if (!documentationId) {
+            alert('Silakan buat dokumentasi terlebih dahulu sebelum upload foto');
+            return;
+        }
+        document.getElementById('documentation_id').value = documentationId;
+        var uploadModal = new bootstrap.Modal(document.getElementById('uploadPhotoModal'));
+        var documentationModal = new bootstrap.Modal(document.getElementById('documentationModal'));
+        uploadModal.show();
+        documentationModal.hide();
     }
   </script>
   <!-- plugins:js -->
