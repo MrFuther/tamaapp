@@ -8,45 +8,37 @@ class ManageUser extends CI_Controller {
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
-
         if ($this->session->userdata('role') !== 'admin') {
-            // Jika bukan admin, arahkan ke halaman khusus "Tidak Memiliki Izin"
             redirect(base_url('forbidden'));
         }
-        $this->load->model('UserModel'); // Load the User model
+        $this->load->model('UserModel');
     }
 
     public function index() {
-        // Get users from the database
         $data['title'] = 'MasterReport';
         $data['user'] = $this->session->userdata();
         $data['users'] = $this->UserModel->get_users();
-        // Load the view
+        $data['units'] = $this->UserModel->get_units(); // Fetch unit kerja
+
         $this->load->view('dashboard/manage_user', $data);
     }
 
     public function add_user() {
-        // Handle adding a user
         $username = $this->input->post('username');
         $password = $this->input->post('password');
         $role = $this->input->post('role');
-        
-        $this->UserModel->add_user($username, $password, $role);
-        
+        $unit_id = $this->input->post('unit_id');
+
+        $this->UserModel->add_user($username, $password, $role, $unit_id);
+
         redirect('ManageUser/index');
     }
 
     public function update_role($id) {
-        // Handle updating user role
         $role = $this->input->post('role');
-        $this->UserModel->update_role($id, $role);
+        $unit_id = $this->input->post('unit_id');
 
-        redirect('ManageUser/index');
-    }
-
-    public function delete_user($id) {
-        // Handle deleting a user
-        $this->UserModel->delete_user($id);
+        $this->UserModel->update_user($id, $role, $unit_id);
 
         redirect('ManageUser/index');
     }
