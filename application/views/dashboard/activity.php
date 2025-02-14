@@ -247,16 +247,16 @@
                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div class="modal-body">
-                                  <!-- Form Dokumentasi -->
                                   <form action="<?= base_url('activity/save_documentation'); ?>" method="POST" enctype="multipart/form-data">
                                       <input type="hidden" name="activity_id" value="<?= $activity->id_activity; ?>">
 
-                                      <!-- Row untuk Data Aktivitas -->
+                                      <!-- Data Aktivitas (Tidak berubah) -->
                                       <div class="row">
                                           <div class="col-md-6">
                                               <div class="mb-3">
                                                   <strong>Data Personel:</strong>
-                                                  <p> <?php foreach ($activity->users as $user): ?>
+                                                  <p> 
+                                                      <?php foreach ($activity->users as $user): ?>
                                                           <span class="badge bg-info"><?= $user->username; ?></span>
                                                       <?php endforeach; ?>
                                                   </p>
@@ -277,21 +277,18 @@
 
                                           <div class="col-md-6">
                                               <div class="mb-3">
-                                                  <strong>Data Dokumentasi Preventive Maintenance</strong>
-                                              </div>
-                                              <div class="mb-3">
                                                   <label for="laporan" class="form-label">Kelompok Laporan</label>
                                                   <select class="form-control" id="laporan" name="laporan" required>
-                                                      <option value="harian">Harian</option>
-                                                      <option value="mingguan">Mingguan</option>
-                                                      <option value="bulanan">Bulanan</option>
+                                                      <option value="harian" <?= isset($documentation) && $documentation->laporan == 'harian' ? 'selected' : ''; ?>>Harian</option>
+                                                      <option value="mingguan" <?= isset($documentation) && $documentation->laporan == 'mingguan' ? 'selected' : ''; ?>>Mingguan</option>
+                                                      <option value="bulanan" <?= isset($documentation) && $documentation->laporan == 'bulanan' ? 'selected' : ''; ?>>Bulanan</option>
                                                   </select>
                                               </div>
                                               <div class="mb-3">
                                                   <label for="area" class="form-label">Area</label>
                                                   <select class="form-control" id="area" name="area" required>
                                                       <?php foreach ($areas as $area): ?>
-                                                          <option value="<?= $area->area_id; ?>"><?= $area->area_name; ?></option>
+                                                          <option value="<?= $area->area_id; ?>" <?= isset($documentation) && $documentation->area_id == $area->area_id ? 'selected' : ''; ?>><?= $area->area_name; ?></option>
                                                       <?php endforeach; ?>
                                                   </select>
                                               </div>
@@ -299,7 +296,7 @@
                                                   <label for="group_device" class="form-label">Group Device</label>
                                                   <select class="form-control" id="group_device" name="group_device" required>
                                                       <?php foreach ($group_devices as $group): ?>
-                                                          <option value="<?= $group->pek_unit_id; ?>"><?= $group->pek_unit_name; ?></option>
+                                                          <option value="<?= $group->pek_unit_id; ?>" <?= isset($documentation) && $documentation->group_device_id == $group->pek_unit_id ? 'selected' : ''; ?>><?= $group->pek_unit_name; ?></option>
                                                       <?php endforeach; ?>
                                                   </select>
                                               </div>
@@ -307,7 +304,7 @@
                                                   <label for="sub_device" class="form-label">Sub Device</label>
                                                   <select class="form-control" id="sub_device" name="sub_device" required>
                                                       <?php foreach ($sub_devices as $sub_device): ?>
-                                                          <option value="<?= $sub_device->sub_device_id; ?>"><?= $sub_device->sub_device_name; ?></option>
+                                                          <option value="<?= $sub_device->sub_device_id; ?>" <?= isset($documentation) && $documentation->sub_device_id == $sub_device->sub_device_id ? 'selected' : ''; ?>><?= $sub_device->sub_device_name; ?></option>
                                                       <?php endforeach; ?>
                                                   </select>
                                               </div>
@@ -315,66 +312,66 @@
                                                   <label for="device" class="form-label">Nama Device</label>
                                                   <select class="form-control" id="device" name="device" required>
                                                       <?php foreach ($devices as $device): ?>
-                                                          <option value="<?= $device->device_hidn_id; ?>"><?= $device->device_hidn_name; ?></option>
+                                                          <option value="<?= $device->device_hidn_id; ?>" <?= isset($documentation) && $documentation->device_id == $device->device_hidn_id ? 'selected' : ''; ?>><?= $device->device_hidn_name; ?></option>
                                                       <?php endforeach; ?>
                                                   </select>
                                               </div>
                                           </div>
                                       </div>
-                                      <button type="button" class="btn btn-info" onclick="openUploadPhoto('<?= $activity->documentation ? $activity->documentation->id_documentation : ''; ?>')">
-                                          Upload Foto
-                                      </button>
-                                      <div class="mt-3">
-                                          <h6>Foto Dokumentasi:</h6>
-                                          <div class="row" id="photoContainer">
-                                              <!-- Foto akan dimuat di sini -->
-                                          </div>
-                                      </div>
-                                      <button type="submit" class="btn btn-primary">Simpan Dokumentasi</button>
-                                  </form>
+                                      <!-- Tombol Submit Berdasarkan Keberadaan Dokumentasi -->
+                                      <button type="submit" class="btn btn-primary"><?= isset($documentation) ? 'Update Dokumentasi' : 'Simpan Dokumentasi'; ?></button>
+                                      <!-- Tombol untuk membuka Modal Dokumentasi Foto -->
+                                      <!-- Tombol untuk membuka Modal Dokumentasi Foto -->
+                                      <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#documentationPhotoModal">
+                                          Dokumentasi Foto
+                                      </button>                  
+                                    </form>
                               </div>
                           </div>
                       </div>
                   </div>
-                  <!-- Modal Upload Foto -->
-                  <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                          <div class="modal-content">
-                              <div class="modal-header">
-                                  <h5 class="modal-title" id="uploadPhotoModalLabel">Upload Foto Dokumentasi</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                              </div>
-                              <form action="<?= base_url('activity/upload_photos'); ?>" method="POST" enctype="multipart/form-data">
-                                  <div class="modal-body">
-                                      <input type="hidden" name="documentation_id" id="documentation_id">
-                                      
-                                      <div class="mb-3">
-                                          <label for="foto_perangkat" class="form-label">Foto Perangkat</label>
-                                          <input type="file" class="form-control" id="foto_perangkat" name="foto_perangkat" accept="image/*" required>
-                                      </div>
+                  <!-- Modal Dokumentasi Foto -->
+                  <div class="modal fade" id="documentationPhotoModal" tabindex="-1" aria-labelledby="documentationPhotoModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="documentationPhotoModalLabel">Dokumentasi Foto</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="<?= base_url('activity/save_documentation_photos'); ?>" method="POST" enctype="multipart/form-data">
+                                    <!-- Pastikan id_documentation sudah ada -->
+                                    <input type="hidden" name="id_documentation" value="<?= isset($documentation) ? $documentation->id_documentation : ''; ?>">
 
-                                      <div class="mb-3">
-                                          <label for="foto_lokasi" class="form-label">Foto Lokasi</label>
-                                          <input type="file" class="form-control" id="foto_lokasi" name="foto_lokasi" accept="image/*" required>
-                                      </div>
+                                    <!-- Foto Perangkat -->
+                                    <div class="mb-3">
+                                        <label for="foto_perangkat" class="form-label">Foto Perangkat</label>
+                                        <input type="file" class="form-control" id="foto_perangkat" name="foto_perangkat" accept="image/*" required>
+                                    </div>
 
-                                      <div class="mb-3">
-                                          <label for="foto_teknisi" class="form-label">Foto Teknisi</label>
-                                          <input type="file" class="form-control" id="foto_teknisi" name="foto_teknisi" accept="image/*" required>
-                                      </div>
+                                    <!-- Foto Lokasi -->
+                                    <div class="mb-3">
+                                        <label for="foto_lokasi" class="form-label">Foto Lokasi</label>
+                                        <input type="file" class="form-control" id="foto_lokasi" name="foto_lokasi" accept="image/*" required>
+                                    </div>
 
-                                      <div class="mb-3">
-                                          <label for="description" class="form-label">Deskripsi</label>
-                                          <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                                      </div>
-                                  </div>
-                                  <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                      <button type="submit" class="btn btn-primary">Upload</button>
-                                  </div>
-                              </form>
-                          </div>
-                      </div>
+                                    <!-- Foto Teknisi -->
+                                    <div class="mb-3">
+                                        <label for="foto_teknisi" class="form-label">Foto Teknisi</label>
+                                        <input type="file" class="form-control" id="foto_teknisi" name="foto_teknisi" accept="image/*" required>
+                                    </div>
+
+                                    <!-- Deskripsi Foto -->
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Deskripsi Foto</label>
+                                        <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">Simpan Foto</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                   </div>
               </div>
             </div>
@@ -427,8 +424,7 @@
     // Redirect ke halaman login atau halaman utama setelah logout
     window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
     }
-  </script>
-  <script>
+
     function openUploadPhoto(documentationId) {
         if (!documentationId) {
             alert('Silakan buat dokumentasi terlebih dahulu sebelum upload foto');
@@ -439,6 +435,21 @@
         var documentationModal = new bootstrap.Modal(document.getElementById('documentationModal'));
         uploadModal.show();
         documentationModal.hide();
+    }
+
+    function loadDocumentationPhoto(activity_id) {
+        // Mengambil data yang relevan dan memanggil modal
+        $.ajax({
+            url: '<?= base_url("activity/show_documentation_photos/"); ?>' + activity_id,
+            type: 'GET',
+            success: function(response) {
+                // Memasukkan data ke dalam modal jika data ditemukan
+                $('#documentationPhotoModal .modal-body').html(response);
+            },
+            error: function() {
+                alert('Error loading documentation photo data');
+            }
+        });
     }
   </script>
   <!-- plugins:js -->
