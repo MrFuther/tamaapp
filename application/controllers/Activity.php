@@ -21,6 +21,13 @@ class Activity extends CI_Controller
         $data['activities'] = $this->ActivityModel->get_all_activities();
         $data['personel'] = $this->ActivityModel->get_all_personel();
         $data['shifts'] = $this->ActivityModel->get_all_shifts();
+        $data['areas'] = $this->ActivityModel->get_area_options();
+        $data['group_devices'] = $this->ActivityModel->get_group_devices();
+        $data['sub_devices'] = $this->ActivityModel->get_sub_devices();
+        $data['devices'] = $this->ActivityModel->get_device_hidn();
+        foreach ($data['activities'] as $activity) {
+            $activity->documentation = $this->ActivityModel->get_documentation($activity->id_activity);
+        }
         $this->load->view('dashboard/activity', $data);
     }
 
@@ -40,6 +47,145 @@ class Activity extends CI_Controller
     public function delete($id) {
         $this->ActivityModel->delete_activity($id);
         redirect('activity');
+    }
+    
+    public function save_documentation() {
+        // Ambil data dari form
+        $laporan = $this->input->post('laporan');
+        $area = $this->input->post('area');
+        $group_device = $this->input->post('group_device');
+        $sub_device = $this->input->post('sub_device');
+        $device = $this->input->post('device');
+        $activity_id = $this->input->post('activity_id');  // ID Aktivitas
+    
+        // Simpan data dokumentasi ke database
+        $data = [
+            'id_activity' => $activity_id,
+            'laporan' => $laporan,
+            'area_id' => $area,
+            'group_device_id' => $group_device,
+            'sub_device_id' => $sub_device,
+            'device_id' => $device
+        ];
+    
+        $this->db->insert('documentation', $data);
+    
+        // Redirect atau tampilkan pesan sukses
+        redirect('activity'); // Ganti dengan URL yang sesuai
+    }
+
+    public function show_documentation($activity_id) {
+        // Ambil data aktivitas yang dipilih
+        $data['activity'] = $this->ActivityModel->get_activity_details($activity_id);
+        
+        // Ambil data dokumentasi berdasarkan activity_id
+        $data['documentation'] = $this->ActivityModel->get_documentation_by_activity($activity_id);
+        
+        // Ambil data lainnya untuk form select
+        $data['areas'] = $this->ActivityModel->get_area_options();
+        $data['group_devices'] = $this->ActivityModel->get_group_devices();
+        $data['sub_devices'] = $this->ActivityModel->get_sub_devices();
+        $data['devices'] = $this->ActivityModel->get_device_hidn();
+    
+        // Tampilkan modal dengan data yang sudah diambil
+        $this->load->view('dashboard/activity', $data);
+    }    
+    
+    public function show_documentation_photos($activity_id) {
+        // Ambil data aktivitas yang dipilih
+        $data['activity'] = $this->ActivityModel->get_activity_details($activity_id);
+        
+        // Ambil data dokumentasi terkait activity_id
+        $data['documentation'] = $this->ActivityModel->get_documentation_by_activity($activity_id);
+    
+        // Ambil data foto dokumentasi
+        $data['documentation_photos'] = $this->ActivityModel->get_photos_by_activity($activity_id);
+    
+        // Ambil data lainnya untuk form select
+        $data['areas'] = $this->ActivityModel->get_area_options();
+        $data['group_devices'] = $this->ActivityModel->get_group_devices();
+        $data['sub_devices'] = $this->ActivityModel->get_sub_devices();
+        $data['devices'] = $this->ActivityModel->get_device_hidn();
+    
+        // Tampilkan modal dengan data yang sudah diambil
+        $this->load->view('activity', $data);
+    }
+    
+    public function save_documentation_photos() {
+        var_dump($_POST);
+        exit();
+        $id_documentation = $this->input->post('id_documentation');
+        $description = $this->input->post('description');
+    
+        // Atur konfigurasi upload untuk setiap foto
+        $config['upload_path'] = '/uploads/documentation/';
+        $config['allowed_types'] = 'jpg|jpeg';
+        $config['max_size'] = 2048;  // 2MB max size
+        $this->load->library('upload', $config);
+    
+        // Data untuk foto
+        $photos = [
+            'foto_perangkat' => '',
+            'foto_lokasi' => '',
+            'foto_teknisi' => ''
+        ];
+    
+        // Proses upload foto
+        foreach ($photos as $key => $value) {
+            if ($_FILES[$key]['name']) {
+                if ($this->upload->do_upload($key)) {
+                    $file_data = $this->upload->data();
+                    $photos[$key] = 'uploads/documentation/' . $file_data['file_name'];
+                } else {
+                    $photos[$key] = NULL; // Jika gagal upload, set foto sebagai NULL
+                }
+            }
+        }
+    
+        // Simpan data foto ke database
+        $data = [
+            'id_documentation' => $id_documentation,
+            'foto_perangkat' => $photos['foto_perangkat'],
+            'foto_lokasi' => $photos['foto_lokasi'],
+            'foto_teknisi' => $photos['foto_teknisi'],
+            'description' => $description
+        ];
+    
+        // Insert atau Update ke tabel documentation_photos
+        $existing_photos = $this->db->get_where('documentation_photos', ['id_documentation' => $id_documentation])->row();
+    
+        if ($existing_photos) {
+            // Jika ada, lakukan update
+            $this->db->where('id_documentation', $id_documentation);
+            $this->db->update('documentation_photos', $data);
+            $this->session->set_flashdata('message', 'Foto berhasil diperbarui');
+        } else {
+            // Jika tidak ada, lakukan insert
+            $this->db->insert('documentation_photos', $data);
+            $this->session->set_flashdata('message', 'Foto berhasil disimpan');
+        }
+    
+        redirect('activity');
+    }    
+    
+    public function get_photos($documentation_id) {
+        $photos = $this->db->get_where('documentation_photos', 
+            ['id_documentation' => $documentation_id])->result();
+        echo json_encode(['photos' => $photos]);
+    }
+    
+    public function delete_photo($photo_id) {
+        $result = $this->ActivityModel->delete_documentation_photo($photo_id);
+        echo json_encode(['success' => $result]);
+    }
+    
+    public function get_documentation_details($activity_id) {
+        $documentation = $this->ActivityModel->get_documentation($activity_id);
+        $photos = $this->ActivityModel->get_documentation_photos($documentation->id_documentation);
+        echo json_encode([
+            'documentation' => $documentation,
+            'photos' => $photos
+        ]);
     }
 
     public function print_pdf($id) {
@@ -108,18 +254,6 @@ class Activity extends CI_Controller
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
-
-        $pdf->Ln(10);
-        
-        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
         // Add images
 
         // Generate filename
@@ -129,3 +263,4 @@ class Activity extends CI_Controller
         $pdf->Output($filename . '.pdf', 'I');
     }
 }
+?>
