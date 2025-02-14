@@ -7,17 +7,38 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE TABLE IF NOT EXISTS `activity_pm` (
+CREATE TABLE IF NOT EXISTS `documentation` (
+  `id_documentation` int(11) NOT NULL AUTO_INCREMENT,
   `id_activity` varchar(15) NOT NULL,
-  `personel_id` int(11) NOT NULL,
-  `shift_id` int(11) NOT NULL,
-  `tanggal_kegiatan` date NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_activity`),
-  KEY `personel_id` (`personel_id`),
-  KEY `shift_id` (`shift_id`),
-  CONSTRAINT `activity_pm_ibfk_1` FOREIGN KEY (`personel_id`) REFERENCES `personel` (`id_personel`) ON DELETE CASCADE,
-  CONSTRAINT `activity_pm_ibfk_2` FOREIGN KEY (`shift_id`) REFERENCES `shift_kerja` (`id_shift`) ON DELETE CASCADE
+  `laporan` enum('harian','mingguan','bulanan') NOT NULL,
+  `area_id` int(11) NOT NULL,
+  `group_device_id` int(11) NOT NULL,
+  `sub_device_id` int(11) NOT NULL,
+  `device_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id_documentation`),
+  KEY `area_id` (`area_id`),
+  KEY `group_device_id` (`group_device_id`),
+  KEY `sub_device_id` (`sub_device_id`),
+  KEY `device_id` (`device_id`),
+  CONSTRAINT `documentation_ibfk_1` FOREIGN KEY (`area_id`) REFERENCES `ms_area` (`area_id`),
+  CONSTRAINT `documentation_ibfk_2` FOREIGN KEY (`group_device_id`) REFERENCES `ms_groupdevices` (`pek_unit_id`),
+  CONSTRAINT `documentation_ibfk_3` FOREIGN KEY (`sub_device_id`) REFERENCES `ms_sub_device` (`sub_device_id`),
+  CONSTRAINT `documentation_ibfk_4` FOREIGN KEY (`device_id`) REFERENCES `ms_device_hidn` (`device_hidn_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `documentation_photos` (
+  `id_photo` int(11) NOT NULL AUTO_INCREMENT,
+  `id_documentation` int(11) NOT NULL,
+  `foto_perangkat` varchar(255) NOT NULL,
+  `foto_lokasi` varchar(255) NOT NULL,
+  `foto_teknisi` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_photo`),
+  KEY `id_documentation` (`id_documentation`),
+  CONSTRAINT `documentation_photos_ibfk_1` FOREIGN KEY (`id_documentation`) REFERENCES `documentation` (`id_documentation`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

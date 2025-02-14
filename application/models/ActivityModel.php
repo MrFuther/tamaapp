@@ -66,6 +66,14 @@ class ActivityModel extends CI_Model {
         return $this->db->get()->row(); // Mengambil satu aktivitas berdasarkan ID
     }
     
+    public function get_documentation_by_activity($activity_id) {
+        $this->db->select('*');
+        $this->db->from('documentation');
+        $this->db->where('id_activity', $activity_id);
+        return $this->db->get()->row();  // Mengambil satu data dokumentasi berdasarkan ID aktivitas
+    }
+    
+
     public function get_area_options() {
         return $this->db->get('ms_area')->result(); // Mengambil data area
     }
