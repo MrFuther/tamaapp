@@ -83,7 +83,8 @@
                   <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
                   </p>
                   <div class="table-responsive">
-                    <table class="table table-striped">
+                  <input type="text" id="searchInput" class="form-control" placeholder="Cari data...">
+                    <table class="table table-striped" id="activityTable">
                       <thead>
                       <tr>
                         <th>#</th>
@@ -109,9 +110,10 @@
                               <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
                               <td><?= $activity->tanggal_kegiatan; ?></td>
                               <td>
-                                  <button class="btn btn-success btn-sm">Ceklist</button>
-                                  <button class="btn btn-info btn-sm">Dokumentasi</button>
-                                  <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
+                                  <button class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i></button>
+                                  <button class="btn btn-info btn-sm"><i class="fa-solid fa-camera"></i></button>
+                                  <button class="btn btn-primary btn-sm"><i class="fa-solid fa-print"></i></button>
+                                  <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')"><i class="fas fa-trash"></i></a>
                               </td>
                           </tr>
                       <?php endforeach; ?>
@@ -206,6 +208,19 @@
     window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
     }
   </script>
+
+  <script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#activityTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+  </script>
+
   <!-- plugins:js -->
   <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->
