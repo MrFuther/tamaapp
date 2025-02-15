@@ -188,16 +188,11 @@
                               <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
                               <td><?= $activity->tanggal_kegiatan; ?></td>
                               <td>
-<<<<<<< HEAD
-                                  <button class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i></button>
-                                  <button class="btn btn-info btn-sm"><i class="fa-solid fa-camera"></i></button>
-                                  <button class="btn btn-primary btn-sm"><i class="fa-solid fa-print"></i></button>
-                                  <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')"><i class="fas fa-trash"></i></a>
-=======
-                                  <button class="btn btn-success btn-sm">Ceklist</button>
+                                  <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#checklistModal" onclick="loadChecklistForm(<?= $activity->id_activity; ?>)">
+                                      Ceklist
+                                  </button>
                                   <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#documentationModal" onclick="loadDocumentation(<?= $activity->id_activity; ?>)">Dokumentasi</button>
                                   <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
->>>>>>> f80bcd83cd2d77b0158ae0b2cf6fec163811f6eb
                               </td>
                           </tr>
                       <?php endforeach; ?>
@@ -381,6 +376,39 @@
                         </div>
                     </div>
                   </div>
+                  <!-- Modal Ceklist dengan Form Pengisian -->
+                  <div class="modal fade" id="checklistModal" tabindex="-1" aria-labelledby="checklistModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="checklistModalLabel">Form Checklist</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="<?= base_url('activity/save_checklist'); ?>" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="activity_id" value="<?= isset($checklist) ? $checklist->activity_id : ''; ?>">
+
+                                    <!-- Pilih Perangkat -->
+                                    <select class="form-control" name="device" id="device" required>
+                                        <option value="">-- Pilih Perangkat --</option>
+                                        <?php foreach ($devices as $device): ?>
+                                            <option value="<?= $device->device_hidn_id; ?>"><?= $device->device_hidn_name; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <!-- Kegiatan yang Dilakukan (Dinamakan Berdasarkan Perangkat yang Dipilih) -->
+                                    <div id="kegiatan_section">
+                                        <!-- Kegiatan akan di-load di sini berdasarkan perangkat yang dipilih -->
+                                    </div>
+                                    <!-- Tombol Submit -->
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
               </div>
             </div>
           </div>
@@ -472,12 +500,38 @@
         });
     });
   </script>
+  <script>
+      $(document).ready(function() {
+          // Ketika perangkat dipilih
+          $('#device').change(function() {
+              var device_id = $(this).val();  // Mendapatkan nilai device_id yang dipilih
 
+              if (device_id != "") {
+                  console.log("Device ID dipilih: ", device_id);  // Debugging: Menampilkan device_id yang dipilih
+                  $.ajax({
+                      url: '<?= base_url('activity/get_kegiatan_per_device'); ?>', // Pastikan URL ini benar
+                      method: 'POST',
+                      data: { device_id: device_id }, // Kirimkan device_id ke server
+                      success: function(response) {
+                          console.log("Respons dari server: ", response);  // Debugging: Menampilkan respons dari server
+                          $('#kegiatan_section').html(response);  // Render pertanyaan kegiatan ke dalam form
+                      },
+                      error: function(xhr, status, error) {
+                          console.log("Error AJAX: ", error);  // Debugging: Menampilkan error jika AJAX gagal
+                      }
+                  });
+              } else {
+                  $('#kegiatan_section').html('');  // Jika tidak ada perangkat yang dipilih
+              }
+          });
+      });
+  </script>
   <!-- plugins:js -->
   <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
   <script src="<?php echo base_url('vendors/chart.js/Chart.min.js'); ?>"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="<?php echo base_url('vendors/datatables.net/jquery.dataTables.js'); ?>"></script>
   <script src="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.js'); ?>"></script>
   <script src="<?php echo base_url('js/dataTables.select.min.js'); ?>"></script>

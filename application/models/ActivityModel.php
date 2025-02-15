@@ -158,5 +158,45 @@ class ActivityModel extends CI_Model {
         $this->db->order_by('documentation_photos.created_at', 'ASC');
         return $this->db->get()->result();
     }
+
+    public function get_kegiatan_per_device($device_id) {
+        // Ambil kegiatan yang sesuai dengan device_id
+        $this->db->where('device_id', $device_id);
+        $query = $this->db->get('kegiatan_ceklist'); // Mengambil data kegiatan dari tabel `kegiatan_ceklist`
+        
+        // Mengembalikan hasil dalam bentuk array
+        return $query->result();
+    }
+
+    // Fungsi untuk menyimpan data checklist ke database
+    public function save_checklist($data) {
+        $this->db->insert('checklist', $data);  // Menyimpan data checklist ke tabel `checklist`
+        return $this->db->insert_id();  // Mengembalikan ID dari data yang disimpan
+    }
+
+    // Fungsi untuk mendapatkan data checklist berdasarkan activity_id
+    public function get_checklist_by_activity($activity_id) {
+        $this->db->where('activity_id', $activity_id);
+        $query = $this->db->get('checklist');
+        return $query->row();  // Mengembalikan satu baris data checklist
+    }
+
+    // Fungsi untuk mengupdate data checklist
+    public function update_checklist($activity_id, $data) {
+        $this->db->where('activity_id', $activity_id);
+        return $this->db->update('checklist', $data);  // Mengupdate data checklist
+    }
+
+    // Fungsi untuk mengambil data perangkat
+    public function get_devices() {
+        $query = $this->db->get('ms_device_hidn');  // Mengambil data perangkat dari tabel `ms_device_hidn`
+        return $query->result();  // Mengembalikan hasil sebagai array
+    }
+
+    // Menyimpan data checklist foto (jika diperlukan di masa depan)
+    public function save_documentation_photos($data) {
+        $this->db->insert('documentation_photos', $data);
+        return $this->db->insert_id();  // Mengembalikan ID dari foto yang disimpan
+    }
 }
 ?>
