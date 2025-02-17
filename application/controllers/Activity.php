@@ -124,28 +124,6 @@ class Activity extends CI_Controller
         $this->session->set_flashdata('success', 'Data berhasil disimpan');
         redirect('activity');
     }
-    
-    public function save_checklist() {
-        $post = $this->input->post();
-        
-        // Data untuk checklist
-        $checklist_data = [
-            'form_id' => $post['form_id'],
-            'device_ids' => $post['device_ids'],
-            'indicator_check' => $post['indicator_check'],
-            'ink_check' => $post['ink_check'],
-            'color_check' => $post['color_check'],
-            'notes' => $post['notes']
-        ];
-    
-        if($this->ChecklistModel->save_checklist($checklist_data)) {
-            $this->session->set_flashdata('success', 'Checklist berhasil disimpan');
-        } else {
-            $this->session->set_flashdata('error', 'Gagal menyimpan checklist');
-        }
-        
-        redirect('activity');
-    }
 
     public function get_form_data($activity_id) {
         // Ambil data form berdasarkan activity_id

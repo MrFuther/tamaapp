@@ -206,12 +206,6 @@ class ActivityModel extends CI_Model {
         return $query->result();
     }
 
-    // Fungsi untuk menyimpan data checklist ke database
-    public function save_checklist($data) {
-        $this->db->insert('checklist', $data);  // Menyimpan data checklist ke tabel `checklist`
-        return $this->db->insert_id();  // Mengembalikan ID dari data yang disimpan
-    }
-
     // Fungsi untuk mendapatkan data checklist berdasarkan activity_id
     public function get_checklist_by_activity($activity_id) {
         $this->db->where('activity_id', $activity_id);
