@@ -159,69 +159,57 @@
                     <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Role</th>
-                            <th>Actions</th>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Unit Kerja</th>
+                        <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (!empty($users)): ?>
                             <?php foreach ($users as $user): ?>
-                                <tr>
-                                    <td><?php echo $user['id']; ?></td>
-                                    <td><?php echo $user['username']; ?></td>
-                                    <td>
-                                        <span class="badge bg-secondary text-capitalize">
-                                            <?php echo $user['role']; ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <!-- Update Role Button -->
-                                            <button 
-                                                class="btn btn-warning btn-sm" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#updateRoleModal-<?php echo $user['id']; ?>"
-                                            >
-                                                <i class="fas fa-edit"></i> Edit Role
-                                            </button>
-
-                                            <!-- Delete Button -->
-                                            <button 
-                                                class="btn btn-danger btn-sm" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#deleteUserModal-<?php echo $user['id']; ?>"
-                                            >
-                                                <i class="fas fa-trash"></i> Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                              <td><?php echo $user['id']; ?></td>
+                              <td><?php echo $user['username']; ?></td>
+                              <td><span class="badge bg-secondary text-capitalize"><?php echo $user['role']; ?></span></td>
+                              <td><?php echo $user['unit_name'] ?? '-'; ?></td>
+                              <td>
+                                  <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateRoleModal-<?php echo $user['id']; ?>">
+                                      <i class="fas fa-edit"></i> Edit Role
+                                  </button>
+                                  <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal-<?php echo $user['id']; ?>">
+                                      <i class="fas fa-trash"></i> Delete
+                                  </button>
+                              </td>
+                            </tr>
 
                                 <!-- Update Role Modal -->
                                 <div class="modal fade" id="updateRoleModal-<?php echo $user['id']; ?>" tabindex="-1" aria-labelledby="updateRoleModalLabel-<?php echo $user['id']; ?>" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
-                                            <form action="<?php echo base_url('manageuser/update_role/'.$user['id']); ?>" method="POST">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Update Role</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <label for="role" class="form-label">Select Role</label>
-                                                    <select name="role" id="role" class="form-select" required>
-                                                        <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                                        <option value="management" <?php echo $user['role'] == 'managemement' ? 'selected' : ''; ?>>Management</option>
-                                                        <option value="supervisor" <?php echo $user['role'] == 'supervisor' ? 'selected' : ''; ?>>Supervisor</option>
-                                                        <option value="teknisi" <?php echo $user['role'] == 'teknisi' ? 'selected' : ''; ?>>Teknisi</option>
-                                                    </select>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <button type="submit" class="btn btn-success">Save Changes</button>
-                                                </div>
-                                            </form>
+                                        <form action="<?php echo base_url('manageuser/update_role/'.$user['id']); ?>" method="POST">
+                                          <div class="modal-body">
+                                              <label for="role" class="form-label">Select Role</label>
+                                              <select name="role" class="form-select">
+                                                  <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                                  <option value="management" <?php echo $user['role'] == 'management' ? 'selected' : ''; ?>>Management</option>
+                                                  <option value="supervisor" <?php echo $user['role'] == 'supervisor' ? 'selected' : ''; ?>>Supervisor</option>
+                                                  <option value="teknisi" <?php echo $user['role'] == 'teknisi' ? 'selected' : ''; ?>>Teknisi</option>
+                                              </select>
+
+                                              <label for="unit_id" class="form-label">Unit Kerja</label>
+                                              <select name="unit_id" class="form-select">
+                                                  <?php foreach ($units as $unit): ?>
+                                                      <option value="<?php echo $unit['unit_id']; ?>" <?php echo ($user['unit_id'] == $unit['unit_id']) ? 'selected' : ''; ?>>
+                                                          <?php echo $unit['unit_name']; ?>
+                                                      </option>
+                                                  <?php endforeach; ?>
+                                              </select>
+                                          </div>
+                                          <div class="modal-footer">
+                                              <button type="submit" class="btn btn-success">Save Changes</button>
+                                          </div>
+                                      </form>
                                         </div>
                                     </div>
                                 </div>
@@ -239,11 +227,12 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <a href="<?php echo base_url('manageuser/delete_user/'.$user['id']); ?>" class="btn btn-danger">Delete</a>
+                                        <a href="<?php echo base_url('manageuser/delete_user/'.$user['id']); ?>" class="btn btn-danger btn-confirm-delete">Delete</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
@@ -281,6 +270,15 @@
                                 <option value="teknisi">Technician</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="unit_id" class="form-label">Unit Kerja</label>
+                            <select name="unit_id" class="form-control" required>
+                                <?php foreach ($units as $unit): ?>
+                                    <option value="<?php echo $unit['unit_id']; ?>"><?php echo $unit['unit_name']; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

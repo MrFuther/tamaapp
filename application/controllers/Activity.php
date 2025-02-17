@@ -46,6 +46,51 @@ class Activity extends CI_Controller
         $this->ActivityModel->delete_activity($id);
         redirect('activity');
     }
+
+    public function save_checklist() {
+        // Ambil data dari form
+        $data = [
+            'activity_id' => $this->input->post('activity_id'),
+            'device_id' => $this->input->post('device'),
+            'kegiatan' => $this->input->post('kegiatan_1'), // Menyimpan kegiatan yang dipilih
+            'status' => $this->input->post('status_1'), // Menyimpan status kegiatan
+            'catatan' => $this->input->post('catatan')
+        ];
+
+        // Simpan data ke tabel checklist
+        $this->ActivityModel->save_checklist($data);
+
+        // Redirect atau tampilkan pesan sukses
+        $this->session->set_flashdata('message', 'Data checklist berhasil disimpan');
+        redirect('activity');  // Redirect kembali ke halaman aktivitas
+    }    
+    
+    public function get_checklist($activity_id) {
+        // Ambil data checklist yang sudah ada berdasarkan activity_id
+        $data['checklist'] = $this->db->get_where('checklist', ['activity_id' => $activity_id])->row();
+        
+        // Ambil data perangkat dari ms_device_hidn
+        $data['devices'] = $this->db->get('ms_device_hidn')->result();
+    
+        // Kirim data ke view
+        $this->load->view('dashboard/activity', $data);
+    }
+    
+    public function get_kegiatan_per_device() {
+        $device_id = $this->input->post('device_id');  // Mendapatkan device_id dari request AJAX
+        $kegiatan = $this->ActivityModel->get_kegiatan_per_device($device_id);  // Mengambil kegiatan berdasarkan perangkat
+
+        // Generate HTML untuk pertanyaan kegiatan
+        $output = '';
+        foreach ($kegiatan as $k) {
+            $output .= '<div class="mb-3">';
+            $output .= '<label for="kegiatan_' . $k->id_kegiatan . '" class="form-label">' . $k->nama_kegiatan . '</label>';
+            $output .= '<input type="radio" name="kegiatan_' . $k->id_kegiatan . '" value="OK" required> OK';
+            $output .= '<input type="radio" name="kegiatan_' . $k->id_kegiatan . '" value="NOT OK"> NOT OK';
+            $output .= '</div>';
+        }
+        echo $output;  // Mengirimkan HTML yang sudah di-generate kembali ke view
+    }     
     
     public function save_form() {
         $post = $this->input->post();

@@ -161,7 +161,8 @@
                   <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
                   </p>
                   <div class="table-responsive">
-                    <table class="table table-striped" id="activityTable">
+                  <input type="text" id="searchInput" class="form-control" placeholder="Cari data...">
+                    <table class="table table-striped" id="activityTable" id="activityTable">
                       <thead>
                         <tr>
                           <th>#</th>
@@ -189,7 +190,9 @@
                           <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
                           <td><?= $activity->tanggal_kegiatan; ?></td>
                           <td>
-                          <button class="btn btn-success btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#checklistModal" data-activity-id="<?= $activity->id_activity ?>">Checklist</button>
+                          <button class="btn btn-success btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#checklistModal" data-activity-id="<?= $activity->id_activity ?>" data-bs-toggle="modal" data-bs-target="#checklistModal" onclick="loadChecklistForm(<?= $activity->id_activity; ?>)">
+                                      Checklist
+                                  </button>
                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#documentationModal" data-activity-id="<?= $activity->id_activity ?>">Dokumentasi</button>
                             <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
                           </td>
@@ -520,11 +523,7 @@
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->
-        <footer class="footer">
-          <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021.  Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash. All rights reserved.</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ml-1"></i></span>
-          </div>
+    
         </footer>
         <!-- partial -->
       </div>
@@ -593,11 +592,50 @@
         });
     }
   </script>
+
+  <script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#activityTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+  </script>
+  <script>
+      $(document).ready(function() {
+          // Ketika perangkat dipilih
+          $('#device').change(function() {
+              var device_id = $(this).val();  // Mendapatkan nilai device_id yang dipilih
+
+              if (device_id != "") {
+                  console.log("Device ID dipilih: ", device_id);  // Debugging: Menampilkan device_id yang dipilih
+                  $.ajax({
+                      url: '<?= base_url('activity/get_kegiatan_per_device'); ?>', // Pastikan URL ini benar
+                      method: 'POST',
+                      data: { device_id: device_id }, // Kirimkan device_id ke server
+                      success: function(response) {
+                          console.log("Respons dari server: ", response);  // Debugging: Menampilkan respons dari server
+                          $('#kegiatan_section').html(response);  // Render pertanyaan kegiatan ke dalam form
+                      },
+                      error: function(xhr, status, error) {
+                          console.log("Error AJAX: ", error);  // Debugging: Menampilkan error jika AJAX gagal
+                      }
+                  });
+              } else {
+                  $('#kegiatan_section').html('');  // Jika tidak ada perangkat yang dipilih
+              }
+          });
+      });
+  </script>
   <!-- plugins:js -->
   <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
   <script src="<?php echo base_url('vendors/chart.js/Chart.min.js'); ?>"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="<?php echo base_url('vendors/datatables.net/jquery.dataTables.js'); ?>"></script>
   <script src="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.js'); ?>"></script>
   <script src="<?php echo base_url('js/dataTables.select.min.js'); ?>"></script>
