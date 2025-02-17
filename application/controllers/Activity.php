@@ -9,7 +9,7 @@ class Activity extends CI_Controller
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
-        $this->load->model('ActivityModel');
+        $this->load->model(['ActivityModel', 'ChecklistModel']);
         $this->load->library('upload'); // Load library untuk upload file
         $this->load->library('tcpdf');
     }
@@ -32,9 +32,7 @@ class Activity extends CI_Controller
     }
 
     public function add() {
-        $id_activity = $this->ActivityModel->generate_activity_id();
         $data = [
-            'id_activity' => $id_activity,
             'personel_id' => $this->input->post('personel_id'),
             'shift_id' => $this->input->post('shift_id'),
             'tanggal_kegiatan' => $this->input->post('tanggal_kegiatan')
@@ -49,6 +47,79 @@ class Activity extends CI_Controller
         redirect('activity');
     }
     
+    public function save_form() {
+        $post = $this->input->post();
+        
+        // Data form utama
+        $form_data = [
+            'activity_id' => $post['activity_id'],
+            'area_id' => $post['area_id'],
+            'report_type' => $post['report_type']
+        ];
+        
+        // Loop untuk setiap device
+        for($i = 1; $i <= 4; $i++) {
+            if(!empty($post['device_ids'][$i-1])) { // Pastikan device dipilih
+                $device_data = [
+                    'activity_id' => $post['activity_id'],
+                    'area_id' => $post['area_id'],
+                    'report_type' => $post['report_type'],
+                    'device_id' => $post['device_ids'][$i-1],
+                    'indicator_check' => $post['indicator_check'][$i],
+                    'ink_check' => $post['ink_check'][$i],
+                    'color_check' => $post['color_check'][$i],
+                    'notes' => $post['notes'][$i]
+                ];
+                
+                // Simpan data device
+                $this->ChecklistModel->save_form($device_data);
+            }
+        }
+        
+        $this->session->set_flashdata('success', 'Data berhasil disimpan');
+        redirect('activity');
+    }
+    
+    public function save_checklist() {
+        $post = $this->input->post();
+        
+        // Data untuk checklist
+        $checklist_data = [
+            'form_id' => $post['form_id'],
+            'device_ids' => $post['device_ids'],
+            'indicator_check' => $post['indicator_check'],
+            'ink_check' => $post['ink_check'],
+            'color_check' => $post['color_check'],
+            'notes' => $post['notes']
+        ];
+    
+        if($this->ChecklistModel->save_checklist($checklist_data)) {
+            $this->session->set_flashdata('success', 'Checklist berhasil disimpan');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menyimpan checklist');
+        }
+        
+        redirect('activity');
+    }
+
+    public function get_form_data($activity_id) {
+        // Ambil data form berdasarkan activity_id
+        $form_data = $this->ChecklistModel->get_form_by_activity($activity_id);
+        
+        // Load data yang diperlukan untuk modal
+        $data['activity'] = $this->ActivityModel->get_activity($activity_id);
+        $data['areas'] = $this->AreaModel->get_all_areas();
+        $data['devices'] = $this->DeviceModel->get_all_devices();
+        $data['form_data'] = $form_data;
+        
+        // Jika form sudah ada, ambil form_id nya
+        if($form_data) {
+            $data['form_id'] = $form_data->id_form;
+        }
+        
+        $this->load->view('dashboard/activity', $data);
+    }
+
     public function save_documentation() {
         // Ambil data dari form
         $laporan = $this->input->post('laporan');
@@ -188,9 +259,9 @@ class Activity extends CI_Controller
         ]);
     }
 
-    public function print_pdf($id) {
+    public function printdokumentasi($id) {
         // Ambil data untuk PDF (modifikasi sesuai dengan logika aplikasi Anda)
-        $activity = $this->ActivityModel->get_activity_by_id($id);
+        $activity = $this->ActivityModel->get_activity_details($id);
     
         // Membuat instance PDF baru
         $pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -200,8 +271,6 @@ class Activity extends CI_Controller
         $pdf->SetAuthor('BSH');
         
         // Pastikan tanggal tidak null sebelum diproses
-        $doc_date = !empty($activity['tanggal']) ? date('d/m/Y', strtotime($activity['tanggal'])) : 'N/A';
-        $pdf->SetTitle('Form PM - ' . $doc_date);
 
         // Set margins
         $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
@@ -218,21 +287,16 @@ class Activity extends CI_Controller
 
         // Add content from database
         $pdf->Ln(3);
-        $pdf->Cell(50, 8, 'Tanggal / Bulan / Tahun:', 0, 0);
-        $pdf->Cell(0, 8, $doc_date, 0, 1);
-        $pdf->Cell(50, 8, 'Lokasi:', 0, 0);
-        $pdf->Cell(0, 8, !empty($activity['lokasi']) ? $activity['lokasi'] : 'N/A', 0, 1);
+        $pdf->Cell(50, 8, 'Tanggal / Bulan / Tahun:', 0, 1);
+        $pdf->Cell(50, 8, 'Lokasi:', 0, 1);
 
-        $pdf->Cell(50, 8, 'Perangkat:', 0, 0);
-        $pdf->Cell(0, 8, !empty($activity['device']) ? $activity['device'] : 'N/A', 0, 1);
+        $pdf->Cell(50, 8, 'Perangkat:', 0, 1);
 
-        $pdf->Cell(50, 8, 'Shift:', 0, 0);
-        $pdf->Cell(0, 8, !empty($activity['shift']) ? $activity['shift'] : 'N/A', 0, 1);
+        $pdf->Cell(50, 8, 'Shift:', 0, 1);
 
-        $pdf->Cell(50, 8, 'Personil:', 0, 0);
-        $pdf->Cell(0, 8, !empty($activity['personil']) ? $activity['personil'] : 'N/A', 0, 1);
+        $pdf->Cell(50, 8, 'Personil:', 0, 1);
 
-        $pdf->Ln(5);
+        $pdf->Ln(15);
         $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
@@ -256,11 +320,117 @@ class Activity extends CI_Controller
         $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
         // Add images
 
-        // Generate filename
-        $filename = 'form_pm_' . (!empty($activity['tanggal']) ? date('Ymd', strtotime($activity['tanggal'])) : 'undated');
-        
         // Output the PDF
-        $pdf->Output($filename . '.pdf', 'I');
+        $pdf->Output('dokumentasi_'.$activity->kode_activity.'.pdf', 'I');
+    }
+
+    public function printchecklist($activity_id) {
+        // Get data
+        $activity = $this->ActivityModel->get_activity_details($activity_id);
+        $checklist = $this->db->select('af.*, dh.device_hidn_name')
+                             ->from('activity_form af')
+                             ->join('ms_device_hidn dh', 'dh.device_hidn_id = af.device_id')
+                             ->where('af.activity_id', $activity_id)
+                             ->get()
+                             ->result();
+        
+        // Create new PDF document
+        $pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+        
+        // Set document information
+        $pdf->SetCreator('TAMA App');
+        $pdf->SetAuthor('TAMA');
+        
+        // Remove default header/footer
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        
+        // Set margins
+        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+        
+        // Add page
+        $pdf->AddPage();
+        $pdf->SetFont('helvetica', '', 11);
+        
+        // Logo
+        $image_file = FCPATH . 'assets/img/logo.png';
+        $pdf->Image($image_file, 15, 15, 20);
+        
+        // Title
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Cell(0, 5, 'CHECKLIST PREVENTIVE MAINTENANCE', 0, 1, 'C');
+        $pdf->SetFont('helvetica', '', 11);
+        $pdf->Cell(0, 5, 'SIMULASI SISTEM DIGIT PADA PUBLIC COMPUTER', 0, 1, 'C');
+        
+        // Information table
+        $pdf->SetY(40);
+        $pdf->SetFont('helvetica', '', 10);
+        
+        $pdf->Cell(35, 5, 'Tanggal', 0);
+        $pdf->Cell(5, 5, ':', 0);
+        $pdf->Cell(70, 5, date('d F Y', strtotime($activity->tanggal_kegiatan)), 0);
+        $pdf->Cell(35, 5, 'Shift', 0);
+        $pdf->Cell(5, 5, ':', 0);
+        $pdf->Cell(0, 5, $activity->nama_shift, 0, 1);
+        
+        $pdf->Cell(35, 5, 'Jam', 0);
+        $pdf->Cell(5, 5, ':', 0);
+        $pdf->Cell(0, 5, $activity->jam_mulai . ' - ' . $activity->jam_selesai, 0, 1);
+        
+        // Checklist items
+        $pdf->SetY(60);
+        $no = 1;
+        foreach($checklist as $item) {
+            $pdf->SetFont('helvetica', '', 10);
+            $pdf->Cell(10, 7, $no . '.', 0, 0);
+            $pdf->Cell(0, 7, 'Perangkat : ' . $item->device_hidn_name, 0, 1);
+            
+            $pdf->Cell(15, 7, '', 0);
+            $pdf->Cell(60, 7, 'a. Cek Indicator berupa LCD Perangkat', 0, 0);
+            $pdf->Cell(5, 7, '', 0);
+            $pdf->Cell(10, 7, $item->indicator_check == 'OK' ? '✓' : '', 1, 0, 'C');
+            $pdf->Cell(10, 7, $item->indicator_check == 'NOT OK' ? '✓' : '', 1, 1, 'C');
+            
+            $pdf->Cell(15, 7, '', 0);
+            $pdf->Cell(60, 7, 'b. Cek tinta apabila kosong', 0, 0);
+            $pdf->Cell(5, 7, '', 0);
+            $pdf->Cell(10, 7, $item->ink_check == 'OK' ? '✓' : '', 1, 0, 'C');
+            $pdf->Cell(10, 7, $item->ink_check == 'NOT OK' ? '✓' : '', 1, 1, 'C');
+
+            $pdf->Cell(15, 7, '', 0);
+            $pdf->Cell(60, 7, 'b. Cek tinta apabila kosong', 0, 0);
+            $pdf->Cell(5, 7, '', 0);
+            $pdf->Cell(10, 7, $item->color_check == 'OK' ? '✓' : '', 1, 0, 'C');
+            $pdf->Cell(10, 7, $item->color_check == 'NOT OK' ? '✓' : '', 1, 1, 'C');
+            
+            $pdf->Cell(15, 7, '', 0);
+            $pdf->Cell(60, 7, 'Catatan:', 0, 1);
+            $pdf->Cell(15, 7, '', 0);
+            $pdf->MultiCell(0, 7, $item->notes, 0, 'L');
+            
+            $pdf->Ln(1);
+            $no++;
+        }
+        
+        // Signature
+        $pdf->SetY(-60);
+        $pdf->Cell(95, 5, 'Mengetahui,', 0, 0, 'C');
+        $pdf->Cell(95, 5, 'Pelaksana,', 0, 1, 'C');
+        
+        $pdf->Cell(95, 5, 'Supervisor', 0, 0, 'C');
+        $pdf->Cell(95, 5, 'Teknisi', 0, 1, 'C');
+        
+        $pdf->Ln(15);
+        
+        $pdf->Cell(95, 5, '(............................)', 0, 0, 'C');
+        $pdf->Cell(95, 5, '(............................)', 0, 1, 'C');
+        
+        // Output PDF
+        $pdf->Output('checklist_'.$activity->kode_activity.'.pdf', 'I');
+
+        header('Content-Type: applDcation/pdf');
+        header('Content-Disposition: inline; filename="checklist_'.$activity_id.'.pdf"');
     }
 }
 ?>

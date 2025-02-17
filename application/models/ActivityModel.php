@@ -6,13 +6,12 @@ class ActivityModel extends CI_Model {
     private $table = "activity_pm";
 
     public function get_all_activities() {
-        $this->db->select('activity_pm.id_activity, personel.id_personel, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai, activity_pm.tanggal_kegiatan');
+        $this->db->select('activity_pm.id_activity, activity_pm.kode_activity, personel.id_personel, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai, activity_pm.tanggal_kegiatan');
         $this->db->from('activity_pm');
         $this->db->join('personel', 'activity_pm.personel_id = personel.id_personel');
         $this->db->join('shift_kerja', 'activity_pm.shift_id = shift_kerja.id_shift');
         $activities = $this->db->get()->result();
     
-        // Pastikan users di-set untuk setiap aktivitas
         foreach ($activities as $activity) {
             $activity->users = $this->get_users_by_personel($activity->id_personel) ?: [];
         }
@@ -43,13 +42,15 @@ class ActivityModel extends CI_Model {
         return $this->db->get()->result();
     }
 
-    public function generate_activity_id() {
+    public function generate_activity_code() {
         $date = date('dmy'); // Format tanggal: 120225
         $random = rand(100, 999);
         return "ACT_".$date.$random;
     }
 
     public function insert_activity($data) {
+        // Generate kode activity
+        $data['kode_activity'] = $this->generate_activity_code();
         return $this->db->insert($this->table, $data);
     }
 
@@ -58,12 +59,12 @@ class ActivityModel extends CI_Model {
     }
     
     public function get_activity_details($activity_id) {
-        $this->db->select('activity_pm.id_activity, personel.id_personel, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai, activity_pm.tanggal_kegiatan');
+        $this->db->select('activity_pm.id_activity, activity_pm.kode_activity, personel.id_personel, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai, activity_pm.tanggal_kegiatan');
         $this->db->from('activity_pm');
         $this->db->join('personel', 'activity_pm.personel_id = personel.id_personel');
         $this->db->join('shift_kerja', 'activity_pm.shift_id = shift_kerja.id_shift');
         $this->db->where('activity_pm.id_activity', $activity_id);
-        return $this->db->get()->row(); // Mengambil satu aktivitas berdasarkan ID
+        return $this->db->get()->row();
     }
     
     public function get_documentation_by_activity($activity_id) {
@@ -157,6 +158,43 @@ class ActivityModel extends CI_Model {
         $this->db->where('documentation.id_activity', $activity_id);
         $this->db->order_by('documentation_photos.created_at', 'ASC');
         return $this->db->get()->result();
+    }
+
+    public function save_form() {
+        $data = [
+            'activity_id' => $this->input->post('activity_id'),
+            'area_id' => $this->input->post('area_id'),
+            'report_type' => $this->input->post('report_type')
+        ];
+        
+        $form_id = $this->ChecklistModel->save_form($data);
+        
+        if($form_id) {
+            $this->session->set_flashdata('success', 'Form berhasil disimpan');
+            echo json_encode(['status' => 'success', 'form_id' => $form_id]);
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menyimpan form');
+            echo json_encode(['status' => 'error']);
+        }
+    }
+    
+    public function save_checklist() {
+        $data = [
+            'form_id' => $this->input->post('form_id'),
+            'device_ids' => $this->input->post('device_ids'),
+            'indicator_check' => $this->input->post('indicator_check'),
+            'ink_check' => $this->input->post('ink_check'),
+            'color_check' => $this->input->post('color_check'),
+            'notes' => $this->input->post('notes')
+        ];
+        
+        if($this->ChecklistModel->save_checklist($data)) {
+            $this->session->set_flashdata('success', 'Checklist berhasil disimpan');
+            redirect('activity');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menyimpan checklist');
+            redirect('activity');
+        }
     }
 }
 ?>

@@ -161,38 +161,40 @@
                   <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
                   </p>
                   <div class="table-responsive">
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="activityTable">
                       <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>ID Aktivitas</th>
-                        <th>Personel</th>
-                        <th>Shift</th>
-                        <th>Jam Kerja</th>
-                        <th>Tanggal Kegiatan</th>
-                        <th>Aksi</th>
-                      </tr>
+                        <tr>
+                          <th>#</th>
+                          <th>ID</th>
+                          <th>Kode Activity</th>
+                          <th>Personel</th>
+                          <th>Shift</th>
+                          <th>Jam Kerja</th>
+                          <th>Tanggal Kegiatan</th>
+                          <th>Aksi</th>
+                        </tr>
                       </thead>
                       <tbody>
-                      <?php foreach ($activities as $index => $activity): ?>
-                          <tr>
-                              <td><?= $index + 1; ?></td>
-                              <td><?= $activity->id_activity; ?></td>
-                              <td>
-                                  <?php foreach ($activity->users as $user): ?>
-                                      <span class="badge bg-info"><?= $user->username; ?></span>
-                                  <?php endforeach; ?>
-                              </td>
-                              <td><?= $activity->nama_shift; ?></td>
-                              <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
-                              <td><?= $activity->tanggal_kegiatan; ?></td>
-                              <td>
-                                  <button class="btn btn-success btn-sm">Ceklist</button>
-                                  <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#documentationModal" onclick="loadDocumentation(<?= $activity->id_activity; ?>)">Dokumentasi</button>
-                                  <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
-                              </td>
-                          </tr>
-                      <?php endforeach; ?>
+                        <?php foreach ($activities as $index => $activity): ?>
+                        <tr>
+                          <td><?= $index + 1; ?></td>
+                          <td><?= $activity->id_activity; ?></td>
+                          <td><?= $activity->kode_activity; ?></td>
+                          <td>
+                            <?php foreach ($activity->users as $user): ?>
+                              <span class="badge bg-info"><?= $user->username; ?></span>
+                            <?php endforeach; ?>
+                          </td>
+                          <td><?= $activity->nama_shift; ?></td>
+                          <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
+                          <td><?= $activity->tanggal_kegiatan; ?></td>
+                          <td>
+                          <button class="btn btn-success btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#checklistModal" data-activity-id="<?= $activity->id_activity ?>">Checklist</button>
+                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#documentationModal" data-activity-id="<?= $activity->id_activity ?>">Dokumentasi</button>
+                            <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
+                          </td>
+                        </tr>
+                        <?php endforeach; ?>
                       </tbody>
                     </table>
                   </div>
@@ -324,7 +326,10 @@
                                       <!-- Tombol untuk membuka Modal Dokumentasi Foto -->
                                       <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#documentationPhotoModal">
                                           Dokumentasi Foto
-                                      </button>                  
+                                      </button>
+                                      <a href="<?= base_url('activity/printdokumentasi/'.$activity->id_activity) ?>" class="btn btn-info" target="_blank">
+                                        <i class="bi bi-printer"></i> Print Dokumentasi
+                                      </a>                   
                                     </form>
                               </div>
                           </div>
@@ -370,6 +375,142 @@
                                     <button type="submit" class="btn btn-primary">Simpan Foto</button>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="modal fade" id="checklistModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Form Checklist Activity</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="<?= base_url('activity/save_form') ?>" method="POST">
+                                <div class="modal-body">
+                                    <!-- Activity Info -->
+                                    <input type="hidden" name="activity_id" value="<?= $activity->id_activity ?>">
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label>Hari/Tanggal</label>
+                                            <input type="text" class="form-control" value="<?= date('l, d F Y', strtotime($activity->tanggal_kegiatan)) ?>" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Shift/Jam Kerja</label>
+                                            <input type="text" class="form-control" value="<?= $activity->nama_shift ?> (<?= $activity->jam_mulai ?> - <?= $activity->jam_selesai ?>)" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label>Personel</label>
+                                            <input type="text" class="form-control" value="<?php 
+                                                $usernames = array();
+                                                foreach ($activity->users as $user) {
+                                                    $usernames[] = $user->username;
+                                                }
+                                                echo implode(', ', $usernames);
+                                            ?>" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Jenis Laporan</label>
+                                            <select class="form-control" name="report_type" required>
+                                                <option value="">Pilih Jenis Laporan</option>
+                                                <option value="Harian">Harian</option>
+                                                <option value="Mingguan">Mingguan</option>
+                                                <option value="Bulanan">Bulanan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label>Area/Lokasi</label>
+                                            <select class="form-control" name="area_id" required>
+                                                <option value="">Pilih Area</option>
+                                                <?php foreach($areas as $area): ?>
+                                                    <option value="<?= $area->area_id ?>"><?= $area->area_name ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <h6>Checklist Devices</h6>
+                                    
+                                    <!-- Device Selection (4 devices) -->
+                                    <?php for($i=0; $i<4; $i++): ?>
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <label>Device <?= $i+1 ?></label>
+                                                    <select class="form-control" name="device_ids[]" required>
+                                                        <option value="">Pilih Device</option>
+                                                        <?php foreach($devices as $device): ?>
+                                                            <option value="<?= $device->device_hidn_id ?>"><?= $device->device_hidn_name ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label>Indikator</label>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="indicator_check[<?= $i ?>]" value="OK" required>
+                                                        <label class="form-check-label">OK</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="indicator_check[<?= $i ?>]" value="NOT OK">
+                                                        <label class="form-check-label">NOT OK</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label>Tinta</label>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="ink_check[<?= $i ?>]" value="OK" required>
+                                                        <label class="form-check-label">OK</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="ink_check[<?= $i ?>]" value="NOT OK">
+                                                        <label class="form-check-label">NOT OK</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label>Warna</label>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="color_check[<?= $i ?>]" value="OK" required>
+                                                        <label class="form-check-label">OK</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="color_check[<?= $i ?>]" value="NOT OK">
+                                                        <label class="form-check-label">NOT OK</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-md-12">
+                                                    <label>Catatan</label>
+                                                    <textarea name="notes[]" class="form-control" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endfor; ?>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                    <a href="<?= base_url('activity/printchecklist/'.$activity->id_activity) ?>" class="btn btn-info" target="_blank">
+                                        <i class="bi bi-printer"></i> Print PDF
+                                    </a>
+                                </div>
+                            </form>
                         </div>
                     </div>
                   </div>
