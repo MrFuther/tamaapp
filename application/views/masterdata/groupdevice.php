@@ -25,8 +25,12 @@
 </head>
 <body>
   <div class="container-scroller">
+    
     <!-- partial:partials/_navbar.html -->
     <?php include APPPATH . 'views\dashboard\navbar.php'; ?>
+    <?php include APPPATH . 'views\dashboard\footer.php'; ?>
+    <?php include APPPATH . 'views\dashboard\sidebar.php'; ?>
+    
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
@@ -50,15 +54,6 @@
       </div>
       
       <div id="right-sidebar" class="settings-panel">
-        <i class="settings-close ti-close"></i>
-        <ul class="nav nav-tabs border-top" id="setting-panel" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link active" id="todo-tab" data-toggle="tab" href="#todo-section" role="tab" aria-controls="todo-section" aria-expanded="true">TO DO LIST</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="chats-tab" data-toggle="tab" href="#chats-section" role="tab" aria-controls="chats-section">CHATS</a>
-          </li>
-        </ul>
         <div class="tab-content" id="setting-content">
           <div class="tab-pane fade show active scroll-wrapper" id="todo-section" role="tabpanel" aria-labelledby="todo-section">
             <div class="add-items d-flex px-3 mb-0">
@@ -70,78 +65,11 @@
               </form>
             </div>
             <div class="list-wrapper px-3">
-              <ul class="d-flex flex-column-reverse todo-list">
-                <li>
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox">
-                      Team review meeting at 3.00 PM
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li>
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox">
-                      Prepare for presentation
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li>
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox">
-                      Resolve all the low priority tickets due today
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li class="completed">
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox" checked>
-                      Schedule meeting for next week
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-                <li class="completed">
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="checkbox" type="checkbox" checked>
-                      Project review
-                    </label>
-                  </div>
-                  <i class="remove ti-close"></i>
-                </li>
-              </ul>
-            </div>
-            <h4 class="px-3 text-muted mt-5 font-weight-light mb-0">Events</h4>
-            <div class="events pt-4 px-3">
-              <div class="wrapper d-flex mb-2">
-                <i class="ti-control-record text-primary mr-2"></i>
-                <span>Feb 11 2018</span>
-              </div>
-              <p class="mb-0 font-weight-thin text-gray">Creating component page build a js</p>
-              <p class="text-gray mb-0">The total number of sessions</p>
-            </div>
-            <div class="events pt-4 px-3">
-              <div class="wrapper d-flex mb-2">
-                <i class="ti-control-record text-primary mr-2"></i>
-                <span>Feb 7 2018</span>
-              </div>
-              <p class="mb-0 font-weight-thin text-gray">Meeting with Alisa</p>
-              <p class="text-gray mb-0 ">Call Sarah Graves</p>
             </div>
           </div>
           <!-- To do section tab ends -->
         </div>
       </div>
-      <!-- partial -->
-      <!-- partial:partials/_sidebar.html -->
-      <?php include APPPATH . 'views\dashboard\sidebar.php'; ?>
       <!-- partial -->
       <div class="main-panel">
       <div class="content-wrapper">
@@ -243,42 +171,7 @@
         <!-- partial -->
       </div>
       <!-- main-panel ends -->
-    </div>
-    <div id="logoutModal" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Konfirmasi Logout</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Apakah Anda yakin ingin logout?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-primary" onclick="logout()">Logout</button>
-          </div>
-        </div>
-      </div>
-    </div>  
-    <!-- page-body-wrapper ends -->
-  </div>
-  <!-- container-scroller -->
-  <script>
-    function showLogoutConfirmation() {
-    // Menampilkan modal
-    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
-    modal.show();
-    }
-
-    function logout() {
-    // Implementasi logika logout di sini
-    alert("Anda telah logout.");
-    // Redirect ke halaman login atau halaman utama setelah logout
-    window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
-    }
+    
   </script>
   <!-- plugins:js -->
   <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
