@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAMA - Login</title>
+    <title>AMAR - Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <link rel="icon" href="<?php echo base_url('assets/images/tama-logo.png'); ?>" >
+    <link rel="icon" href="<?php echo base_url('assets/images/amar.png'); ?>" >
 
     <style>
         body {
@@ -150,10 +150,10 @@
         <!-- Right side - Login form -->
         <div class="login-box">
             <div class="logo-container">
-                <img src="<?php echo base_url('assets/images/tama-logo.png'); ?>" alt="TAMA Logo">
+                <img src="<?php echo base_url('assets/images/amar.png'); ?>" alt="AMAR Logo">
                 <div class="logo-text">
-                    Technical Activity<br>
-                    Maintenance Assistant
+                    Assets Maintenance<br>
+                    and Report
                 </div>
             </div>
 

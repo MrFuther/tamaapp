@@ -14,6 +14,7 @@ $route['locationdata'] = 'locationdata/index';
 $route['devicedata'] = 'devicedata/index';
 $route['personel'] = 'personel/index';
 $route['m_user'] = 'manageuser/index';
+$route['devicehidn'] = 'devicehidn/index';
 $route['shift'] = 'shift/index';
 $route['get-group-areas'] = 'activity/get_group_areas';
 $route['get-sub-areas'] = 'activity/get_sub_areas';
