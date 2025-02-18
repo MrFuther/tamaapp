@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAMA Apps</title>
+    <title>AMAR Apps</title>
     <!-- plugins:css -->
   
     <link rel="stylesheet" href="<?php echo base_url('vendors/feather/feather.css'); ?>">
