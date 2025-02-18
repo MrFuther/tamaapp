@@ -92,37 +92,78 @@ class Activity extends CI_Controller
         echo $output;  // Mengirimkan HTML yang sudah di-generate kembali ke view
     }     
     
-    public function save_form() {
-        $post = $this->input->post();
+    public function show_form($activity_id) {  
+        if (!$this->input->is_ajax_request()) {  
+            show_404(); // Atau redirect('activity');  
+            return;  
+        }  
+    
+        // Ambil data aktivitas  
+        $data['activity'] = $this->db->select('activity_pm.*, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai')  
+                                    ->from('activity_pm')  
+                                    ->join('shift_kerja', 'shift_kerja.id_shift = activity_pm.shift_id')  
+                                    ->where('activity_pm.id_activity', $activity_id)  
+                                    ->get()  
+                                    ->row();  
+    
+        // Pastikan aktivitas ditemukan  
+        if (!$data['activity']) {  
+            show_404(); // Jika tidak ada aktivitas, tampilkan halaman 404  
+            return;  
+        }  
+    
+        // Ambil pengguna yang terkait  
+        $data['users'] = $this->db->select('ms_account.username')  
+                                 ->from('personel_user')  
+                                 ->join('ms_account', 'ms_account.id = personel_user.user_id')  
+                                 ->where('personel_user.personel_id', $data['activity']->personel_id)  
+                                 ->get()  
+                                 ->result();  
+    
+        // Ambil sub perangkat dan area untuk dropdown  
+        $data['sub_devices'] = $this->db->get('ms_sub_device')->result();  
+        $data['areas'] = $this->db->get('ms_area')->result();  
+    
+        // Ambil formulir yang sudah ada untuk aktivitas ini  
+        $data['saved_forms'] = $this->db->select('activity_forms.*, ms_sub_device.sub_device_name, ms_area.area_name')  
+                                         ->from('activity_forms')  
+                                         ->join('ms_sub_device', 'ms_sub_device.sub_device_id = activity_forms.sub_device_id')  
+                                         ->join('ms_area', 'ms_area.area_id = activity_forms.area_id')  
+                                         ->where('activity_forms.activity_id', $activity_id)  
+                                         ->get()  
+                                         ->result();  
+    
+        // Muat view  
+        $this->load->view('activity_form', $data);  
+    }
         
-        // Data form utama
-        $form_data = [
-            'activity_id' => $post['activity_id'],
-            'area_id' => $post['area_id'],
-            'report_type' => $post['report_type']
-        ];
+    public function save_form() {  
+        $data = array(  
+                'activity_id' => $this->input->post('activity_id'),  
+                'sub_device_id' => $this->input->post('sub_device_id'),  
+                'area_id' => $this->input->post('area_id'),  
+                'report_type' => $this->input->post('report_type')  
+        );  
         
-        // Loop untuk setiap device
-        for($i = 1; $i <= 4; $i++) {
-            if(!empty($post['device_ids'][$i-1])) { // Pastikan device dipilih
-                $device_data = [
-                    'activity_id' => $post['activity_id'],
-                    'area_id' => $post['area_id'],
-                    'report_type' => $post['report_type'],
-                    'device_id' => $post['device_ids'][$i-1],
-                    'indicator_check' => $post['indicator_check'][$i],
-                    'ink_check' => $post['ink_check'][$i],
-                    'color_check' => $post['color_check'][$i],
-                    'notes' => $post['notes'][$i]
-                ];
-                
-                // Simpan data device
-                $this->ChecklistModel->save_form($device_data);
-            }
-        }
+        $this->db->insert('activity_forms', $data);  
+        $form_id = $this->db->insert_id(); // Ambil ID dari form yang baru disimpan  
         
-        $this->session->set_flashdata('success', 'Data berhasil disimpan');
-        redirect('activity');
+        // Ambil data untuk respons  
+        $response = array(  
+                'status' => 'success',  
+                'form_id' => $form_id,  
+                'sub_device_name' => $this->db->get_where('ms_sub_device', ['sub_device_id' => $data['sub_device_id']])->row()->sub_device_name,  
+                'area_name' => $this->db->get_where('ms_area', ['area_id' => $data['area_id']])->row()->area_name,  
+                'report_type' => $data['report_type'],  
+                'activity_id' => $data['activity_id']  
+        );
+         echo json_encode($response);
+         redirect('activity'); // Kembalikan respons dalam format JSON  
+    }
+        
+    public function delete_form($form_id, $activity_id) {
+            $this->db->where('form_id', $form_id)->delete('activity_forms');
+            redirect('activity');
     }
 
     public function get_form_data($activity_id) {

@@ -145,13 +145,6 @@
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
-          <!-- Tambahkan di bagian atas konten -->
-          <?php if($this->session->flashdata('message')): ?>
-              <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  <?= $this->session->flashdata('message'); ?>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-          <?php endif; ?>
           <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
@@ -190,10 +183,7 @@
                           <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
                           <td><?= $activity->tanggal_kegiatan; ?></td>
                           <td>
-                          <button class="btn btn-success btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#checklistModal" data-activity-id="<?= $activity->id_activity ?>" data-bs-toggle="modal" data-bs-target="#checklistModal" onclick="loadChecklistForm(<?= $activity->id_activity; ?>)">
-                                      Checklist
-                                  </button>
-                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#documentationModal" data-activity-id="<?= $activity->id_activity ?>">Dokumentasi</button>
+                            <button class="btn btn-primary btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#formModal" data-activity-id="<?= $activity->id_activity ?>">Form</button>
                             <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
                           </td>
                         </tr>
@@ -243,280 +233,111 @@
                       </div>
                     </div>
                   </div>
-                  <!-- Modal Dokumentasi -->
-                  <div class="modal fade" id="documentationModal" tabindex="-1" aria-labelledby="documentationModalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-lg">
-                          <div class="modal-content">
-                              <div class="modal-header">
-                                  <h5 class="modal-title" id="documentationModalLabel">Dokumentasi Aktivitas</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <div class="modal fade" id="formModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title">Activity Form</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          
+                          <div class="modal-body">
+                              <!-- Activity Details -->
+                              <div class="row mb-3">
+                                  <div class="col-md-6">
+                                      <h5>Activity Details</h5>
+                                      <p>Date: <?= date('d M Y', strtotime($activity->tanggal_kegiatan)) ?></p>
+                                      <p>Shift: <?= $activity->nama_shift ?></p>
+                                      <p>Time: <?= $activity->jam_mulai ?> - <?= $activity->jam_selesai ?></p>
+                                      <p>Team: 
+                                          <?php foreach($users as $user): ?>
+                                              <?= $user->username ?>, 
+                                          <?php endforeach; ?>
+                                      </p>
+                                  </div>
+                                  
+                                  <!-- Form Input -->
+                                  <div class="col-md-6">
+                                      <form id="activityForm" action="<?= base_url('activity/save_form') ?>" method="POST">
+                                          <input type="hidden" name="activity_id" value="<?= $activity->id_activity ?>">
+                                          
+                                          <div class="mb-3">
+                                              <label>Perangkat</label>
+                                              <select name="sub_device_id" class="form-control" required>
+                                                  <option value="">Select Device</option>
+                                                  <?php foreach($sub_devices as $device): ?>
+                                                      <option value="<?= $device->sub_device_id ?>"><?= $device->sub_device_name ?></option>
+                                                  <?php endforeach; ?>
+                                              </select>
+                                          </div>
+                                          
+                                          <div class="mb-3">
+                                              <label>Lokasi</label>
+                                              <select name="area_id" class="form-control" required>
+                                                  <option value="">Select Location</option>
+                                                  <?php foreach($areas as $area): ?>
+                                                      <option value="<?= $area->area_id ?>"><?= $area->area_name ?></option>
+                                                  <?php endforeach; ?>
+                                              </select>
+                                          </div>
+                                          
+                                          <div class="mb-3">
+                                              <label>Kelompok Laporan</label>
+                                              <div class="form-check">
+                                                  <input type="radio" name="report_type" value="Harian" class="form-check-input" required>
+                                                  <label class="form-check-label">Harian</label>
+                                              </div>
+                                              <div class="form-check">
+                                                  <input type="radio" name="report_type" value="Mingguan" class="form-check-input">
+                                                  <label class="form-check-label">Mingguan</label>
+                                              </div>
+                                              <div class="form-check">
+                                                  <input type="radio" name="report_type" value="Bulanan" class="form-check-input">
+                                                  <label class="form-check-label">Bulanan</label>
+                                              </div>
+                                          </div>
+                                          
+                                          <button type="submit" class="btn btn-primary">Save</button>
+                                      </form>
+                                  </div>
                               </div>
-                              <div class="modal-body">
-                                  <form action="<?= base_url('activity/save_documentation'); ?>" method="POST" enctype="multipart/form-data">
-                                      <input type="hidden" name="activity_id" value="<?= $activity->id_activity; ?>">
-
-                                      <!-- Data Aktivitas (Tidak berubah) -->
-                                      <div class="row">
-                                          <div class="col-md-6">
-                                              <div class="mb-3">
-                                                  <strong>Data Personel:</strong>
-                                                  <p> 
-                                                      <?php foreach ($activity->users as $user): ?>
-                                                          <span class="badge bg-info"><?= $user->username; ?></span>
-                                                      <?php endforeach; ?>
-                                                  </p>
-                                              </div>
-                                              <div class="mb-3">
-                                                  <strong>Shift:</strong>
-                                                  <p><?= $activity->nama_shift; ?></p>
-                                              </div>
-                                              <div class="mb-3">
-                                                  <strong>Jam Kerja:</strong>
-                                                  <p><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></p>
-                                              </div>
-                                              <div class="mb-3">
-                                                  <strong>Tanggal Kegiatan:</strong>
-                                                  <p><?= $activity->tanggal_kegiatan; ?></p>
-                                              </div>
-                                          </div>
-
-                                          <div class="col-md-6">
-                                              <div class="mb-3">
-                                                  <label for="laporan" class="form-label">Kelompok Laporan</label>
-                                                  <select class="form-control" id="laporan" name="laporan" required>
-                                                      <option value="harian" <?= isset($documentation) && $documentation->laporan == 'harian' ? 'selected' : ''; ?>>Harian</option>
-                                                      <option value="mingguan" <?= isset($documentation) && $documentation->laporan == 'mingguan' ? 'selected' : ''; ?>>Mingguan</option>
-                                                      <option value="bulanan" <?= isset($documentation) && $documentation->laporan == 'bulanan' ? 'selected' : ''; ?>>Bulanan</option>
-                                                  </select>
-                                              </div>
-                                              <div class="mb-3">
-                                                  <label for="area" class="form-label">Area</label>
-                                                  <select class="form-control" id="area" name="area" required>
-                                                      <?php foreach ($areas as $area): ?>
-                                                          <option value="<?= $area->area_id; ?>" <?= isset($documentation) && $documentation->area_id == $area->area_id ? 'selected' : ''; ?>><?= $area->area_name; ?></option>
-                                                      <?php endforeach; ?>
-                                                  </select>
-                                              </div>
-                                              <div class="mb-3">
-                                                  <label for="group_device" class="form-label">Group Device</label>
-                                                  <select class="form-control" id="group_device" name="group_device" required>
-                                                      <?php foreach ($group_devices as $group): ?>
-                                                          <option value="<?= $group->pek_unit_id; ?>" <?= isset($documentation) && $documentation->group_device_id == $group->pek_unit_id ? 'selected' : ''; ?>><?= $group->pek_unit_name; ?></option>
-                                                      <?php endforeach; ?>
-                                                  </select>
-                                              </div>
-                                              <div class="mb-3">
-                                                  <label for="sub_device" class="form-label">Sub Device</label>
-                                                  <select class="form-control" id="sub_device" name="sub_device" required>
-                                                      <?php foreach ($sub_devices as $sub_device): ?>
-                                                          <option value="<?= $sub_device->sub_device_id; ?>" <?= isset($documentation) && $documentation->sub_device_id == $sub_device->sub_device_id ? 'selected' : ''; ?>><?= $sub_device->sub_device_name; ?></option>
-                                                      <?php endforeach; ?>
-                                                  </select>
-                                              </div>
-                                              <div class="mb-3">
-                                                  <label for="device" class="form-label">Nama Device</label>
-                                                  <select class="form-control" id="device" name="device" required>
-                                                      <?php foreach ($devices as $device): ?>
-                                                          <option value="<?= $device->device_hidn_id; ?>" <?= isset($documentation) && $documentation->device_id == $device->device_hidn_id ? 'selected' : ''; ?>><?= $device->device_hidn_name; ?></option>
-                                                      <?php endforeach; ?>
-                                                  </select>
-                                              </div>
-                                          </div>
-                                      </div>
-                                      <!-- Tombol Submit Berdasarkan Keberadaan Dokumentasi -->
-                                      <button type="submit" class="btn btn-primary"><?= isset($documentation) ? 'Update Dokumentasi' : 'Simpan Dokumentasi'; ?></button>
-                                      <!-- Tombol untuk membuka Modal Dokumentasi Foto -->
-                                      <!-- Tombol untuk membuka Modal Dokumentasi Foto -->
-                                      <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#documentationPhotoModal">
-                                          Dokumentasi Foto
-                                      </button>
-                                      <a href="<?= base_url('activity/printdokumentasi/'.$activity->id_activity) ?>" class="btn btn-info" target="_blank">
-                                        <i class="bi bi-printer"></i> Print Dokumentasi
-                                      </a>                   
-                                    </form>
+                              
+                              <!-- Saved Forms Table -->
+                              <div class="table-responsive mt-4">
+                                  <h6>Saved Forms</h6>
+                                  <table id="savedFormsTable" class="table table-bordered">
+                                      <thead>
+                                          <tr>
+                                              <th>No</th>
+                                              <th>Perangkat</th>
+                                              <th>Lokasi</th>
+                                              <th>Kelompok Laporan</th>
+                                              <th>Actions</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>  
+                                        <?php foreach($saved_forms as $index => $form): ?>  
+                                            <tr>  
+                                                <td><?= $index + 1 ?></td>  
+                                                <td><?= $form->sub_device_name ?></td>  
+                                                <td><?= $form->area_name ?></td>  
+                                                <td><?= $form->report_type ?></td>  
+                                                <td>  
+                                                    <a href="<?= base_url('activity/delete_form/'.$form->form_id.'/'.$activity->id_activity) ?>"   
+                                                      class="btn btn-danger btn-sm delete-form"   
+                                                      onclick="return confirm('Are you sure?')">Delete</a>  
+                                                    <a href="#" class="btn btn-info btn-sm">Print</a>  
+                                                </td>  
+                                            </tr>  
+                                        <?php endforeach; ?>  
+                                    </tbody>
+                                  </table>
                               </div>
                           </div>
                       </div>
-                  </div>
-                  <!-- Modal Dokumentasi Foto -->
-                  <div class="modal fade" id="documentationPhotoModal" tabindex="-1" aria-labelledby="documentationPhotoModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="documentationPhotoModalLabel">Dokumentasi Foto</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="<?= base_url('activity/save_documentation_photos'); ?>" method="POST" enctype="multipart/form-data">
-                                    <!-- Pastikan id_documentation sudah ada -->
-                                    <input type="hidden" name="id_documentation" value="<?= isset($documentation) ? $documentation->id_documentation : ''; ?>">
-
-                                    <!-- Foto Perangkat -->
-                                    <div class="mb-3">
-                                        <label for="foto_perangkat" class="form-label">Foto Perangkat</label>
-                                        <input type="file" class="form-control" id="foto_perangkat" name="foto_perangkat" accept="image/*" required>
-                                    </div>
-
-                                    <!-- Foto Lokasi -->
-                                    <div class="mb-3">
-                                        <label for="foto_lokasi" class="form-label">Foto Lokasi</label>
-                                        <input type="file" class="form-control" id="foto_lokasi" name="foto_lokasi" accept="image/*" required>
-                                    </div>
-
-                                    <!-- Foto Teknisi -->
-                                    <div class="mb-3">
-                                        <label for="foto_teknisi" class="form-label">Foto Teknisi</label>
-                                        <input type="file" class="form-control" id="foto_teknisi" name="foto_teknisi" accept="image/*" required>
-                                    </div>
-
-                                    <!-- Deskripsi Foto -->
-                                    <div class="mb-3">
-                                        <label for="description" class="form-label">Deskripsi Foto</label>
-                                        <textarea class="form-control" id="description" name="description" rows="4"></textarea>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary">Simpan Foto</button>
-                                </form>
-                            </div>
-                        </div>
                     </div>
                   </div>
-                  <div class="modal fade" id="checklistModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Form Checklist Activity</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <form action="<?= base_url('activity/save_form') ?>" method="POST">
-                                <div class="modal-body">
-                                    <!-- Activity Info -->
-                                    <input type="hidden" name="activity_id" value="<?= $activity->id_activity ?>">
-                                    
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label>Hari/Tanggal</label>
-                                            <input type="text" class="form-control" value="<?= date('l, d F Y', strtotime($activity->tanggal_kegiatan)) ?>" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label>Shift/Jam Kerja</label>
-                                            <input type="text" class="form-control" value="<?= $activity->nama_shift ?> (<?= $activity->jam_mulai ?> - <?= $activity->jam_selesai ?>)" readonly>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label>Personel</label>
-                                            <input type="text" class="form-control" value="<?php 
-                                                $usernames = array();
-                                                foreach ($activity->users as $user) {
-                                                    $usernames[] = $user->username;
-                                                }
-                                                echo implode(', ', $usernames);
-                                            ?>" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label>Jenis Laporan</label>
-                                            <select class="form-control" name="report_type" required>
-                                                <option value="">Pilih Jenis Laporan</option>
-                                                <option value="Harian">Harian</option>
-                                                <option value="Mingguan">Mingguan</option>
-                                                <option value="Bulanan">Bulanan</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label>Area/Lokasi</label>
-                                            <select class="form-control" name="area_id" required>
-                                                <option value="">Pilih Area</option>
-                                                <?php foreach($areas as $area): ?>
-                                                    <option value="<?= $area->area_id ?>"><?= $area->area_name ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <hr>
-                                    <h6>Checklist Devices</h6>
-                                    
-                                    <!-- Device Selection (4 devices) -->
-                                    <?php for($i=0; $i<4; $i++): ?>
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <div class="row mb-3">
-                                                <div class="col-md-12">
-                                                    <label>Device <?= $i+1 ?></label>
-                                                    <select class="form-control" name="device_ids[]" required>
-                                                        <option value="">Pilih Device</option>
-                                                        <?php foreach($devices as $device): ?>
-                                                            <option value="<?= $device->device_hidn_id ?>"><?= $device->device_hidn_name ?></option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <label>Indikator</label>
-                                                    <div class="form-check">
-                                                        <input type="radio" class="form-check-input" name="indicator_check[<?= $i ?>]" value="OK" required>
-                                                        <label class="form-check-label">OK</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input type="radio" class="form-check-input" name="indicator_check[<?= $i ?>]" value="NOT OK">
-                                                        <label class="form-check-label">NOT OK</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4">
-                                                    <label>Tinta</label>
-                                                    <div class="form-check">
-                                                        <input type="radio" class="form-check-input" name="ink_check[<?= $i ?>]" value="OK" required>
-                                                        <label class="form-check-label">OK</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input type="radio" class="form-check-input" name="ink_check[<?= $i ?>]" value="NOT OK">
-                                                        <label class="form-check-label">NOT OK</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4">
-                                                    <label>Warna</label>
-                                                    <div class="form-check">
-                                                        <input type="radio" class="form-check-input" name="color_check[<?= $i ?>]" value="OK" required>
-                                                        <label class="form-check-label">OK</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input type="radio" class="form-check-input" name="color_check[<?= $i ?>]" value="NOT OK">
-                                                        <label class="form-check-label">NOT OK</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row mt-3">
-                                                <div class="col-md-12">
-                                                    <label>Catatan</label>
-                                                    <textarea name="notes[]" class="form-control" rows="2"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <?php endfor; ?>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                    <a href="<?= base_url('activity/printchecklist/'.$activity->id_activity) ?>" class="btn btn-info" target="_blank">
-                                        <i class="bi bi-printer"></i> Print PDF
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -591,6 +412,102 @@
             }
         });
     }
+
+    const formModal = document.getElementById('formModal');  
+      formModal.addEventListener('show.bs.modal', event => {  
+          const button = event.relatedTarget; // Tombol yang memicu modal  
+          const activityId = button.getAttribute('data-activity-id');  
+
+          // Lakukan permintaan AJAX ke controller  
+          fetch('<?= base_url('activity/show_form/') ?>' + activityId, {  
+              method: 'GET',  
+              headers: {  
+                  'X-Requested-With': 'XMLHttpRequest' // Penting untuk CodeIgniter  
+              }  
+          })  
+          .then(response => response.text())  
+          .then(html => {  
+              formModal.querySelector('.modal-body').innerHTML = html; // Masukkan HTML ke dalam body modal  
+          })  
+          .catch(error => {  
+              console.error('Error:', error);  
+              formModal.querySelector('.modal-body').innerHTML = '<p>Error loading form.</p>';  
+          });  
+      });  
+
+    $(document).ready(function() {  
+        // Handler untuk submit form  
+        $('#activityForm').on('submit', function(e) {  
+            e.preventDefault(); // Mencegah form submit biasa  
+
+            $.ajax({  
+                type: 'POST',  
+                url: '<?= base_url('activity/save_form') ?>',  
+                data: $(this).serialize(),  
+                dataType: 'json',  
+                success: function(response) {  
+                    if (response.status === 'success') {  
+                        // Tambahkan baris baru ke tabel  
+                        var newRow = `  
+                            <tr>  
+                                <td>${$('#savedFormsTable tbody tr').length + 1}</td>  
+                                <td>${response.form.sub_device_name}</td>  
+                                <td>${response.form.area_name}</td>  
+                                <td>${response.form.report_type}</td>  
+                                <td>  
+                                    <a href="<?= base_url('activity/delete_form/') ?>${response.form.form_id}/${response.form.activity_id}"   
+                                      class="btn btn-danger btn-sm delete-form"   
+                                      onclick="return confirm('Are you sure?')">Delete</a>  
+                                    <a href="#" class="btn btn-info btn-sm">Print</a>  
+                                </td>  
+                            </tr>  
+                        `;  
+                        $('#savedFormsTable tbody').append(newRow);  
+
+                        // Reset form  
+                        $('#activityForm')[0].reset();  
+
+                        // Tampilkan pesan sukses (opsional)  
+                        alert(response.message);  
+                    } else {  
+                        // Tampilkan pesan error  
+                        alert(response.message);  
+                    }  
+                },  
+                error: function() {  
+                    alert('Terjadi kesalahan saat mengirim data');  
+                }  
+            });  
+        });  
+
+        // Handler untuk delete form (event delegation karena elemen dinamis)  
+        $('#savedFormsTable').on('click', '.delete-form', function(e) {  
+            e.preventDefault();  
+            var url = $(this).attr('href');  
+            var row = $(this).closest('tr');  
+
+            $.ajax({  
+                type: 'GET',  
+                url: url,  
+                dataType: 'json',  
+                success: function(response) {  
+                    if (response.status === 'success') {  
+                        // Hapus baris dari tabel  
+                        row.remove();  
+                        // Renomor ulang baris  
+                        $('#savedFormsTable tbody tr').each(function(index) {  
+                            $(this).find('td:first').text(index + 1);  
+                        });  
+                    } else {  
+                        alert(response.message);  
+                    }  
+                },  
+                error: function() {  
+                    alert('Terjadi kesalahan saat menghapus data');  
+                }  
+            });  
+        });  
+    });  
   </script>
 
   <script>
@@ -604,32 +521,6 @@
         });
     });
   </script>
-  <script>
-      $(document).ready(function() {
-          // Ketika perangkat dipilih
-          $('#device').change(function() {
-              var device_id = $(this).val();  // Mendapatkan nilai device_id yang dipilih
-
-              if (device_id != "") {
-                  console.log("Device ID dipilih: ", device_id);  // Debugging: Menampilkan device_id yang dipilih
-                  $.ajax({
-                      url: '<?= base_url('activity/get_kegiatan_per_device'); ?>', // Pastikan URL ini benar
-                      method: 'POST',
-                      data: { device_id: device_id }, // Kirimkan device_id ke server
-                      success: function(response) {
-                          console.log("Respons dari server: ", response);  // Debugging: Menampilkan respons dari server
-                          $('#kegiatan_section').html(response);  // Render pertanyaan kegiatan ke dalam form
-                      },
-                      error: function(xhr, status, error) {
-                          console.log("Error AJAX: ", error);  // Debugging: Menampilkan error jika AJAX gagal
-                      }
-                  });
-              } else {
-                  $('#kegiatan_section').html('');  // Jika tidak ada perangkat yang dipilih
-              }
-          });
-      });
-  </script>
   <!-- plugins:js -->
   <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->
@@ -640,7 +531,7 @@
   <script src="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.js'); ?>"></script>
   <script src="<?php echo base_url('js/dataTables.select.min.js'); ?>"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
 
   <!-- End plugin js for this page -->
   <!-- inject:js -->
