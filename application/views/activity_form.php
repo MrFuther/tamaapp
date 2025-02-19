@@ -1,3 +1,4 @@
+<script src="<?= base_url('js/jquery-3.7.1.min.js'); ?>"></script>
 <div class="modal-body">
             <!-- Activity Details -->
             <div class="row mb-3">
@@ -15,29 +16,30 @@
                 
                 <!-- Form Input -->
                 <div class="col-md-6">
-                    <form action="<?= base_url('activity/save_form') ?>" method="POST">
-                        <input type="hidden" name="activity_id" value="<?= $activity->id_activity ?>">
-                        
+                    <form id="activityForm" action="javascript:void(0);">
+                        <input type="hidden" name="activity_id" value="<?= $activity_id ?>">
+
+                        <!-- Input fields seperti sub_device, area, report_type, dll. -->
                         <div class="mb-3">
                             <label>Perangkat</label>
                             <select name="sub_device_id" class="form-control" required>
-                                <option value="">Select Device</option>
-                                <?php foreach($sub_devices as $device): ?>
+                                <option value="">Pilih Perangkat</option>
+                                <?php foreach ($sub_devices as $device): ?>
                                     <option value="<?= $device->sub_device_id ?>"><?= $device->sub_device_name ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label>Lokasi</label>
                             <select name="area_id" class="form-control" required>
-                                <option value="">Select Location</option>
-                                <?php foreach($areas as $area): ?>
+                                <option value="">Pilih Lokasi</option>
+                                <?php foreach ($areas as $area): ?>
                                     <option value="<?= $area->area_id ?>"><?= $area->area_name ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label>Kelompok Laporan</label>
                             <div class="form-check">
@@ -53,8 +55,8 @@
                                 <label class="form-check-label">Bulanan</label>
                             </div>
                         </div>
-                        
-                        <button type="submit" class="btn btn-primary">Save</button>
+
+                        <button type="submit" class="btn btn-primary">Simpan</button>
                     </form>
                 </div>
             </div>
@@ -62,7 +64,7 @@
             <!-- Saved Forms Table -->
             <div class="table-responsive mt-4">
                 <h6>Saved Forms</h6>
-                <table class="table table-bordered">
+                <table id="savedFormsTable" class="table table-bordered">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -73,20 +75,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($saved_forms as $index => $form): ?>
-                            <tr>
-                                <td><?= $index + 1 ?></td>
-                                <td><?= $form->sub_device_name ?></td>
-                                <td><?= $form->area_name ?></td>
-                                <td><?= $form->report_type ?></td>
-                                <td>
-                                    <a href="<?= base_url('activity/delete_form/'.$form->form_id.'/'.$activity->id_activity) ?>" 
-                                       class="btn btn-danger btn-sm" 
-                                       onclick="return confirm('Are you sure?')">Delete</a>
-                                    <a href="#" class="btn btn-info btn-sm">Print</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                        <!-- Data akan dimuat melalui AJAX setelah form disubmit -->
                     </tbody>
                 </table>
             </div>
