@@ -202,7 +202,7 @@
                                                 <select class="form-control" id="id_grouparea" name="id_grouparea" required>
                                                     <option value="">-- Select Group Area --</option>
                                                     <?php foreach ($grouparea as $group): ?>
-                                                        <option value="<?= $group->id_grouparea; ?>"><?= $group->nama_grouparea; ?></option>
+                                                        <option value="<?= $group->area_id; ?>"><?= $group->area_name; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>

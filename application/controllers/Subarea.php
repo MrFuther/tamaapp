@@ -18,10 +18,20 @@ class Subarea extends CI_Controller {
 
     public function index() {
         $data['user'] = $this->session->userdata();
-        // Mendapatkan semua sub area dari database
+        
+        // Ambil semua data sub area
         $data['subarea'] = $this->m_subarea->get_all();
-        // Mendapatkan daftar group area untuk dropdown di form
+
+        // Cek apakah id_grouparea ada di setiap sub area
+        foreach ($data['subarea'] as &$sub) {
+            if (!isset($sub->sub_area_id)) {
+                $sub->sub_area_id = null; // Default null jika tidak ada
+            }
+        }
+
+        // Ambil data group area
         $data['grouparea'] = $this->m_grouparea->get_all();
+        
         // Load tampilan
         $this->load->view('masterdata/subarea', $data);
     }

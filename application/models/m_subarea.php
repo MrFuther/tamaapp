@@ -11,7 +11,10 @@ class M_subarea extends CI_Model {
 
     // Mendapatkan semua sub area
     public function get_all() {
-        return $this->db->get($this->table)->result();  // Mengembalikan data sebagai objek
+        $this->db->select('ms_sub_area.*, ms_area.area_id'); // Ambil id_grouparea dari ms_area
+        $this->db->from('ms_sub_area');
+        $this->db->join('ms_area', 'ms_area.area_id = ms_sub_area.sub_area_id', 'left'); // Join dengan ms_area
+        return $this->db->get()->result();
     }
 
     // Menyimpan data sub area baru

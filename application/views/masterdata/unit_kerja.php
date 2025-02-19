@@ -163,8 +163,8 @@
                                     <div class="modal-body">
                                         <form action="<?= base_url('unitkerja/save'); ?>" method="post" enctype="multipart/form-data">
                                             <div class="mb-3">
-                                                <label for="nama_unitkerja" class="form-label">Nama Unit Kerja</label>
-                                                <input type="text" class="form-control" id="nama_unitkerja" name="nama_unitkerja" required>
+                                                <label for="name_unitkerja" class="form-label">Nama Unit Kerja</label>
+                                                <input type="text" class="form-control" id="unit_name" name="unit_name" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="inisial_unitkerja" class="form-label">Inisial Unit Kerja</label>
