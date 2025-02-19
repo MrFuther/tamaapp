@@ -12,8 +12,8 @@
 <div class="sidebar d-flex flex-column p-3">
     <!-- Logo Section -->
     <div class="d-flex sidebar-logo">
-        <img src="<?php echo base_url('assets/images/tama-logo.png'); ?>" alt="Tama Logo">
-        <span class="ms-2 app-name">TAMA App</span>
+        <img src="<?php echo base_url('assets/images/amar.png'); ?>" alt="Amar Logo">
+        <span class="ms-2 app-name">AMAR App</span>
     </div>
     <ul class="nav flex-column mt-4">
         <li class="nav-item">

@@ -21,7 +21,7 @@
     <!-- inject:css -->
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
     <!-- endinject -->
-    <link rel="shortcut icon" href="<?php echo base_url('assets/images/logobawah.png'); ?>" />
+    <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
 </head>
 <body>
   <div class="container-scroller">
