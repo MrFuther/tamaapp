@@ -5,7 +5,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>TAMA Apps</title>
+  <title>AMAR Apps</title>
     <link rel="stylesheet" href="<?php echo base_url('vendors/feather/feather.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/css/vendor.bundle.base.css'); ?>">
@@ -22,7 +22,7 @@
     <!-- inject:css -->
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
     <!-- endinject -->
-    <link rel="shortcut icon" href="<?php echo base_url('assets/images/logobawah.png'); ?>" />
+    <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
     <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>x`
 </head>
 <body>
