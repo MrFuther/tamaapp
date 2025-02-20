@@ -194,15 +194,16 @@
                                     <div class="modal-body">
                                         <form action="<?= base_url('subarea/save'); ?>" method="post" enctype="multipart/form-data">
                                             <div class="mb-3">
-                                                <label for="nama_subarea" class="form-label">Nama Sub Area</label>
-                                                <input type="text" class="form-control" id="nama_subarea" name="nama_subarea" required>
+                                                <label for="sub_area_name" class="form-label">Sub Area Name</label>
+                                                <input type="text" class="form-control" id="sub_area_name" name="sub_area_name" required>
                                             </div>
+
                                             <div class="mb-3">
-                                                <label for="id_grouparea" class="form-label">Group Area</label>
-                                                <select class="form-control" id="id_grouparea" name="id_grouparea" required>
+                                                <label for="gr_area_name" class="form-label">Group Area</label>
+                                                <select class="form-control" id="gr_area_name" name="gr_area_name" required>
                                                     <option value="">-- Select Group Area --</option>
                                                     <?php foreach ($grouparea as $group): ?>
-                                                        <option value="<?= $group->area_id; ?>"><?= $group->area_name; ?></option>
+                                                        <option value="<?= $group->area_name; ?>"><?= $group->area_name; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>

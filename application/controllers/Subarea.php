@@ -37,22 +37,35 @@ class Subarea extends CI_Controller {
     }
 
     public function save() {
-        // Ambil data dari form input
+        // Validasi input
+        $this->form_validation->set_rules('sub_area_name', 'Sub Area Name', 'required');
+        $this->form_validation->set_rules('gr_area_name', 'Group Area Name', 'required');
+        
+        if ($this->form_validation->run() == FALSE) {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect('subarea');
+        }
+    
+        // Persiapkan data
         $data = [
             'sub_area_name' => $this->input->post('sub_area_name'),
-            'area_id' => $this->input->post('area_id'),
-            'gr_area_name' => $this->input->post('gr_area_name'),
+            'gr_area_name' => $this->input->post('gr_area_name')
         ];
-
-        if ($this->input->post('sub_area_id')) {
-            // Update sub area
-            $this->m_subarea->update($this->input->post('sub_area_id'), $data);
-        } else {
-            // Insert sub area baru
-            $this->m_subarea->insert($data);
+    
+        try {
+            if ($this->input->post('sub_area_id')) {
+                // Update
+                $this->m_subarea->update($this->input->post('sub_area_id'), $data);
+                $this->session->set_flashdata('success', 'Sub area updated successfully');
+            } else {
+                // Insert
+                $this->m_subarea->insert($data);
+                $this->session->set_flashdata('success', 'Sub area added successfully');
+            }
+        } catch (Exception $e) {
+            $this->session->set_flashdata('error', 'Failed to save data');
         }
-
-        // Redirect ke halaman utama
+    
         redirect('subarea');
     }
 
