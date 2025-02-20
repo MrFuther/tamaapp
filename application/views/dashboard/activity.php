@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="<?php echo base_url('vendors/feather/feather.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/css/vendor.bundle.base.css'); ?>">
+
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
@@ -22,6 +23,7 @@
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
     <!-- endinject -->
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
+    <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>x`
 </head>
 <body>
   <div class="container-scroller">
@@ -183,7 +185,7 @@
                           <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
                           <td><?= $activity->tanggal_kegiatan; ?></td>
                           <td>
-                            <button class="btn btn-primary btn-sm mx-1" data-bs-toggle="modal" data-bs-target="#formModal" data-activity-id="<?= $activity->id_activity ?>">Form</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openFormModal(<?= $activity->id_activity ?>)">Form</button>
                             <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
                           </td>
                         </tr>
@@ -233,108 +235,82 @@
                       </div>
                     </div>
                   </div>
-                  <div class="modal fade" id="formModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h5 class="modal-title">Activity Form</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                          </div>
-                          
-                          <div class="modal-body">
-                              <!-- Activity Details -->
-                              <div class="row mb-3">
-                                  <div class="col-md-6">
-                                      <h5>Activity Details</h5>
-                                      <p>Date: <?= date('d M Y', strtotime($activity->tanggal_kegiatan)) ?></p>
-                                      <p>Shift: <?= $activity->nama_shift ?></p>
-                                      <p>Time: <?= $activity->jam_mulai ?> - <?= $activity->jam_selesai ?></p>
-                                      <p>Team: 
-                                          <?php foreach($users as $user): ?>
-                                              <?= $user->username ?>, 
-                                          <?php endforeach; ?>
-                                      </p>
-                                  </div>
-                                  
-                                  <!-- Form Input -->
-                                  <div class="col-md-6">
-                                      <form id="activityForm" action="<?= base_url('activity/save_form') ?>" method="POST">
-                                          <input type="hidden" name="activity_id" value="<?= $activity->id_activity ?>">
-                                          
-                                          <div class="mb-3">
-                                              <label>Perangkat</label>
-                                              <select name="sub_device_id" class="form-control" required>
-                                                  <option value="">Select Device</option>
-                                                  <?php foreach($sub_devices as $device): ?>
-                                                      <option value="<?= $device->sub_device_id ?>"><?= $device->sub_device_name ?></option>
-                                                  <?php endforeach; ?>
-                                              </select>
-                                          </div>
-                                          
-                                          <div class="mb-3">
-                                              <label>Lokasi</label>
-                                              <select name="area_id" class="form-control" required>
-                                                  <option value="">Select Location</option>
-                                                  <?php foreach($areas as $area): ?>
-                                                      <option value="<?= $area->area_id ?>"><?= $area->area_name ?></option>
-                                                  <?php endforeach; ?>
-                                              </select>
-                                          </div>
-                                          
-                                          <div class="mb-3">
-                                              <label>Kelompok Laporan</label>
-                                              <div class="form-check">
-                                                  <input type="radio" name="report_type" value="Harian" class="form-check-input" required>
-                                                  <label class="form-check-label">Harian</label>
-                                              </div>
-                                              <div class="form-check">
-                                                  <input type="radio" name="report_type" value="Mingguan" class="form-check-input">
-                                                  <label class="form-check-label">Mingguan</label>
-                                              </div>
-                                              <div class="form-check">
-                                                  <input type="radio" name="report_type" value="Bulanan" class="form-check-input">
-                                                  <label class="form-check-label">Bulanan</label>
-                                              </div>
-                                          </div>
-                                          
-                                          <button type="submit" class="btn btn-primary">Save</button>
-                                      </form>
-                                  </div>
-                              </div>
-                              
-                              <!-- Saved Forms Table -->
-                              <div class="table-responsive mt-4">
-                                  <h6>Saved Forms</h6>
-                                  <table id="savedFormsTable" class="table table-bordered">
-                                      <thead>
-                                          <tr>
-                                              <th>No</th>
-                                              <th>Perangkat</th>
-                                              <th>Lokasi</th>
-                                              <th>Kelompok Laporan</th>
-                                              <th>Actions</th>
-                                          </tr>
-                                      </thead>
-                                      <tbody>  
-                                        <?php foreach($saved_forms as $index => $form): ?>  
-                                            <tr>  
-                                                <td><?= $index + 1 ?></td>  
-                                                <td><?= $form->sub_device_name ?></td>  
-                                                <td><?= $form->area_name ?></td>  
-                                                <td><?= $form->report_type ?></td>  
-                                                <td>  
-                                                    <a href="<?= base_url('activity/delete_form/'.$form->form_id.'/'.$activity->id_activity) ?>"   
-                                                      class="btn btn-danger btn-sm delete-form"   
-                                                      onclick="return confirm('Are you sure?')">Delete</a>  
-                                                    <a href="#" class="btn btn-info btn-sm">Print</a>  
-                                                </td>  
-                                            </tr>  
-                                        <?php endforeach; ?>  
-                                    </tbody>
-                                  </table>
-                              </div>
-                          </div>
-                      </div>
+                  <div class="modal fade" id="formModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Activity Form</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <strong>Hari/Tanggal:</strong> <span id="modalTanggal"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Shift/Jam Kerja:</strong> <span id="modalShift"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Team/Regu:</strong> <span id="modalTeam"></span>
+                                    </div>
+                                </div>
+
+                                <form id="activityForm">
+                                    <input type="hidden" id="activity_id" name="activity_id">
+                                    <div class="form-group">
+                                        <label>Perangkat</label>
+                                        <select class="form-control" name="sub_device_id" required>
+                                            <option value="">Pilih Perangkat</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Lokasi</label>
+                                        <select class="form-control" name="area_id" required>
+                                            <option value="">Pilih Lokasi</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Kelompok Laporan</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="report_type" 
+                                                      value="Harian" required>
+                                                <label class="form-check-label">Harian</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="report_type" 
+                                                      value="Mingguan">
+                                                <label class="form-check-label">Mingguan</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="report_type" 
+                                                      value="Bulanan">
+                                                <label class="form-check-label">Bulanan</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </form>
+
+                                <div class="mt-4">
+                                    <h6>Data Form</h6>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Perangkat</th>
+                                                <th>Lokasi</th>
+                                                <th>Kelompok Laporan</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="formDataTable">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -371,6 +347,9 @@
     </div>  
     <!-- page-body-wrapper ends -->
   </div>
+  <script src="<?= base_url('js/jquery-3.7.1.min.js'); ?>"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  
   <!-- container-scroller -->
   <script>
     function showLogoutConfirmation() {
@@ -386,128 +365,171 @@
     window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
     }
 
-    function openUploadPhoto(documentationId) {
-        if (!documentationId) {
-            alert('Silakan buat dokumentasi terlebih dahulu sebelum upload foto');
-            return;
-        }
-        document.getElementById('documentation_id').value = documentationId;
-        var uploadModal = new bootstrap.Modal(document.getElementById('uploadPhotoModal'));
-        var documentationModal = new bootstrap.Modal(document.getElementById('documentationModal'));
-        uploadModal.show();
-        documentationModal.hide();
-    }
-
-    function loadDocumentationPhoto(activity_id) {
-        // Mengambil data yang relevan dan memanggil modal
+    const loadFormData = (activityId) => {
         $.ajax({
-            url: '<?= base_url("activity/show_documentation_photos/"); ?>' + activity_id,
-            type: 'GET',
-            success: function(response) {
-                // Memasukkan data ke dalam modal jika data ditemukan
-                $('#documentationPhotoModal .modal-body').html(response);
+            url: '<?= base_url("activity/get_activity_forms/") ?>' + activityId,
+            method: 'GET',
+            dataType: 'json',
+            success: function(forms) {
+                var tbody = $('#formDataTable');
+                tbody.empty();
+                if (Array.isArray(forms)) {
+                    forms.forEach(function(form) {
+                        tbody.append(`
+                            <tr>
+                                <td>${form.sub_device_name}</td>
+                                <td>${form.area_name}</td>
+                                <td>${form.report_type}</td>
+                                <td>
+                                    <button class="btn btn-info btn-sm" onclick="viewData(${form.form_id})">
+                                        Data
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="4" class="text-center">No forms available</td></tr>');
+                }
             },
-            error: function() {
-                alert('Error loading documentation photo data');
+            error: function(xhr, status, error) {
+                console.error('Error loading form data:', error);
+                $('#formDataTable').html('<tr><td colspan="4" class="text-center">Error loading data</td></tr>');
             }
         });
-    }
+    };
 
-    const formModal = document.getElementById('formModal');  
-      formModal.addEventListener('show.bs.modal', event => {  
-          const button = event.relatedTarget; // Tombol yang memicu modal  
-          const activityId = button.getAttribute('data-activity-id');  
+    const loadSubDevices = () => {
+        $.ajax({
+            url: '<?= base_url("activity/get_sub_devices") ?>',
+            method: 'GET',
+            dataType: 'json',
+            success: function(devices) {
+                var deviceSelect = $('select[name="sub_device_id"]');
+                deviceSelect.empty().append('<option value="">Pilih Perangkat</option>');
+                if (Array.isArray(devices)) {
+                    devices.forEach(function(device) {
+                        deviceSelect.append(
+                            `<option value="${device.sub_device_id}">${device.sub_device_name}</option>`
+                        );
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to load devices:', error);
+                alert('Failed to load devices. Please try again.');
+            }
+        });
+    };
 
-          // Lakukan permintaan AJAX ke controller  
-          fetch('<?= base_url('activity/show_form/') ?>' + activityId, {  
-              method: 'GET',  
-              headers: {  
-                  'X-Requested-With': 'XMLHttpRequest' // Penting untuk CodeIgniter  
-              }  
-          })  
-          .then(response => response.text())  
-          .then(html => {  
-              formModal.querySelector('.modal-body').innerHTML = html; // Masukkan HTML ke dalam body modal  
-          })  
-          .catch(error => {  
-              console.error('Error:', error);  
-              formModal.querySelector('.modal-body').innerHTML = '<p>Error loading form.</p>';  
-          });  
-      });  
+    const loadAreas = () => {
+        $.ajax({
+            url: '<?= base_url("activity/get_areas") ?>',
+            method: 'GET',
+            dataType: 'json',
+            success: function(areas) {
+                var areaSelect = $('select[name="area_id"]');
+                areaSelect.empty().append('<option value="">Pilih Lokasi</option>');
+                if (Array.isArray(areas)) {
+                    areas.forEach(function(area) {
+                        areaSelect.append(
+                            `<option value="${area.area_id}">${area.area_name}</option>`
+                        );
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to load areas:', error);
+                alert('Failed to load areas. Please try again.');
+            }
+        });
+    };
 
-    $(document).ready(function() {  
-        // Handler untuk submit form  
-        $('#activityForm').on('submit', function(e) {  
-            e.preventDefault(); // Mencegah form submit biasa  
+    const deleteForm = (formId) => {
+        if(confirm('Are you sure you want to delete this form?')) {
+            $.ajax({
+                url: '<?= base_url("activity/delete_form/") ?>' + formId,
+                method: 'POST',
+                dataType: 'json',
+                success: function(response) {
+                    if(response.status === 'success') {
+                        loadFormData($('#activity_id').val());
+                    } else {
+                        alert('Failed to delete form');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Delete error:', error);
+                    alert('Failed to delete form. Please try again.');
+                }
+            });
+        }
+    };
 
-            $.ajax({  
-                type: 'POST',  
-                url: '<?= base_url('activity/save_form') ?>',  
-                data: $(this).serialize(),  
-                dataType: 'json',  
-                success: function(response) {  
-                    if (response.status === 'success') {  
-                        // Tambahkan baris baru ke tabel  
-                        var newRow = `  
-                            <tr>  
-                                <td>${$('#savedFormsTable tbody tr').length + 1}</td>  
-                                <td>${response.form.sub_device_name}</td>  
-                                <td>${response.form.area_name}</td>  
-                                <td>${response.form.report_type}</td>  
-                                <td>  
-                                    <a href="<?= base_url('activity/delete_form/') ?>${response.form.form_id}/${response.form.activity_id}"   
-                                      class="btn btn-danger btn-sm delete-form"   
-                                      onclick="return confirm('Are you sure?')">Delete</a>  
-                                    <a href="#" class="btn btn-info btn-sm">Print</a>  
-                                </td>  
-                            </tr>  
-                        `;  
-                        $('#savedFormsTable tbody').append(newRow);  
+    const viewData = (formId) => {
+        // Implementasi untuk melihat data form
+        alert('View data for form ID: ' + formId);
+        // Tambahkan kode untuk menampilkan data form sesuai kebutuhan
+    };
 
-                        // Reset form  
-                        $('#activityForm')[0].reset();  
+    const openFormModal = (activityId) => {
+        $.ajax({
+            url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    const data = response.data;
+                    $('#activity_id').val(activityId);
+                    $('#modalTanggal').text(data.formatted_date);
+                    $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
+                    $('#modalTeam').text(data.personel_name);
+                    
+                    // Load sub devices and areas
+                    loadSubDevices();
+                    loadAreas();
+                    
+                    // Load existing form data
+                    loadFormData(activityId);
+                    
+                    // Show modal
+                    $('#formModal').modal('show');
+                } else {
+                    alert('Error: ' + (response.message || 'Failed to load activity details'));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                alert('Failed to load activity details. Please try again.');
+            }
+        });
+    };
 
-                        // Tampilkan pesan sukses (opsional)  
-                        alert(response.message);  
-                    } else {  
-                        // Tampilkan pesan error  
-                        alert(response.message);  
-                    }  
-                },  
-                error: function() {  
-                    alert('Terjadi kesalahan saat mengirim data');  
-                }  
-            });  
-        });  
-
-        // Handler untuk delete form (event delegation karena elemen dinamis)  
-        $('#savedFormsTable').on('click', '.delete-form', function(e) {  
-            e.preventDefault();  
-            var url = $(this).attr('href');  
-            var row = $(this).closest('tr');  
-
-            $.ajax({  
-                type: 'GET',  
-                url: url,  
-                dataType: 'json',  
-                success: function(response) {  
-                    if (response.status === 'success') {  
-                        // Hapus baris dari tabel  
-                        row.remove();  
-                        // Renomor ulang baris  
-                        $('#savedFormsTable tbody tr').each(function(index) {  
-                            $(this).find('td:first').text(index + 1);  
-                        });  
-                    } else {  
-                        alert(response.message);  
-                    }  
-                },  
-                error: function() {  
-                    alert('Terjadi kesalahan saat menghapus data');  
-                }  
-            });  
-        });  
-    });  
+    // Form submission handler
+    $('#activityForm').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '<?= base_url("activity/save_form") ?>',
+            method: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if(response.status === 'success') {
+                    loadFormData($('#activity_id').val());
+                    $('#activityForm')[0].reset();
+                } else {
+                    alert('Failed to save form: ' + (response.message || 'Unknown error'));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Save error:', error);
+                alert('Failed to save form. Please try again.');
+            }
+        });
+    });
   </script>
 
   <script>
@@ -522,16 +544,11 @@
     });
   </script>
   <!-- plugins:js -->
-  <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
+  
   <!-- endinject -->
   <!-- Plugin js for this page -->
-  <script src="<?php echo base_url('vendors/chart.js/Chart.min.js'); ?>"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="<?php echo base_url('vendors/datatables.net/jquery.dataTables.js'); ?>"></script>
-  <script src="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.js'); ?>"></script>
-  <script src="<?php echo base_url('js/dataTables.select.min.js'); ?>"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
 
   <!-- End plugin js for this page -->
   <!-- inject:js -->
@@ -542,8 +559,6 @@
   <script src="<?php echo base_url('js/todolist.js'); ?>"></script>
   <!-- endinject -->
   <!-- Custom js for this page-->
-  <script src="<?php echo base_url('js/dashboard.js'); ?>"></script>
-  <script src="<?php echo base_url('js/Chart.roundedBarCharts.js'); ?>"></script>
   <!-- End custom js for this page-->
 </body>
 
