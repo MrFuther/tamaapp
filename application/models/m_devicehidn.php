@@ -15,10 +15,9 @@ class M_devicehidn extends CI_Model {
         $this->db->insert('ms_device_hidn', $data);  // Insert data baru ke ms_device_hidn
     }
 
-    public function get_all_sub_devices() {
-        $query = $this->db->get('ms_sub_device')->result();
-        print_r($query); // Debug
-        exit;
+    public function get_all_names() {
+        $this->db->select('sub_device_name');  // Pilih hanya kolom sub_device_name
+        return $this->db->get($this->table)->result();  // Mengembalikan hasil sebagai objek
     }
       
     public function update($id, $data) {
