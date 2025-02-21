@@ -141,7 +141,7 @@
                                                 <select class="form-control" id="id_subunit" name="id_subunit" required>
                                                     <option value="">-- Select Sub Unit Kerja --</option>
                                                     <?php foreach ($subunitkerja as $subunit): ?>
-                                                        <option value="<?= $subunit->id_subunit; ?>"><?= $subunit->nama_subunit; ?></option>
+                                                        <option value="<?= $subunit->subunit_id; ?>"><?= $subunit->subunit_pek_name; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -150,7 +150,7 @@
                                                 <select class="form-control" id="id_unitkerja" name="id_unitkerja" required>
                                                     <option value="">-- Select Unit Kerja --</option>
                                                     <?php foreach ($unitkerja as $unit): ?>
-                                                        <option value="<?= $unit->id_unitkerja; ?>"><?= $unit->nama_unitkerja; ?></option>
+                                                        <option value="<?= $unit->unit_id; ?>"><?= $unit->unit_name; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>

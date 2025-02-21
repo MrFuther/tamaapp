@@ -37,8 +37,16 @@ class ManageUser extends CI_Controller {
     public function update_role($id) {
         $role = $this->input->post('role');
         $unit_id = $this->input->post('unit_id');
+        
 
         $this->UserModel->update_user($id, $role, $unit_id);
+
+        redirect('ManageUser/index');
+    }
+
+    public function delete_user($id) {
+        // Handle deleting a user
+        $this->UserModel->delete_user($id);
 
         redirect('ManageUser/index');
     }

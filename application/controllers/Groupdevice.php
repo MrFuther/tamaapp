@@ -29,21 +29,29 @@ class Groupdevice extends CI_Controller {
     }
 
     public function save() {
-        // Ambil data dari form input
+        // Dapatkan nama subunit dan inisial unit dari model berdasarkan ID
+        $subunit = $this->m_subunitkerja->get_by_id($this->input->post('id_subunit'));
+        $unit = $this->m_unitkerja->get_by_id($this->input->post('id_unitkerja'));
+        
+        // Ambil data dari form input dan sesuaikan dengan struktur database
         $data = [
-            'pek_unit_name' => $this->input->post('pek_unit_name'),
-            'id_subunit' => $this->input->post('id_subunit'),
-            'id_unitkerja' => $this->input->post('id_unitkerja') // Menambahkan unitkerja ke data yang disimpan
+            'pek_unit_name' => $this->input->post('nama_pekerjaanunit'),
+            'subunit_pek_name' => $subunit->subunit_pek_name,
+            'inisial_unit_kerja' => $unit->inisial_unit,
+            'created_by' => $this->session->userdata('username'),
+            'created_date' => date('Y-m-d H:i:s')
         ];
-
+    
         if ($this->input->post('pek_unit_id')) {
-            // Update group device
+            // Update: tambahkan updated_by dan updated_date
+            $data['updated_by'] = $this->session->userdata('username');
+            $data['updated_date'] = date('Y-m-d H:i:s');
             $this->m_groupdevice->update($this->input->post('pek_unit_id'), $data);
         } else {
             // Insert group device baru
             $this->m_groupdevice->insert($data);
         }
-
+    
         // Redirect ke halaman utama
         redirect('groupdevice');
     }
