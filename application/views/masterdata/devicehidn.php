@@ -23,6 +23,7 @@
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
 </head>
 <body>
+    
     <div class="container-scroller">
         <!-- Navbar -->
         <?php include APPPATH . 'views/dashboard/navbar.php'; ?>
@@ -102,10 +103,19 @@
                                         <label for="jum_device_hidn" class="form-label">Jumlah Device</label>
                                         <input type="number" class="form-control" id="jum_device_hidn" name="jum_device_hidn" required>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="sub_device_name" class="form-label">Sub Device Name</label>
-                                        <input type="text" class="form-control" id="sub_device_name" name="sub_device_name" required>
-                                    </div>
+                                    <label for="sub_device_name" class="form-label">Sub Device Name</label>
+<select class="form-control" id="sub_device_name" name="sub_device_id" required>
+    <option value="">Pilih Sub Device</option>
+    <?php if (!empty($sub_devices)) : ?>
+        <?php foreach ($sub_devices as $sub_device): ?>
+            <option value="<?= $sub_device->sub_device_id; ?>"><?= $sub_device->sub_device_name; ?></option>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <option value="">Data tidak ditemukan</option>
+    <?php endif; ?>
+</select>
+
+
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                         <button type="submit" class="btn btn-primary">Simpan</button>

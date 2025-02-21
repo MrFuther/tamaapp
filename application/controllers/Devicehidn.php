@@ -15,8 +15,7 @@ class Devicehidn extends CI_Controller {
 
         // Load model yang dibutuhkan
         $this->load->model('m_devicehidn');  // Load model devicehidn
-        $this->load->model('m_groupdevice');  // Load model groupdevice untuk dropdown
-        $this->load->model('m_subarea');     // Load model subarea untuk dropdown
+        $this->load->model('m_subdevice');  // Load model groupdevice untuk dropdown
     }
 
     public function index() {
@@ -24,8 +23,7 @@ class Devicehidn extends CI_Controller {
         // Mendapatkan semua data devicehidn dari database
         $data['devicehidn'] = $this->m_devicehidn->get_all_devicehidn();
         // Mendapatkan daftar grup device, sub area, dan area untuk dropdown di form
-        $data['groupdevice'] = $this->m_groupdevice->get_all();
-        $data['subarea'] = $this->m_subarea->get_all();
+        $data['subdevice'] = $this->m_subdevice->get_all();
 
         // Load tampilan untuk masterdata/devicehidn
         $this->load->view('masterdata/devicehidn', $data);
@@ -36,10 +34,6 @@ class Devicehidn extends CI_Controller {
         $data = [
             'device_hidn_name' => $this->input->post('device_hidn_name'),
             'jum_device_hidn' => $this->input->post('jum_device_hidn'),
-            'sub_device_name' => $this->input->post('sub_device_name'),
-            'pek_unit_name' => $this->input->post('pek_unit_name'),
-            'sub_area_name' => $this->input->post('sub_area_name'),
-            'area_name' => $this->input->post('area_name'),
             'created_by' => $this->session->userdata('username'),  // Assuming username is stored in session
             'created_date' => date('Y-m-d H:i:s')
         ];
@@ -55,6 +49,14 @@ class Devicehidn extends CI_Controller {
         // Redirect kembali ke halaman utama
         redirect('devicehidn');
     }
+    
+    public function add() {
+    $data['sub_devices'] = $this->m_devicehidn->get_all_sub_devices(); // Ambil data sub_device_name
+
+    $this->load->view('devicehidn/add_devicehidn', $data);
+    }
+
+    
 
     public function edit($id) {
         // Ambil data berdasarkan ID
