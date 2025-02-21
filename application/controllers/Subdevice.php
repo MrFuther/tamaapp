@@ -27,22 +27,24 @@ class Subdevice extends CI_Controller {
     }
 
     public function save() {
-        // Ambil data dari form input
+        // Tambahkan created_by dan created_date
         $data = [
             'sub_device_name' => $this->input->post('sub_device_name'),
-            'pek_unit_id' => $this->input->post('pek_unit_id'),
-            'pek_unit_name' => $this->input->post('pek_unit_name')
+            'pek_unit_name' => $this->input->post('pek_unit_name'),
+            'created_by' => $this->session->userdata('username'),
+            'created_date' => date('Y-m-d H:i:s')
         ];
-
+    
         if ($this->input->post('sub_device_id')) {
-            // Update sub device
+            // Update: tambahkan updated_by dan updated_date
+            $data['updated_by'] = $this->session->userdata('username');
+            $data['updated_date'] = date('Y-m-d H:i:s');
             $this->m_subdevice->update($this->input->post('sub_device_id'), $data);
         } else {
-            // Insert sub device baru
+            // Insert baru
             $this->m_subdevice->insert($data);
         }
-
-        // Redirect ke halaman utama
+    
         redirect('subdevice');
     }
 
