@@ -240,7 +240,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Activity Form</h5>
-                                <button type="button" class="close" data-bs-dismiss="modal">
+                                <button type="button" class="close" data-dismiss="modal">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
@@ -273,17 +273,20 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Kelompok Laporan</label>
-                                        <div class="d-flex">
+                                        <div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" value="Harian" required>
+                                                <input class="form-check-input" type="radio" name="report_type" 
+                                                      value="Harian" required>
                                                 <label class="form-check-label">Harian</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" value="Mingguan">
+                                                <input class="form-check-input" type="radio" name="report_type" 
+                                                      value="Mingguan">
                                                 <label class="form-check-label">Mingguan</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" value="Bulanan">
+                                                <input class="form-check-input" type="radio" name="report_type" 
+                                                      value="Bulanan">
                                                 <label class="form-check-label">Bulanan</label>
                                             </div>
                                         </div>
@@ -518,7 +521,7 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
                                             Delete
                                         </button>
-                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}'" target="_blank">
+                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}'">
                                             <i class="fas fa-print"></i> Dokumentasi
                                         </button>
                                         <button class="btn btn-primary btn-sm" onclick="window.location.href='<?= base_url('activity/printchecklist/') ?>${form.form_id}'">
@@ -583,7 +586,7 @@
                                         <td>${item.tindakan3 || '-'}</td>
                                         <td>
                                             ${item.foto_perangkat ? 
-                                                `<img src="<?= base_url('uploads/') ?>${item.foto_perangkat}" width="100" class="img-thumbnail">` : 
+                                                `<img src="<?= base_url('uploads/') ?>${item.foto_perangkat}" width="50" class="img-thumbnail">` : 
                                                 '-'}
                                         </td>
                                         <td>
