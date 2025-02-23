@@ -245,54 +245,125 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <strong>Hari/Tanggal:</strong> <span id="modalTanggal"></span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <strong>Shift/Jam Kerja:</strong> <span id="modalShift"></span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <strong>Team/Regu:</strong> <span id="modalTeam"></span>
-                                    </div>
-                                </div>
-
-                                <form id="activityForm">
-                                    <input type="hidden" id="activity_id" name="activity_id">
-                                    <div class="form-group">
-                                        <label>Perangkat</label>
-                                        <select class="form-control" name="sub_device_id" required>
-                                            <option value="">Pilih Perangkat</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Lokasi</label>
-                                        <select class="form-control" name="area_id" required>
-                                            <option value="">Pilih Lokasi</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Kelompok Laporan</label>
-                                        <div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Harian" required>
-                                                <label class="form-check-label">Harian</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Mingguan">
-                                                <label class="form-check-label">Mingguan</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Bulanan">
-                                                <label class="form-check-label">Bulanan</label>
-                                            </div>
+                                <div class="border p-3 mb-4">
+                                    <!-- Header Form -->
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            <!-- Form Title -->
+                                        </div>
+                                        <div class="text-end border border-dark p-2" style="min-width: 200px;">
+                                            <strong>PREVENTIVE MAINTENANCE</strong>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </form>
+
+                                    <!-- Form Content -->
+                                    <form id="activityForm">
+                                        <input type="hidden" id="activity_id" name="activity_id">
+                                        
+                                        <!-- Row 1: Hari/Tanggal -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Hari / Tanggal</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <div id="modalTanggal"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 2: Shift/Jam Kerja -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Shift Kerja / Jam Kerja</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <div id="modalShift"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 3: Team/Regu -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Team / Regu</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <div id="modalTeam"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 4: Perangkat -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Perangkat</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <select class="form-control" name="sub_device_id" required>
+                                                        <option value="">Pilih Perangkat</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 5: Lokasi -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Lokasi</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <select class="form-control" name="area_id" required>
+                                                        <option value="">Pilih Lokasi</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Jadwal Checklist -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Jadwal</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex align-items-start">
+                                                    <span class="me-2">:</span>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Harian" class="custom-control-input" required>
+                                                            <label class="custom-control-label">Harian</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Mingguan" class="custom-control-input">
+                                                            <label class="custom-control-label">Mingguan</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Bulanan" class="custom-control-input">
+                                                            <label class="custom-control-label">Bulanan</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-end mt-3">
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </div>
+                                    </form>
+                                </div>
 
                                 <div class="mt-4">
                                     <h6>Data Form</h6>
@@ -467,37 +538,46 @@
 
     // Form Management Functions
     const openFormModal = (activityId) => {
-            $.ajax({
-                url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        const data = response.data;
-                        $('#activity_id').val(activityId);
-                        $('#modalTanggal').text(data.formatted_date);
-                        $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
-                        $('#modalTeam').text(data.personel_name);
-                        
-                        // Load sub devices and areas
-                        loadSubDevices();
-                        loadAreas();
-                        
-                        // Load existing form data
-                        loadFormData(activityId);
-                        
-                        // Show modal
-                        $('#formModal').modal('show');
-                    } else {
-                        alert('Error: ' + (response.message || 'Failed to load activity details'));
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
-                    alert('Failed to load activity details. Please try again.');
+        $.ajax({
+            url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    const data = response.data;
+                    $('#activity_id').val(activityId);
+                    
+                    // Format tanggal ke Bahasa Indonesia
+                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    const date = new Date(data.tanggal_kegiatan);
+                    const dayName = days[date.getDay()];
+                    const formattedDate = `${dayName} / ${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()}`;
+                    
+                    $('#modalTanggal').text(formattedDate);
+                    $('#modalShift').text(`${data.nama_shift} / ${data.jam_mulai} s/d ${data.jam_selesai}`);
+                    $('#modalTeam').text(data.personel_name);
+                    
+                    loadSubDevices();
+                    loadAreas();
+                    loadFormData(activityId);
+                    
+                    $('#formModal').modal('show');
+                } else {
+                    alert('Error: ' + (response.message || 'Failed to load activity details'));
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                alert('Failed to load activity details. Please try again.');
+            }
+        });
     };
+
+    // Helper function untuk nama bulan dalam Bahasa Indonesia
+    function getMonthName(month) {
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        return months[month];
+    }
 
     const loadFormData = (activityId) => {
             $.ajax({
