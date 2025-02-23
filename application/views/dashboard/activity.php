@@ -236,7 +236,7 @@
                     </div>
                   </div>
                   <div class="modal fade" id="formModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-dialog modal-xl" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Activity Form</h5>
@@ -312,6 +312,95 @@
                             </div>
                         </div>
                     </div>
+                  </div>
+                  <!-- Modal for viewing data -->
+                  <div class="modal fade" id="dataModal" tabindex="-1">
+                      <div class="modal-dialog modal-xl">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title">Form Data</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <div class="modal-body">
+                              <button id="addDataButton" class="btn btn-primary mb-3" onclick="openAddDataModal()">
+                                Add Data
+                              </button>
+                                  <div class="table-responsive">
+                                      <table class="table table-bordered" id="formDataItemsTable">
+                                          <thead>
+                                              <tr>
+                                                  <th>Device</th>
+                                                  <th>Jam Kegiatan</th>
+                                                  <th>Tindakan 1</th>
+                                                  <th>Tindakan 2</th>
+                                                  <th>Tindakan 3</th>
+                                                  <th>Photo 1</th>
+                                                  <th>Photo 2</th>
+                                                  <th>Photo 3</th>
+                                                  <th>Notes</th>
+                                                  <th>Actions</th>
+                                              </tr>
+                                          </thead>
+                                          <tbody></tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Modal for adding data -->
+                  <div class="modal fade" id="addDataModal" tabindex="-1">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title">Add Form Data</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <div class="modal-body">
+                                  <form id="addDataForm" onsubmit="submitFormData(event)">
+                                      <input type="hidden" name="form_id">
+                                      
+                                      <div class="mb-3">
+                                          <label class="form-label">Device</label>
+                                          <select class="form-control" id="device_hidn_id" name="device_hidn_id" required>
+                                          </select>
+                                      </div>
+                                      
+                                      <div class="mb-3">
+                                          <label class="form-label">Jam Kegiatan</label>
+                                          <input type="time" class="form-control" name="jam_kegiatan" required>
+                                      </div>
+                                      
+                                      <div id="checklistContainer">
+                                          <!-- Checklist questions will be loaded here -->
+                                      </div>
+                                      
+                                      <div class="mb-3">
+                                          <label class="form-label">Foto Perangkat</label>
+                                          <input type="file" class="form-control" name="foto_perangkat" accept="image/*" required>
+                                      </div>
+                                      
+                                      <div class="mb-3">
+                                          <label class="form-label">Foto Lokasi</label>
+                                          <input type="file" class="form-control" name="foto_lokasi" accept="image/*" required>
+                                      </div>
+                                      
+                                      <div class="mb-3">
+                                          <label class="form-label">Foto Teknisi</label>
+                                          <input type="file" class="form-control" name="foto_teknisi" accept="image/*" required>
+                                      </div>
+                                      
+                                      <div class="mb-3">
+                                          <label class="form-label">Notes</label>
+                                          <textarea class="form-control" name="notes" rows="3">Normal</textarea>
+                                      </div>
+                                      
+                                      <button type="submit" class="btn btn-primary">Save</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -469,12 +558,6 @@
         }
     };
 
-    const viewData = (formId) => {
-        // Implementasi untuk melihat data form
-        alert('View data for form ID: ' + formId);
-        // Tambahkan kode untuk menampilkan data form sesuai kebutuhan
-    };
-
     const openFormModal = (activityId) => {
         $.ajax({
             url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
@@ -530,6 +613,295 @@
             }
         });
     });
+  </script>
+
+  <script>
+    let currentFormId = null;
+    // Function to handle view data button click
+    const viewData = (formId) => {
+        if (!formId) {
+            console.error('No form ID provided to viewData');
+            return;
+        }
+
+        console.log('ViewData called with formId:', formId);
+        
+        // Simpan form ID
+        localStorage.setItem('currentFormId', formId);
+        $('#current_form_id').val(formId);
+        
+        // Load data
+        loadFormDataItems(formId);
+        
+        // Show modal
+        $('#dataModal').modal('show');
+        $('#formModal').modal('hide');
+    };
+
+    const openAddDataModal = () => {
+        // Coba ambil form ID dari beberapa sumber
+        const formId = $('#current_form_id').val() || localStorage.getItem('currentFormId');
+        
+        console.log('Current form ID:', formId); // Untuk debugging
+        
+        if (!formId) {
+            alert('Invalid form ID');
+            return;
+        }
+
+        // Set form_id di form
+        $('#addDataForm input[name="form_id"]').val(formId);
+        
+        // Load device and checklist data
+        loadDeviceAndChecklist(formId);
+        
+        // Show modal
+        $('#addDataModal').modal('show');
+        $('#dataModal').modal('hide');
+    };
+
+    const showErrorAlert = (message) => {
+    alert(message); // Using basic alert for now, you can enhance this later
+    };
+
+    // Update fungsi loadDeviceAndChecklist
+    const loadDeviceAndChecklist = async (formId) => {
+        try {
+            console.log('Loading device and checklist for formId:', formId);
+
+            // Load devices dengan error handling yang lebih baik
+            const deviceResponse = await $.ajax({
+                url: '<?= base_url("activity/get_all_device_hidn") ?>',
+                method: 'GET',
+                dataType: 'json',
+                error: function(xhr, status, error) {
+                    console.error('XHR Status:', status);
+                    console.error('Error:', error);
+                    console.error('Response:', xhr.responseText);
+                    throw new Error('Failed to load devices');
+                }
+            });
+
+            console.log('Device response:', deviceResponse);
+            
+            const select = $('#device_hidn_id');
+            select.empty();
+            select.append('<option value="">Select Device</option>');
+            
+            if (deviceResponse.status === 'success' && Array.isArray(deviceResponse.data)) {
+                deviceResponse.data.forEach(device => {
+                    select.append(
+                        $('<option>', {
+                            value: device.device_hidn_id,
+                            text: device.device_hidn_name
+                        })
+                    );
+                });
+            }
+
+            // Load checklist questions setelah devices berhasil dimuat
+            await loadChecklistQuestions(formId);
+
+        } catch (error) {
+            console.error('Error in loadDeviceAndChecklist:', error);
+            alert('Failed to load devices. Please try again.');
+        }
+    };
+
+    // Function to load form data items
+    const loadFormDataItems = (formId) => {
+        if (!formId) {
+            console.error('No form ID provided to loadFormDataItems');
+            return;
+        }
+
+        $.ajax({
+            url: '<?= base_url("activity/get_form_data/") ?>' + formId,
+            method: 'GET',
+            success: function(response) {
+                if(response.status === 'success') {
+                    // Pastikan form ID tersimpan
+                    $('#current_form_id').val(formId);
+                    localStorage.setItem('currentFormId', formId);
+                    
+                    const dataTable = $('#formDataItemsTable tbody');
+                    dataTable.empty();
+                    
+                    response.data.forEach(item => {
+                        // ... kode existing untuk menampilkan data ...
+                    });
+
+                    // Check if add button should be disabled
+                    const addButton = $('#addDataButton');
+                    if(response.data.length >= 4) {
+                        addButton.prop('disabled', true);
+                        addButton.attr('title', 'Maximum 4 data entries reached');
+                    } else {
+                        addButton.prop('disabled', false);
+                        addButton.attr('title', '');
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading form data:', error);
+                alert('Failed to load form data');
+            }
+        });
+    };
+
+    // Tambahkan event handler untuk modal
+    $('#dataModal').on('shown.bs.modal', function () {
+        const formId = $('#current_form_id').val() || localStorage.getItem('currentFormId');
+        console.log('Modal shown, current form ID:', formId); // Untuk debugging
+    });
+
+    // Reset form ID saat modal ditutup (opsional, tergantung kebutuhan)
+    $('#dataModal').on('hidden.bs.modal', function () {
+        localStorage.removeItem('currentFormId');
+    });
+
+    // Function to handle add data button click
+
+
+    // Function to load device hidn options
+    const loadAllDeviceHidnOptions = async (subDeviceId) => {
+        try {
+            const response = await $.ajax({
+                url: '<?= base_url("activity/get_all_device_hidn") ?>',
+                method: 'GET',
+                data: { sub_device_id: subDeviceId }
+            });
+
+            if (response.status === 'success' && Array.isArray(response.data)) {
+                const select = $('#device_hidn_id');
+                select.empty();
+                select.append('<option value="">Select Device</option>');
+                
+                response.data.forEach(device => {
+                    select.append(
+                        $('<option>', {
+                            value: device.device_hidn_id,
+                            text: device.device_hidn_name
+                        })
+                    );
+                });
+            }
+        } catch (error) {
+            console.error('Error loading device options:', error);
+            alert('Failed to load device options');
+        }
+    };
+
+    // Function to load checklist questions
+    const loadChecklistQuestions = async (formId) => {
+        try {
+            if (!formId) {
+                console.error('Form ID is required');
+                return;
+            }
+
+            const response = await $.ajax({
+                url: `<?= base_url("activity/get_checklist_for_form/") ?>${formId}`,
+                method: 'GET',
+                dataType: 'json'
+            });
+
+            const container = $('#checklistContainer');
+            container.empty();
+
+            if (response.status === 'success' && Array.isArray(response.data)) {
+                response.data.forEach((question, index) => {
+                    container.append(`
+                        <div class="mb-3">
+                            <label class="form-label">${question.question_text}</label>
+                            <select name="tindakan${index + 1}" class="form-control" required>
+                                <option value="OK">OK</option>
+                                <option value="NOT OK">NOT OK</option>
+                            </select>
+                        </div>
+                    `);
+                });
+            } else {
+                container.append('<div class="alert alert-info">No checklist questions available.</div>');
+            }
+        } catch (error) {
+            console.error('Error loading checklist questions:', error);
+            $('#checklistContainer').html(
+                '<div class="alert alert-danger">Failed to load checklist questions. Please try again.</div>'
+            );
+        }
+    };
+
+    // Function to handle form submission
+    const submitFormData = (e) => {
+        e.preventDefault();
+        
+        const formId = $('#addDataForm input[name="form_id"]').val();
+        if (!formId) {
+            alert('Form ID is missing');
+            return;
+        }
+        
+        const formData = new FormData($('#addDataForm')[0]);
+        
+        // Add validation
+        if (!formData.get('device_hidn_id')) {
+            alert('Please select a device');
+            return;
+        }
+        
+        $.ajax({
+            url: '<?= base_url("activity/add_form_data") ?>',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                try {
+                    const result = typeof response === 'string' ? JSON.parse(response) : response;
+                    
+                    if(result.status === 'success') {
+                        $('#addDataModal').modal('hide');
+                        $('#addDataForm')[0].reset();
+                        loadFormDataItems(formId);
+                        alert('Data saved successfully');
+                    } else {
+                        alert(result.message || 'Failed to save data');
+                    }
+                } catch (error) {
+                    console.error('Error processing response:', error);
+                    alert('Failed to process server response');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error saving form data:', error);
+                alert('Failed to save form data. Error: ' + error);
+            }
+        });
+    };
+
+
+    // Function to delete form data
+    const deleteFormData = (formDataId) => {
+        if(confirm('Are you sure you want to delete this data?')) {
+            $.ajax({
+                url: '<?= base_url("activity/delete_form_data/") ?>' + formDataId,
+                method: 'POST',
+                success: function(response) {
+                    if(response.status === 'success') {
+                        loadFormDataItems($('#addDataForm input[name="form_id"]').val());
+                        alert('Data deleted successfully');
+                    } else {
+                        alert('Failed to delete data');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error deleting form data:', error);
+                    alert('Failed to delete form data');
+                }
+            });
+        }
+    };
   </script>
 
   <script>

@@ -125,6 +125,8 @@ class ActivityModel extends CI_Model {
         }
         return null;
     }
+
+    
     
     public function get_areas() {
         return $this->db->get('ms_area')->result();
@@ -136,7 +138,25 @@ class ActivityModel extends CI_Model {
         $this->db->join('ms_sub_device sd', 'sd.sub_device_id = f.sub_device_id');
         $this->db->join('ms_area a', 'a.area_id = f.area_id');
         $this->db->where('f.activity_id', $activity_id);
-        return $this->db->get()->result();
+        
+        // Tambahkan log untuk debugging
+        $query = $this->db->get();
+        log_message('debug', 'SQL Query: ' . $this->db->last_query());
+        log_message('debug', 'Result: ' . json_encode($query->result()));
+        
+        return $query->result();
+    }
+
+    public function get_all_devices() {
+        $query = $this->db->select('device_hidn_id, device_hidn_name')
+                          ->from('ms_device_hidn')
+                          ->get();
+                          
+        if (!$query) {
+            throw new Exception('Database error: ' . $this->db->error()['message']);
+        }
+        
+        return $query->result();
     }
     
     public function save_form($data) {
