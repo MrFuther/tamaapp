@@ -326,23 +326,25 @@
                                 Add Data
                               </button>
                                   <div class="table-responsive">
-                                      <table class="table table-bordered" id="formDataItemsTable">
-                                          <thead>
-                                              <tr>
-                                                  <th>Device</th>
-                                                  <th>Jam Kegiatan</th>
-                                                  <th>Tindakan 1</th>
-                                                  <th>Tindakan 2</th>
-                                                  <th>Tindakan 3</th>
-                                                  <th>Photo 1</th>
-                                                  <th>Photo 2</th>
-                                                  <th>Photo 3</th>
-                                                  <th>Notes</th>
-                                                  <th>Actions</th>
-                                              </tr>
-                                          </thead>
-                                          <tbody></tbody>
-                                      </table>
+                                    <table class="table table-bordered" id="formDataItemsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Device</th>
+                                                <th>Jam Kegiatan</th>
+                                                <th>Tindakan 1</th>
+                                                <th>Tindakan 2</th>
+                                                <th>Tindakan 3</th>
+                                                <th>Photo 1</th>
+                                                <th>Photo 2</th>
+                                                <th>Photo 3</th>
+                                                <th>Notes</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data will be loaded here -->
+                                        </tbody>
+                                    </table>
                                   </div>
                               </div>
                           </div>
@@ -441,158 +443,486 @@
   
   <!-- container-scroller -->
   <script>
+    // Global Variables
+    let currentFormId = null;
+
+    // Document Ready Function
+    $(document).ready(function() {
+        // Event Handlers
+        $('#activityForm').on('submit', handleActivityFormSubmit);
+        $('#dataModal').on('shown.bs.modal', handleDataModalShown);
+        $('#dataModal').on('hidden.bs.modal', handleDataModalHidden);
+    });
+
+    // Authentication Functions
     function showLogoutConfirmation() {
-    // Menampilkan modal
-    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
-    modal.show();
+        var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+        modal.show();
     }
 
     function logout() {
-    // Implementasi logika logout di sini
-    alert("Anda telah logout.");
-    // Redirect ke halaman login atau halaman utama setelah logout
-    window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
+        alert("Anda telah logout.");
+        window.location.href = "<?php echo base_url('auth/logout'); ?>";
     }
 
-    const loadFormData = (activityId) => {
-        $.ajax({
-            url: '<?= base_url("activity/get_activity_forms/") ?>' + activityId,
-            method: 'GET',
-            dataType: 'json',
-            success: function(forms) {
-                var tbody = $('#formDataTable');
-                tbody.empty();
-                if (Array.isArray(forms)) {
-                    forms.forEach(function(form) {
-                        tbody.append(`
-                            <tr>
-                                <td>${form.sub_device_name}</td>
-                                <td>${form.area_name}</td>
-                                <td>${form.report_type}</td>
-                                <td>
-                                    <button class="btn btn-info btn-sm" onclick="viewData(${form.form_id})">
-                                        Data
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        `);
-                    });
-                } else {
-                    tbody.append('<tr><td colspan="4" class="text-center">No forms available</td></tr>');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading form data:', error);
-                $('#formDataTable').html('<tr><td colspan="4" class="text-center">Error loading data</td></tr>');
-            }
-        });
-    };
-
-    const loadSubDevices = () => {
-        $.ajax({
-            url: '<?= base_url("activity/get_sub_devices") ?>',
-            method: 'GET',
-            dataType: 'json',
-            success: function(devices) {
-                var deviceSelect = $('select[name="sub_device_id"]');
-                deviceSelect.empty().append('<option value="">Pilih Perangkat</option>');
-                if (Array.isArray(devices)) {
-                    devices.forEach(function(device) {
-                        deviceSelect.append(
-                            `<option value="${device.sub_device_id}">${device.sub_device_name}</option>`
-                        );
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to load devices:', error);
-                alert('Failed to load devices. Please try again.');
-            }
-        });
-    };
-
-    const loadAreas = () => {
-        $.ajax({
-            url: '<?= base_url("activity/get_areas") ?>',
-            method: 'GET',
-            dataType: 'json',
-            success: function(areas) {
-                var areaSelect = $('select[name="area_id"]');
-                areaSelect.empty().append('<option value="">Pilih Lokasi</option>');
-                if (Array.isArray(areas)) {
-                    areas.forEach(function(area) {
-                        areaSelect.append(
-                            `<option value="${area.area_id}">${area.area_name}</option>`
-                        );
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to load areas:', error);
-                alert('Failed to load areas. Please try again.');
-            }
-        });
-    };
-
-    const deleteForm = (formId) => {
-        if(confirm('Are you sure you want to delete this form?')) {
+    // Form Management Functions
+    const openFormModal = (activityId) => {
             $.ajax({
-                url: '<?= base_url("activity/delete_form/") ?>' + formId,
-                method: 'POST',
+                url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
+                method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    if(response.status === 'success') {
-                        loadFormData($('#activity_id').val());
+                    if (response.status === 'success') {
+                        const data = response.data;
+                        $('#activity_id').val(activityId);
+                        $('#modalTanggal').text(data.formatted_date);
+                        $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
+                        $('#modalTeam').text(data.personel_name);
+                        
+                        // Load sub devices and areas
+                        loadSubDevices();
+                        loadAreas();
+                        
+                        // Load existing form data
+                        loadFormData(activityId);
+                        
+                        // Show modal
+                        $('#formModal').modal('show');
                     } else {
-                        alert('Failed to delete form');
+                        alert('Error: ' + (response.message || 'Failed to load activity details'));
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('Delete error:', error);
-                    alert('Failed to delete form. Please try again.');
+                    console.error('AJAX Error:', error);
+                    alert('Failed to load activity details. Please try again.');
                 }
             });
-        }
     };
 
-    const openFormModal = (activityId) => {
+    const loadFormData = (activityId) => {
+            $.ajax({
+                url: '<?= base_url("activity/get_activity_forms/") ?>' + activityId,
+                method: 'GET',
+                dataType: 'json',
+                success: function(forms) {
+                    var tbody = $('#formDataTable');
+                    tbody.empty();
+                    if (Array.isArray(forms)) {
+                        forms.forEach(function(form) {
+                            tbody.append(`
+                                <tr>
+                                    <td>${form.sub_device_name}</td>
+                                    <td>${form.area_name}</td>
+                                    <td>${form.report_type}</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" onclick="viewData(${form.form_id})">
+                                            Data
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
+                                            Delete
+                                        </button>
+                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}'">
+                                            <i class="fas fa-print"></i> Dokumentasi
+                                        </button>
+                                        <button class="btn btn-primary btn-sm" onclick="window.location.href='<?= base_url('activity/printchecklist/') ?>${form.form_id}'">
+                                            <i class="fas fa-print"></i> Checklist
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="4" class="text-center">No forms available</td></tr>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading form data:', error);
+                    $('#formDataTable').html('<tr><td colspan="4" class="text-center">Error loading data</td></tr>');
+                }
+            });
+    };
+
+    // View Data Functions
+    const viewData = (formId) => {
+        if (!formId) {
+            console.error('No form ID provided to viewData');
+            return;
+        }
+        
+        console.log('ViewData called with formId:', formId);
+        localStorage.setItem('currentFormId', formId);
+        $('#current_form_id').val(formId);
+        loadFormDataItems(formId);
+        $('#dataModal').modal('show');
+        $('#formModal').modal('hide');
+    };
+
+    const loadFormDataItems = (formId) => {
+        if (!formId) {
+            console.error('No form ID provided to loadFormDataItems');
+            return;
+        }
+
         $.ajax({
-            url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
+            url: '<?= base_url("activity/get_form_data/") ?>' + formId,
             method: 'GET',
-            dataType: 'json',
+            dataType: 'json', // Pastikan response dianggap sebagai JSON
             success: function(response) {
-                if (response.status === 'success') {
-                    const data = response.data;
-                    $('#activity_id').val(activityId);
-                    $('#modalTanggal').text(data.formatted_date);
-                    $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
-                    $('#modalTeam').text(data.personel_name);
+                try {
+                    console.log('Response received:', response); // Debug log
                     
-                    // Load sub devices and areas
-                    loadSubDevices();
-                    loadAreas();
+                    const dataTable = $('#formDataItemsTable tbody');
+                    dataTable.empty();
                     
-                    // Load existing form data
-                    loadFormData(activityId);
-                    
-                    // Show modal
-                    $('#formModal').modal('show');
-                } else {
-                    alert('Error: ' + (response.message || 'Failed to load activity details'));
+                    if (response.status === 'success' && Array.isArray(response.data)) {
+                        if (response.data.length > 0) {
+                            response.data.forEach(item => {
+                                const row = `
+                                    <tr>
+                                        <td>${item.device_hidn_name || '-'}</td>
+                                        <td>${item.jam_kegiatan || '-'}</td>
+                                        <td>${item.tindakan1 || '-'}</td>
+                                        <td>${item.tindakan2 || '-'}</td>
+                                        <td>${item.tindakan3 || '-'}</td>
+                                        <td>
+                                            ${item.foto_perangkat ? 
+                                                `<img src="<?= base_url('uploads/') ?>${item.foto_perangkat}" width="50" class="img-thumbnail">` : 
+                                                '-'}
+                                        </td>
+                                        <td>
+                                            ${item.foto_lokasi ? 
+                                                `<img src="<?= base_url('uploads/') ?>${item.foto_lokasi}" width="50" class="img-thumbnail">` : 
+                                                '-'}
+                                        </td>
+                                        <td>
+                                            ${item.foto_teknisi ? 
+                                                `<img src="<?= base_url('uploads/') ?>${item.foto_teknisi}" width="50" class="img-thumbnail">` : 
+                                                '-'}
+                                        </td>
+                                        <td>${item.notes || 'Normal'}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteFormData(${item.form_data_id})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                                dataTable.append(row);
+                            });
+                        } else {
+                            dataTable.append(`
+                                <tr>
+                                    <td colspan="10" class="text-center">No data available</td>
+                                </tr>
+                            `);
+                        }
+
+                        // Update add button state
+                        const addButton = $('#addDataButton');
+                        if (response.data.length >= 4) {
+                            addButton.prop('disabled', true);
+                            addButton.attr('title', 'Maximum 4 data entries reached');
+                        } else {
+                            addButton.prop('disabled', false);
+                            addButton.attr('title', '');
+                        }
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
+                } catch (error) {
+                    console.error('Error processing response:', error);
+                    $('#formDataItemsTable tbody').html(`
+                        <tr>
+                            <td colspan="10" class="text-center text-danger">Error loading data: ${error.message}</td>
+                        </tr>
+                    `);
                 }
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', error);
-                alert('Failed to load activity details. Please try again.');
+                console.error('Status:', status);
+                console.error('Response:', xhr.responseText);
+                
+                $('#formDataItemsTable tbody').html(`
+                    <tr>
+                        <td colspan="10" class="text-center text-danger">Failed to load data. Please try again.</td>
+                    </tr>
+                `);
             }
         });
     };
 
-    // Form submission handler
-    $('#activityForm').on('submit', function(e) {
+    // Device and Area Loading Functions
+    const loadSubDevices = () => {
+            $.ajax({
+                url: '<?= base_url("activity/get_sub_devices") ?>',
+                method: 'GET',
+                dataType: 'json',
+                success: function(devices) {
+                    var deviceSelect = $('select[name="sub_device_id"]');
+                    deviceSelect.empty().append('<option value="">Pilih Perangkat</option>');
+                    if (Array.isArray(devices)) {
+                        devices.forEach(function(device) {
+                            deviceSelect.append(
+                                `<option value="${device.sub_device_id}">${device.sub_device_name}</option>`
+                            );
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load devices:', error);
+                    alert('Failed to load devices. Please try again.');
+                }
+            });
+    };
+
+    const loadAreas = () => {
+            $.ajax({
+                url: '<?= base_url("activity/get_areas") ?>',
+                method: 'GET',
+                dataType: 'json',
+                success: function(areas) {
+                    var areaSelect = $('select[name="area_id"]');
+                    areaSelect.empty().append('<option value="">Pilih Lokasi</option>');
+                    if (Array.isArray(areas)) {
+                        areas.forEach(function(area) {
+                            areaSelect.append(
+                                `<option value="${area.area_id}">${area.area_name}</option>`
+                            );
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load areas:', error);
+                    alert('Failed to load areas. Please try again.');
+                }
+            });
+    };
+
+    const loadAllDeviceHidnOptions = async (subDeviceId) => {
+            try {
+                const response = await $.ajax({
+                    url: '<?= base_url("activity/get_all_device_hidn") ?>',
+                    method: 'GET',
+                    data: { sub_device_id: subDeviceId }
+                });
+
+                if (response.status === 'success' && Array.isArray(response.data)) {
+                    const select = $('#device_hidn_id');
+                    select.empty();
+                    select.append('<option value="">Select Device</option>');
+                    
+                    response.data.forEach(device => {
+                        select.append(
+                            $('<option>', {
+                                value: device.device_hidn_id,
+                                text: device.device_hidn_name
+                            })
+                        );
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading device options:', error);
+                alert('Failed to load device options');
+            }
+    };
+
+    // Add Data Modal Functions
+    const openAddDataModal = () => {
+        const formId = $('#current_form_id').val() || localStorage.getItem('currentFormId');
+        console.log('Current form ID:', formId);
+        
+        if (!formId) {
+            alert('Invalid form ID');
+            return;
+        }
+
+        $('#addDataForm input[name="form_id"]').val(formId);
+        loadDeviceAndChecklist(formId);
+        $('#addDataModal').modal('show');
+        $('#dataModal').modal('hide');
+    };
+
+    const loadDeviceAndChecklist = async (formId) => {
+            try {
+                console.log('Loading device and checklist for formId:', formId);
+
+                // Load devices dengan error handling yang lebih baik
+                const deviceResponse = await $.ajax({
+                    url: '<?= base_url("activity/get_all_device_hidn") ?>',
+                    method: 'GET',
+                    dataType: 'json',
+                    error: function(xhr, status, error) {
+                        console.error('XHR Status:', status);
+                        console.error('Error:', error);
+                        console.error('Response:', xhr.responseText);
+                        throw new Error('Failed to load devices');
+                    }
+                });
+
+                console.log('Device response:', deviceResponse);
+                
+                const select = $('#device_hidn_id');
+                select.empty();
+                select.append('<option value="">Select Device</option>');
+                
+                if (deviceResponse.status === 'success' && Array.isArray(deviceResponse.data)) {
+                    deviceResponse.data.forEach(device => {
+                        select.append(
+                            $('<option>', {
+                                value: device.device_hidn_id,
+                                text: device.device_hidn_name
+                            })
+                        );
+                    });
+                }
+
+                // Load checklist questions setelah devices berhasil dimuat
+                await loadChecklistQuestions(formId);
+
+            } catch (error) {
+                console.error('Error in loadDeviceAndChecklist:', error);
+                alert('Failed to load devices. Please try again.');
+            }
+    };
+
+    const loadChecklistQuestions = async (formId) => {
+            try {
+                if (!formId) {
+                    console.error('Form ID is required');
+                    return;
+                }
+
+                const response = await $.ajax({
+                    url: `<?= base_url("activity/get_checklist_for_form/") ?>${formId}`,
+                    method: 'GET',
+                    dataType: 'json'
+                });
+
+                const container = $('#checklistContainer');
+                container.empty();
+
+                if (response.status === 'success' && Array.isArray(response.data)) {
+                    response.data.forEach((question, index) => {
+                        container.append(`
+                            <div class="mb-3">
+                                <label class="form-label">${question.question_text}</label>
+                                <select name="tindakan${index + 1}" class="form-control" required>
+                                    <option value="OK">OK</option>
+                                    <option value="NOT OK">NOT OK</option>
+                                </select>
+                            </div>
+                        `);
+                    });
+                } else {
+                    container.append('<div class="alert alert-info">No checklist questions available.</div>');
+                }
+            } catch (error) {
+                console.error('Error loading checklist questions:', error);
+                $('#checklistContainer').html(
+                    '<div class="alert alert-danger">Failed to load checklist questions. Please try again.</div>'
+                );
+            }
+    };
+
+    // Form Submission Functions
+    const submitFormData = (e) => {
+            e.preventDefault();
+            
+            const formId = $('#addDataForm input[name="form_id"]').val();
+            if (!formId) {
+                alert('Form ID is missing');
+                return;
+            }
+            
+            const formData = new FormData($('#addDataForm')[0]);
+            
+            // Add validation
+            if (!formData.get('device_hidn_id')) {
+                alert('Please select a device');
+                return;
+            }
+            
+            $.ajax({
+                url: '<?= base_url("activity/add_form_data") ?>',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    try {
+                        const result = typeof response === 'string' ? JSON.parse(response) : response;
+                        
+                        if(result.status === 'success') {
+                            $('#addDataModal').modal('hide');
+                            $('#addDataForm')[0].reset();
+                            loadFormDataItems(formId);
+                            alert('Data saved successfully');
+                        } else {
+                            alert(result.message || 'Failed to save data');
+                        }
+                    } catch (error) {
+                        console.error('Error processing response:', error);
+                        alert('Failed to process server response');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saving form data:', error);
+                    alert('Failed to save form data. Error: ' + error);
+                }
+            });
+    };
+
+    // Delete Functions
+    const deleteForm = (formId) => {
+            if(confirm('Are you sure you want to delete this form?')) {
+                $.ajax({
+                    url: '<?= base_url("activity/delete_form/") ?>' + formId,
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        if(response.status === 'success') {
+                            loadFormData($('#activity_id').val());
+                        } else {
+                            alert('Failed to delete form');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Delete error:', error);
+                        alert('Failed to delete form. Please try again.');
+                    }
+                });
+            }
+    };
+
+    const deleteFormData = (formDataId) => {
+            if(confirm('Are you sure you want to delete this data?')) {
+                $.ajax({
+                    url: '<?= base_url("activity/delete_form_data/") ?>' + formDataId,
+                    method: 'POST',
+                    success: function(response) {
+                        if(response.status === 'success') {
+                            loadFormDataItems($('#addDataForm input[name="form_id"]').val());
+                            alert('Data deleted successfully');
+                        } else {
+                            alert('Failed to delete data');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting form data:', error);
+                        alert('Failed to delete form data');
+                    }
+                });
+            }
+    };
+
+    // Utility Functions
+    const showErrorAlert = (message) => {
+        alert(message);
+    };
+
+    // Event Handler Functions
+    function handleActivityFormSubmit(e) {
         e.preventDefault();
         $.ajax({
             url: '<?= base_url("activity/save_form") ?>',
@@ -612,296 +942,16 @@
                 alert('Failed to save form. Please try again.');
             }
         });
-    });
-  </script>
+    }
 
-  <script>
-    let currentFormId = null;
-    // Function to handle view data button click
-    const viewData = (formId) => {
-        if (!formId) {
-            console.error('No form ID provided to viewData');
-            return;
-        }
-
-        console.log('ViewData called with formId:', formId);
-        
-        // Simpan form ID
-        localStorage.setItem('currentFormId', formId);
-        $('#current_form_id').val(formId);
-        
-        // Load data
-        loadFormDataItems(formId);
-        
-        // Show modal
-        $('#dataModal').modal('show');
-        $('#formModal').modal('hide');
-    };
-
-    const openAddDataModal = () => {
-        // Coba ambil form ID dari beberapa sumber
+    function handleDataModalShown() {
         const formId = $('#current_form_id').val() || localStorage.getItem('currentFormId');
-        
-        console.log('Current form ID:', formId); // Untuk debugging
-        
-        if (!formId) {
-            alert('Invalid form ID');
-            return;
-        }
+        console.log('Modal shown, current form ID:', formId);
+    }
 
-        // Set form_id di form
-        $('#addDataForm input[name="form_id"]').val(formId);
-        
-        // Load device and checklist data
-        loadDeviceAndChecklist(formId);
-        
-        // Show modal
-        $('#addDataModal').modal('show');
-        $('#dataModal').modal('hide');
-    };
-
-    const showErrorAlert = (message) => {
-    alert(message); // Using basic alert for now, you can enhance this later
-    };
-
-    // Update fungsi loadDeviceAndChecklist
-    const loadDeviceAndChecklist = async (formId) => {
-        try {
-            console.log('Loading device and checklist for formId:', formId);
-
-            // Load devices dengan error handling yang lebih baik
-            const deviceResponse = await $.ajax({
-                url: '<?= base_url("activity/get_all_device_hidn") ?>',
-                method: 'GET',
-                dataType: 'json',
-                error: function(xhr, status, error) {
-                    console.error('XHR Status:', status);
-                    console.error('Error:', error);
-                    console.error('Response:', xhr.responseText);
-                    throw new Error('Failed to load devices');
-                }
-            });
-
-            console.log('Device response:', deviceResponse);
-            
-            const select = $('#device_hidn_id');
-            select.empty();
-            select.append('<option value="">Select Device</option>');
-            
-            if (deviceResponse.status === 'success' && Array.isArray(deviceResponse.data)) {
-                deviceResponse.data.forEach(device => {
-                    select.append(
-                        $('<option>', {
-                            value: device.device_hidn_id,
-                            text: device.device_hidn_name
-                        })
-                    );
-                });
-            }
-
-            // Load checklist questions setelah devices berhasil dimuat
-            await loadChecklistQuestions(formId);
-
-        } catch (error) {
-            console.error('Error in loadDeviceAndChecklist:', error);
-            alert('Failed to load devices. Please try again.');
-        }
-    };
-
-    // Function to load form data items
-    const loadFormDataItems = (formId) => {
-        if (!formId) {
-            console.error('No form ID provided to loadFormDataItems');
-            return;
-        }
-
-        $.ajax({
-            url: '<?= base_url("activity/get_form_data/") ?>' + formId,
-            method: 'GET',
-            success: function(response) {
-                if(response.status === 'success') {
-                    // Pastikan form ID tersimpan
-                    $('#current_form_id').val(formId);
-                    localStorage.setItem('currentFormId', formId);
-                    
-                    const dataTable = $('#formDataItemsTable tbody');
-                    dataTable.empty();
-                    
-                    response.data.forEach(item => {
-                        // ... kode existing untuk menampilkan data ...
-                    });
-
-                    // Check if add button should be disabled
-                    const addButton = $('#addDataButton');
-                    if(response.data.length >= 4) {
-                        addButton.prop('disabled', true);
-                        addButton.attr('title', 'Maximum 4 data entries reached');
-                    } else {
-                        addButton.prop('disabled', false);
-                        addButton.attr('title', '');
-                    }
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading form data:', error);
-                alert('Failed to load form data');
-            }
-        });
-    };
-
-    // Tambahkan event handler untuk modal
-    $('#dataModal').on('shown.bs.modal', function () {
-        const formId = $('#current_form_id').val() || localStorage.getItem('currentFormId');
-        console.log('Modal shown, current form ID:', formId); // Untuk debugging
-    });
-
-    // Reset form ID saat modal ditutup (opsional, tergantung kebutuhan)
-    $('#dataModal').on('hidden.bs.modal', function () {
+    function handleDataModalHidden() {
         localStorage.removeItem('currentFormId');
-    });
-
-    // Function to handle add data button click
-
-
-    // Function to load device hidn options
-    const loadAllDeviceHidnOptions = async (subDeviceId) => {
-        try {
-            const response = await $.ajax({
-                url: '<?= base_url("activity/get_all_device_hidn") ?>',
-                method: 'GET',
-                data: { sub_device_id: subDeviceId }
-            });
-
-            if (response.status === 'success' && Array.isArray(response.data)) {
-                const select = $('#device_hidn_id');
-                select.empty();
-                select.append('<option value="">Select Device</option>');
-                
-                response.data.forEach(device => {
-                    select.append(
-                        $('<option>', {
-                            value: device.device_hidn_id,
-                            text: device.device_hidn_name
-                        })
-                    );
-                });
-            }
-        } catch (error) {
-            console.error('Error loading device options:', error);
-            alert('Failed to load device options');
-        }
-    };
-
-    // Function to load checklist questions
-    const loadChecklistQuestions = async (formId) => {
-        try {
-            if (!formId) {
-                console.error('Form ID is required');
-                return;
-            }
-
-            const response = await $.ajax({
-                url: `<?= base_url("activity/get_checklist_for_form/") ?>${formId}`,
-                method: 'GET',
-                dataType: 'json'
-            });
-
-            const container = $('#checklistContainer');
-            container.empty();
-
-            if (response.status === 'success' && Array.isArray(response.data)) {
-                response.data.forEach((question, index) => {
-                    container.append(`
-                        <div class="mb-3">
-                            <label class="form-label">${question.question_text}</label>
-                            <select name="tindakan${index + 1}" class="form-control" required>
-                                <option value="OK">OK</option>
-                                <option value="NOT OK">NOT OK</option>
-                            </select>
-                        </div>
-                    `);
-                });
-            } else {
-                container.append('<div class="alert alert-info">No checklist questions available.</div>');
-            }
-        } catch (error) {
-            console.error('Error loading checklist questions:', error);
-            $('#checklistContainer').html(
-                '<div class="alert alert-danger">Failed to load checklist questions. Please try again.</div>'
-            );
-        }
-    };
-
-    // Function to handle form submission
-    const submitFormData = (e) => {
-        e.preventDefault();
-        
-        const formId = $('#addDataForm input[name="form_id"]').val();
-        if (!formId) {
-            alert('Form ID is missing');
-            return;
-        }
-        
-        const formData = new FormData($('#addDataForm')[0]);
-        
-        // Add validation
-        if (!formData.get('device_hidn_id')) {
-            alert('Please select a device');
-            return;
-        }
-        
-        $.ajax({
-            url: '<?= base_url("activity/add_form_data") ?>',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                try {
-                    const result = typeof response === 'string' ? JSON.parse(response) : response;
-                    
-                    if(result.status === 'success') {
-                        $('#addDataModal').modal('hide');
-                        $('#addDataForm')[0].reset();
-                        loadFormDataItems(formId);
-                        alert('Data saved successfully');
-                    } else {
-                        alert(result.message || 'Failed to save data');
-                    }
-                } catch (error) {
-                    console.error('Error processing response:', error);
-                    alert('Failed to process server response');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error saving form data:', error);
-                alert('Failed to save form data. Error: ' + error);
-            }
-        });
-    };
-
-
-    // Function to delete form data
-    const deleteFormData = (formDataId) => {
-        if(confirm('Are you sure you want to delete this data?')) {
-            $.ajax({
-                url: '<?= base_url("activity/delete_form_data/") ?>' + formDataId,
-                method: 'POST',
-                success: function(response) {
-                    if(response.status === 'success') {
-                        loadFormDataItems($('#addDataForm input[name="form_id"]').val());
-                        alert('Data deleted successfully');
-                    } else {
-                        alert('Failed to delete data');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error deleting form data:', error);
-                    alert('Failed to delete form data');
-                }
-            });
-        }
-    };
+    }
   </script>
 
   <script>

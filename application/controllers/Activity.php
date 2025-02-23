@@ -104,17 +104,43 @@ class Activity extends CI_Controller
     }
 
     public function get_form_data($formId) {
-        $this->db->select('afd.*, dh.device_hidn_name')
-                 ->from('activity_form_data afd')
-                 ->join('ms_device_hidn dh', 'dh.device_hidn_id = afd.device_hidn_id')
-                 ->where('afd.form_id', $formId);
-                 
-        $data = $this->db->get()->result();
-        
-        echo json_encode([
-            'status' => 'success',
-            'data' => $data
-        ]);
+        try {
+            // Validasi input
+            if (!$formId) {
+                throw new Exception('Form ID is required');
+            }
+    
+            // Query data
+            $this->db->select('afd.*, dh.device_hidn_name')
+                     ->from('activity_form_data afd')
+                     ->join('ms_device_hidn dh', 'dh.device_hidn_id = afd.device_hidn_id')
+                     ->where('afd.form_id', $formId);
+            
+            $query = $this->db->get();
+            
+            // Log query untuk debugging
+            log_message('debug', 'Form Data Query: ' . $this->db->last_query());
+            
+            if (!$query) {
+                throw new Exception('Database error: ' . $this->db->error()['message']);
+            }
+    
+            $data = $query->result();
+    
+            // Return response
+            echo json_encode([
+                'status' => 'success',
+                'data' => $data
+            ]);
+    
+        } catch (Exception $e) {
+            log_message('error', 'Error in get_form_data: ' . $e->getMessage());
+            
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
     
     public function get_all_device_hidn() {
@@ -402,177 +428,286 @@ class Activity extends CI_Controller
     }
 
     public function printdokumentasi($id) {
-        // Ambil data untuk PDF (modifikasi sesuai dengan logika aplikasi Anda)
-        $activity = $this->ActivityModel->get_activity_details($id);
+        try {
+            // Get form details first
+            $formDetails = $this->db->select('
+                    af.*,
+                    ap.tanggal_kegiatan,
+                    ap.kode_activity,
+                    ma.area_name,
+                    sk.nama_shift,
+                    sk.jam_mulai,
+                    sk.jam_selesai,
+                    GROUP_CONCAT(ms.username) as personel_names
+                ')
+                ->from('activity_forms af')
+                ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
+                ->join('ms_area ma', 'ma.area_id = af.area_id')
+                ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
+                ->join('personel p', 'p.id_personel = ap.personel_id')
+                ->join('personel_user pu', 'pu.personel_id = p.id_personel')
+                ->join('ms_account ms', 'ms.id = pu.user_id')
+                ->where('af.form_id', $id)
+                ->group_by('af.form_id')
+                ->get()
+                ->row();
+
+            if (!$formDetails) {
+                throw new Exception('Form data not found');
+            }
     
-        // Membuat instance PDF baru
-        $pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
-        // Set document information
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('BSH');
-        
-        // Pastikan tanggal tidak null sebelum diproses
-
-        // Set margins
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-
-        // Set auto page breaks
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-        // Add a page
-        $pdf->AddPage();
-
-        // Set font
-        $pdf->SetFont('helvetica', '', 11);
-
-        // Add content from database
-        $pdf->Ln(3);
-        $pdf->Cell(50, 8, 'Tanggal / Bulan / Tahun:', 0, 1);
-        $pdf->Cell(50, 8, 'Lokasi:', 0, 1);
-
-        $pdf->Cell(50, 8, 'Perangkat:', 0, 1);
-
-        $pdf->Cell(50, 8, 'Shift:', 0, 1);
-
-        $pdf->Cell(50, 8, 'Personil:', 0, 1);
-
-        $pdf->Ln(15);
-        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
-
-        $pdf->Ln(10);
-        
-        $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 0, 'C');
-        $pdf->Cell(60, 30, 'Foto', 1, 1, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 0, 'C');
-        $pdf->Cell(60, 10, 'Deskripsi', 1, 1, 'C');
-        // Add images
-
-        // Output the PDF
-        $pdf->Output('dokumentasi_'.$activity->kode_activity.'.pdf', 'I');
+            // Get form data (photos and details)
+            $formData = $this->db->select('afd.*, dh.device_hidn_name')
+                ->from('activity_form_data afd')
+                ->join('ms_device_hidn dh', 'dh.device_hidn_id = afd.device_hidn_id')
+                ->where('afd.form_id', $id)
+                ->get()
+                ->result();
+    
+            if (empty($formData)) {
+                throw new Exception('No form data found');
+            }
+    
+            // Create new PDF instance
+            $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+            
+            // Set document information
+            $pdf->SetCreator('ITNP');
+            $pdf->SetAuthor('ITNP');
+            $pdf->SetTitle('Dokumentasi Preventive Maintenance');
+            
+            // Remove default header/footer
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+            
+            // Set margins
+            $pdf->SetMargins(15, 15, 15);
+            
+            // Add a page
+            $pdf->AddPage();
+            
+            // Set font
+            $pdf->SetFont('helvetica', 'B', 14);
+            
+            // Header
+            $pdf->Cell(0, 10, 'DOKUMENTASI PREVENTIVE MAINTENANCE', 0, 1, 'C');
+            $pdf->SetFont('helvetica', '', 11);
+            
+            // Information table
+            $pdf->Ln(5);
+            $pdf->SetFont('helvetica', '', 10);
+            $pdf->Cell(40, 7, 'Tanggal', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, date('d F Y', strtotime($formDetails->tanggal_kegiatan)), 0, 1);
+            
+            $pdf->Cell(40, 7, 'Lokasi', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, $formDetails->area_name, 0, 1);
+            
+            $pdf->Cell(40, 7, 'Shift', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, $formDetails->nama_shift . ' (' . $formDetails->jam_mulai . ' - ' . $formDetails->jam_selesai . ')', 0, 1);
+            
+            $pdf->Cell(40, 7, 'Personil', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, $formDetails->personel_names, 0, 1);
+            
+            // Add photos for each form data
+            foreach ($formData as $index => $data) {
+                $pdf->Ln(10);
+                $pdf->SetFont('helvetica', 'B', 10);
+                $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
+                $pdf->SetFont('helvetica', '', 10);
+                
+                // First row - Labels
+                $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
+                $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
+                $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
+                
+                // Second row - Photos
+                $photoHeight = 40;
+                
+                // Foto Perangkat
+                if (file_exists('./uploads/' . $data->foto_perangkat)) {
+                    $pdf->Image('./uploads/' . $data->foto_perangkat, $pdf->GetX() + 1, $pdf->GetY() + 1, 58);
+                }
+                $pdf->Cell(60, $photoHeight, '', 1, 0);
+                
+                // Foto Lokasi
+                if (file_exists('./uploads/' . $data->foto_lokasi)) {
+                    $pdf->Image('./uploads/' . $data->foto_lokasi, $pdf->GetX() + 1, $pdf->GetY() + 1, 58);
+                }
+                $pdf->Cell(60, $photoHeight, '', 1, 0);
+                
+                // Foto Teknisi
+                if (file_exists('./uploads/' . $data->foto_teknisi)) {
+                    $pdf->Image('./uploads/' . $data->foto_teknisi, $pdf->GetX() + 1, $pdf->GetY() + 1, 58);
+                }
+                $pdf->Cell(60, $photoHeight, '', 1, 1);
+                
+                // Third row - Descriptions
+                $pdf->Cell(60, 10, $data->notes, 1, 0, 'C');
+                $pdf->Cell(60, 10, 'Jam: ' . $data->jam_kegiatan, 1, 0, 'C');
+                $pdf->Cell(60, 10, $data->device_hidn_name, 1, 1, 'C');
+            }
+    
+            // Signature
+            $pdf->Ln(20);
+            $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
+            $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
+            
+            $pdf->Ln(20);
+            $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
+            $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');
+            
+            // Output PDF
+            $pdf->Output('dokumentasi_pm_' . date('Y-m-d') . '.pdf', 'I');
+            
+        } catch (Exception $e) {
+            log_message('error', 'Error generating PDF: ' . $e->getMessage());
+            $this->session->set_flashdata('error', 'Failed to generate PDF: ' . $e->getMessage());
+            redirect('activity');
+        }
     }
 
-    public function printchecklist($activity_id) {
-        // Get data
-        $activity = $this->ActivityModel->get_activity_details($activity_id);
-        $checklist = $this->db->select('af.*, dh.device_hidn_name')
-                             ->from('activity_form af')
-                             ->join('ms_device_hidn dh', 'dh.device_hidn_id = af.device_id')
-                             ->where('af.activity_id', $activity_id)
-                             ->get()
-                             ->result();
-        
-        // Create new PDF document
-        $pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        
-        // Set document information
-        $pdf->SetCreator('TAMA App');
-        $pdf->SetAuthor('TAMA');
-        
-        // Remove default header/footer
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
-        
-        // Set margins
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        
-        // Add page
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 11);
-        
-        // Logo
-        $image_file = FCPATH . 'assets/img/logo.png';
-        $pdf->Image($image_file, 15, 15, 20);
-        
-        // Title
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Cell(0, 5, 'CHECKLIST PREVENTIVE MAINTENANCE', 0, 1, 'C');
-        $pdf->SetFont('helvetica', '', 11);
-        $pdf->Cell(0, 5, 'SIMULASI SISTEM DIGIT PADA PUBLIC COMPUTER', 0, 1, 'C');
-        
-        // Information table
-        $pdf->SetY(40);
-        $pdf->SetFont('helvetica', '', 10);
-        
-        $pdf->Cell(35, 5, 'Tanggal', 0);
-        $pdf->Cell(5, 5, ':', 0);
-        $pdf->Cell(70, 5, date('d F Y', strtotime($activity->tanggal_kegiatan)), 0);
-        $pdf->Cell(35, 5, 'Shift', 0);
-        $pdf->Cell(5, 5, ':', 0);
-        $pdf->Cell(0, 5, $activity->nama_shift, 0, 1);
-        
-        $pdf->Cell(35, 5, 'Jam', 0);
-        $pdf->Cell(5, 5, ':', 0);
-        $pdf->Cell(0, 5, $activity->jam_mulai . ' - ' . $activity->jam_selesai, 0, 1);
-        
-        // Checklist items
-        $pdf->SetY(60);
-        $no = 1;
-        foreach($checklist as $item) {
+    public function printchecklist($id) {
+        try {
+            // Get main form details first
+            $formDetails = $this->db->select('
+                    af.*,
+                    ap.tanggal_kegiatan,
+                    ap.kode_activity,
+                    ma.area_name,
+                    sk.nama_shift,
+                    sk.jam_mulai,
+                    sk.jam_selesai,
+                    GROUP_CONCAT(ms.username) as personel_names
+                ')
+                ->from('activity_forms af')
+                ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
+                ->join('ms_area ma', 'ma.area_id = af.area_id')
+                ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
+                ->join('personel p', 'p.id_personel = ap.personel_id')
+                ->join('personel_user pu', 'pu.personel_id = p.id_personel')
+                ->join('ms_account ms', 'ms.id = pu.user_id')
+                ->where('af.form_id', $id)
+                ->group_by('af.form_id')
+                ->get()
+                ->row();
+    
+            if (!$formDetails) {
+                throw new Exception('Form details not found');
+            }
+    
+            // Get form data with checklist answers
+            $formData = $this->db->select('
+                    afd.*,
+                    dh.device_hidn_name
+                ')
+                ->from('activity_form_data afd')
+                ->join('ms_device_hidn dh', 'dh.device_hidn_id = afd.device_hidn_id')
+                ->where('afd.form_id', $id)
+                ->get()
+                ->result();
+    
+            if (empty($formData)) {
+                throw new Exception('No form data found');
+            }
+    
+            // Get checklist questions for the sub device
+            $questions = $this->db->select('*')
+                ->from('device_checklist')
+                ->where('sub_device_id', $formDetails->sub_device_id)
+                ->order_by('question_number', 'ASC')
+                ->get()
+                ->result();
+    
+            if (empty($questions)) {
+                throw new Exception('No checklist questions found');
+            }
+    
+            // Create PDF
+            $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+            $pdf->SetMargins(15, 15, 15);
+            
+            // Add page
+            $pdf->AddPage();
+            
+            // Header
+            $pdf->SetFont('helvetica', 'B', 14);
+            $pdf->Cell(0, 10, 'CHECKLIST PREVENTIVE MAINTENANCE', 0, 1, 'C');
+            $pdf->SetFont('helvetica', '', 12);
+            $pdf->Cell(0, 5, strtoupper($formDetails->report_type), 0, 1, 'C');
+            
+            // Information
+            $pdf->Ln(5);
             $pdf->SetFont('helvetica', '', 10);
-            $pdf->Cell(10, 7, $no . '.', 0, 0);
-            $pdf->Cell(0, 7, 'Perangkat : ' . $item->device_hidn_name, 0, 1);
             
-            $pdf->Cell(15, 7, '', 0);
-            $pdf->Cell(60, 7, 'a. Cek Indicator berupa LCD Perangkat', 0, 0);
-            $pdf->Cell(5, 7, '', 0);
-            $pdf->Cell(10, 7, $item->indicator_check == 'OK' ? '✓' : '', 1, 0, 'C');
-            $pdf->Cell(10, 7, $item->indicator_check == 'NOT OK' ? '✓' : '', 1, 1, 'C');
+            // Basic information
+            $pdf->Cell(40, 7, 'Tanggal', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, date('d F Y', strtotime($formDetails->tanggal_kegiatan)), 0, 1);
             
-            $pdf->Cell(15, 7, '', 0);
-            $pdf->Cell(60, 7, 'b. Cek tinta apabila kosong', 0, 0);
-            $pdf->Cell(5, 7, '', 0);
-            $pdf->Cell(10, 7, $item->ink_check == 'OK' ? '✓' : '', 1, 0, 'C');
-            $pdf->Cell(10, 7, $item->ink_check == 'NOT OK' ? '✓' : '', 1, 1, 'C');
-
-            $pdf->Cell(15, 7, '', 0);
-            $pdf->Cell(60, 7, 'b. Cek tinta apabila kosong', 0, 0);
-            $pdf->Cell(5, 7, '', 0);
-            $pdf->Cell(10, 7, $item->color_check == 'OK' ? '✓' : '', 1, 0, 'C');
-            $pdf->Cell(10, 7, $item->color_check == 'NOT OK' ? '✓' : '', 1, 1, 'C');
+            $pdf->Cell(40, 7, 'Lokasi', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, $formDetails->area_name, 0, 1);
+    
+            $pdf->Cell(40, 7, 'Shift/Jam Kerja', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, $formDetails->nama_shift . ' (' . $formDetails->jam_mulai . ' - ' . $formDetails->jam_selesai . ')', 0, 1);
+    
+            $pdf->Cell(40, 7, 'Personel', 0, 0);
+            $pdf->Cell(5, 7, ':', 0, 0);
+            $pdf->Cell(0, 7, $formDetails->personel_names, 0, 1);
             
-            $pdf->Cell(15, 7, '', 0);
-            $pdf->Cell(60, 7, 'Catatan:', 0, 1);
-            $pdf->Cell(15, 7, '', 0);
-            $pdf->MultiCell(0, 7, $item->notes, 0, 'L');
+            // Add checklist tables for each data entry
+            foreach ($formData as $index => $data) {
+                $pdf->Ln(10);
+                $pdf->SetFont('helvetica', 'B', 11);
+                $pdf->Cell(0, 7, 'Checklist ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1);
+                $pdf->Cell(0, 7, 'Jam Kegiatan: ' . $data->jam_kegiatan, 0, 1);
+                
+                // Table header
+                $pdf->SetFont('helvetica', 'B', 10);
+                $pdf->Cell(10, 7, 'No', 1, 0, 'C');
+                $pdf->Cell(100, 7, 'Item Check', 1, 0, 'C');
+                $pdf->Cell(30, 7, 'Status', 1, 0, 'C');
+                $pdf->Cell(40, 7, 'Keterangan', 1, 1, 'C');
+                
+                // Table content
+                $pdf->SetFont('helvetica', '', 10);
+                foreach ($questions as $key => $question) {
+                    $pdf->Cell(10, 7, ($key + 1), 1, 0, 'C');
+                    $pdf->Cell(100, 7, $question->question_text, 1, 0, 'L');
+                    
+                    // Get corresponding tindakan based on question number
+                    $tindakan = 'tindakan' . ($key + 1);
+                    $pdf->Cell(30, 7, $data->$tindakan, 1, 0, 'C');
+                    
+                    // Notes for each item
+                    $pdf->Cell(40, 7, $data->notes, 1, 1, 'L');
+                }
+            }
             
-            $pdf->Ln(1);
-            $no++;
+            // Signature
+            $pdf->Ln(20);
+            $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
+            $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
+            
+            $pdf->Ln(20);
+            $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
+            $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');
+            
+            // Output PDF
+            $pdf->Output('checklist_pm_' . date('Y-m-d') . '.pdf', 'I');
+            
+        } catch (Exception $e) {
+            log_message('error', 'Error generating checklist PDF: ' . $e->getMessage());
+            // Jangan kirim output apapun sebelum redirect
+            redirect('activity');
         }
-        
-        // Signature
-        $pdf->SetY(-60);
-        $pdf->Cell(95, 5, 'Mengetahui,', 0, 0, 'C');
-        $pdf->Cell(95, 5, 'Pelaksana,', 0, 1, 'C');
-        
-        $pdf->Cell(95, 5, 'Supervisor', 0, 0, 'C');
-        $pdf->Cell(95, 5, 'Teknisi', 0, 1, 'C');
-        
-        $pdf->Ln(15);
-        
-        $pdf->Cell(95, 5, '(............................)', 0, 0, 'C');
-        $pdf->Cell(95, 5, '(............................)', 0, 1, 'C');
-        
-        // Output PDF
-        $pdf->Output('checklist_'.$activity->kode_activity.'.pdf', 'I');
-
-        header('Content-Type: applDcation/pdf');
-        header('Content-Disposition: inline; filename="checklist_'.$activity_id.'.pdf"');
     }
 }
 ?>
