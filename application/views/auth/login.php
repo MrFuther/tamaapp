@@ -88,7 +88,7 @@
             color: white;
             font-weight: 500;
             width: 100%;
-            transition: background 0.3s;
+            transition: 0.3s;
         }
         .btn-login:hover {
             background: linear-gradient(to left, #006CB6, #15afbd);
@@ -150,11 +150,7 @@
         <!-- Right side - Login form -->
         <div class="login-box">
             <div class="logo-container">
-                <img src="<?php echo base_url('assets/images/amar.png'); ?>" alt="AMAR Logo">
-                <div class="logo-text">
-                    Assets Maintenance<br>
-                    and Report
-                </div>
+                <img src="<?php echo base_url('assets/images/amarlogin.png'); ?>" alt="AMAR Logo">
             </div>
 
             <form id="loginForm" action="<?php echo base_url('auth/login'); ?>" method="post">
