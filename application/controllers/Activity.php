@@ -481,17 +481,42 @@ class Activity extends CI_Controller
             $pdf->setPrintFooter(false);
             
             // Set margins
-            $pdf->SetMargins(15, 15, 15);
+            $pdf->SetMargins(15, 30, 15);
             
             // Add a page
             $pdf->AddPage();
             
             // Set font
-            $pdf->SetFont('helvetica', 'B', 14);
+            $pdf->SetFont('helvetica', 'B', 12);
             
-            // Header
-            $pdf->Cell(0, 10, 'DOKUMENTASI PREVENTIVE MAINTENANCE', 0, 1, 'C');
-            $pdf->SetFont('helvetica', '', 11);
+            // Add Header Content
+            // Logo kiri
+            $image_file_left = FCPATH . 'assets/images/logo.jpg';
+            $pdf->Image($image_file_left, 15, 7, 40, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+            
+            // Buat rectangle untuk header
+            $pdf->Rect(15, 7, 180, 0);
+            $pdf->Rect(15, 27, 180, 0);
+            $pdf->Rect(15, 7, 0, 20);
+            $pdf->Rect(55, 7, 0, 20);
+            $pdf->Rect(155, 7, 0, 20);
+            $pdf->Rect(195, 7, 0, 20);
+
+            // Logo kanan
+            $image_file_right = FCPATH . 'assets/images/logo-ias.jpg';
+            $pdf->Image($image_file_right, 163, 8, 25, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+
+            // Title untuk dokumen
+            $pdf->SetY(7);
+            $pdf->Cell(0, 5, 'DOCUMENTATION REPORT', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'PREVENTIVE MAINTENANCE ACTIVITY', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'IT NON-PUBLIC SERVICE SYSTEM EQUIPMENT', 0, 1, 'C');
+            
+            // Berikan jarak setelah header
+            $pdf->Ln(5);
+
+            // Lanjutkan dengan informasi detail
+            $pdf->SetFont('helvetica', '', 10);
             
             // Information table
             $pdf->Ln(5);
@@ -514,8 +539,12 @@ class Activity extends CI_Controller
             
             // Add photos for each form data
             foreach ($formData as $index => $data) {
-                $pdf->Ln(8);
+                $pdf->Ln(2);
                 
+                $pdf->SetFont('helvetica', 'B', 10);
+                $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
+                $pdf->SetFont('helvetica', '', 10);
+
                 // Second row - Photos
                 $photoHeight = 35;
                 
@@ -537,10 +566,11 @@ class Activity extends CI_Controller
                 }
                 $pdf->Cell(60, $photoHeight, '', 1, 1);
                 
-                // Third row - Descriptions
-                $pdf->Cell(60, 10, $data->notes, 1, 0, 'C');
-                $pdf->Cell(60, 10, 'Jam: ' . $data->jam_kegiatan, 1, 0, 'C');
-                $pdf->Cell(60, 10, $data->device_hidn_name, 1, 1, 'C');
+                // Descriptions with device name
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->Cell(60, 10, "Memastikan indikator access\npoint(" . $data->device_hidn_name . ")", 1, 0, 'C');
+                $pdf->Cell(60, 10, "Lokasi Perangkat Access Point\n(" . $data->device_hidn_name . ")", 1, 0, 'C');
+                $pdf->Cell(60, 10, "Hasil Speed Test Internet\n(" . $data->device_hidn_name . ")", 1, 1, 'C');
             }
             
             // Output PDF
@@ -613,20 +643,37 @@ class Activity extends CI_Controller
             $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
-            $pdf->SetMargins(15, 15, 15);
+            $pdf->SetMargins(15, 30, 15);
             
             // Add page
             $pdf->AddPage();
             
-            // Header
-            $pdf->SetFont('helvetica', 'B', 14);
-            $pdf->Cell(0, 10, 'CHECKLIST PREVENTIVE MAINTENANCE', 0, 1, 'C');
-            $pdf->SetFont('helvetica', '', 12);
-            $pdf->Cell(0, 5, strtoupper($formDetails->report_type), 0, 1, 'C');
+            // Add Header Content
+            // Logo kiri
+            $image_file_left = FCPATH . 'assets/images/logo.jpg';
+            $pdf->Image($image_file_left, 15, 7, 40, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+            
+            // Buat rectangle untuk header
+            $pdf->Rect(15, 7, 180, 0);
+            $pdf->Rect(15, 27, 180, 0);
+            $pdf->Rect(15, 7, 0, 20);
+            $pdf->Rect(55, 7, 0, 20);
+            $pdf->Rect(155, 7, 0, 20);
+            $pdf->Rect(195, 7, 0, 20);
+
+            // Logo kanan
+            $image_file_right = FCPATH . 'assets/images/logo-ias.jpg';
+            $pdf->Image($image_file_right, 163, 8, 25, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+
+            // Title untuk dokumen
+            $pdf->SetY(7);
+            $pdf->Cell(0, 5, 'CHECKLIST REPORT', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'PREVENTIVE MAINTENANCE ACTIVITY', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'IT NON-PUBLIC SERVICE SYSTEM EQUIPMENT', 0, 1, 'C');
             
             // Information
             $pdf->Ln(5);
-            $pdf->SetFont('helvetica', '', 10);
+            $pdf->SetFont('helvetica', 'B', 10);
             
             // Basic information
             $pdf->Cell(40, 7, 'Tanggal', 0, 0);
@@ -647,7 +694,7 @@ class Activity extends CI_Controller
             
             // Add checklist tables for each data entry
             foreach ($formData as $index => $data) {
-                $pdf->Ln(10);
+                $pdf->Ln(5);
                 $pdf->SetFont('helvetica', 'B', 11);
                 $pdf->Cell(0, 7, 'Checklist ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1);
                 $pdf->Cell(0, 7, 'Jam Kegiatan: ' . $data->jam_kegiatan, 0, 1);
@@ -675,11 +722,11 @@ class Activity extends CI_Controller
             }
             
             // Signature
-            $pdf->Ln(20);
+            $pdf->Ln(5);
             $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
             $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
             
-            $pdf->Ln(20);
+            $pdf->Ln(12);
             $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
             $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');
             
