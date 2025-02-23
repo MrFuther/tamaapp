@@ -27,22 +27,28 @@ class Subunitkerja extends CI_Controller {
     }
 
     public function save() {
-        // Ambil data dari form input
+        // Dapatkan data unit kerja untuk mendapatkan inisial unit
+        $unit = $this->m_unitkerja->get_by_id($this->input->post('id_unitkerja'));
+        
+        // Ambil data dari form input dan sesuaikan dengan struktur database
         $data = [
-            'subunit_pek_name' => $this->input->post('subunit_pek_name'),
-            'unit_id' => $this->input->post('unit_id'),
-            'initial_unit_kerja' => $this->input->post('initial_unit_kerja')
+            'subunit_pek_name' => $this->input->post('nama_subunit'),
+            'inisial_unit_kerja' => $unit->inisial_unit,
+            'created_by' => $this->session->userdata('username'),
+            'created_date' => date('Y-m-d H:i:s')
         ];
-
+    
         if ($this->input->post('subunit_id')) {
-            // Update sub unit kerja   
-            $this->m_subunitkerja->update($this->input->post('id_subunit'), $data);
+            // Update: tambahkan updated_by dan updated_date
+            $data['updated_by'] = $this->session->userdata('username');
+            $data['updated_date'] = date('Y-m-d H:i:s');
+            $this->m_subunitkerja->update($this->input->post('subunit_id'), $data);
         } else {
             // Insert sub unit kerja baru
             $this->m_subunitkerja->insert($data);
         }
-
-        // Redirect ke halaman utama
+    
+        $this->session->set_flashdata('success', 'Data berhasil disimpan');
         redirect('subunitkerja');
     }
 

@@ -194,15 +194,15 @@
                                     <div class="modal-body">
                                         <form action="<?= base_url('subdevice/save'); ?>" method="post" enctype="multipart/form-data">
                                             <div class="mb-3">
-                                                <label for="nama_subdevice" class="form-label">Nama Sub Device</label>
-                                                <input type="text" class="form-control" id="nama_subdevice" name="nama_subdevice" required>
+                                                <label for="sub_device_name" class="form-label">Nama Sub Device</label>
+                                                <input type="text" class="form-control" id="sub_device_name" name="sub_device_name" required>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="id_groupdevice" class="form-label">Group Device</label>
-                                                <select class="form-control" id="id_groupdevice" name="id_groupdevice" required>
+                                                <label for="pek_unit_name" class="form-label">Group Device</label>
+                                                <select class="form-control" id="pek_unit_name" name="pek_unit_name" required>
                                                     <option value="">-- Select Group Device --</option>
                                                     <?php foreach ($groupdevice as $group): ?>
-                                                        <option value="<?= $group->id_groupdevice; ?>"><?= $group->nama_pekerjaanunit; ?></option>
+                                                        <option value="<?= $group->pek_unit_name; ?>"><?= $group->pek_unit_name; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>

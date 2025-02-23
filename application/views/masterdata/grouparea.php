@@ -193,7 +193,7 @@
                                         <form action="<?= base_url('grouparea/save'); ?>" method="post" enctype="multipart/form-data">
                                             <div class="mb-3">
                                                 <label for="nama_grouparea" class="form-label">Nama Group Area</label>
-                                                <input type="text" class="form-control" id="nama_grouparea" name="nama_grouparea" required>
+                                                <input type="text" class="form-control" id="area_name" name="area_name" required>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>

@@ -193,16 +193,25 @@
                                     </div>
                                     <div class="modal-body">
                                         <form action="<?= base_url('subunitkerja/save'); ?>" method="post" enctype="multipart/form-data">
+                                            <?php if(isset($subunit)): ?>
+                                                <input type="hidden" name="subunit_id" value="<?= $subunit->subunit_id ?>">
+                                            <?php endif; ?>
+                                            
                                             <div class="mb-3">
                                                 <label for="nama_subunit" class="form-label">Nama Sub Unit Kerja</label>
-                                                <input type="text" class="form-control" id="nama_subunit" name="nama_subunit" required>
+                                                <input type="text" class="form-control" id="nama_subunit" 
+                                                      name="nama_subunit" required 
+                                                      value="<?= isset($subunit) ? $subunit->subunit_pek_name : '' ?>">
                                             </div>
                                             <div class="mb-3">
                                                 <label for="id_unitkerja" class="form-label">Unit Kerja</label>
                                                 <select class="form-control" id="id_unitkerja" name="id_unitkerja" required>
                                                     <option value="">-- Select Unit Kerja --</option>
                                                     <?php foreach ($unitkerja as $unit): ?>
-                                                        <option value="<?= $unit->id_unitkerja; ?>"><?= $unit->nama_unitkerja; ?></option>
+                                                        <option value="<?= $unit->unit_id ?>" 
+                                                                <?= isset($subunit) && $subunit->inisial_unit_kerja == $unit->inisial_unit ? 'selected' : '' ?>>
+                                                            <?= $unit->unit_name ?>
+                                                        </option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
