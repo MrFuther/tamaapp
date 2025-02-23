@@ -514,18 +514,10 @@ class Activity extends CI_Controller
             
             // Add photos for each form data
             foreach ($formData as $index => $data) {
-                $pdf->Ln(10);
-                $pdf->SetFont('helvetica', 'B', 10);
-                $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
-                $pdf->SetFont('helvetica', '', 10);
-                
-                // First row - Labels
-                $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-                $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-                $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
+                $pdf->Ln(8);
                 
                 // Second row - Photos
-                $photoHeight = 40;
+                $photoHeight = 35;
                 
                 // Foto Perangkat
                 if (file_exists('./uploads/' . $data->foto_perangkat)) {
@@ -550,15 +542,6 @@ class Activity extends CI_Controller
                 $pdf->Cell(60, 10, 'Jam: ' . $data->jam_kegiatan, 1, 0, 'C');
                 $pdf->Cell(60, 10, $data->device_hidn_name, 1, 1, 'C');
             }
-    
-            // Signature
-            $pdf->Ln(20);
-            $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
-            $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
-            
-            $pdf->Ln(20);
-            $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
-            $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');
             
             // Output PDF
             $pdf->Output('dokumentasi_pm_' . date('Y-m-d') . '.pdf', 'I');
