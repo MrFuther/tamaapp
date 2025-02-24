@@ -137,8 +137,8 @@
         <!-- Logos on the top-left -->
         <div class="logo-group">
             <img src="<?php echo base_url('assets/images/bumn-logo.png'); ?>" alt="BUMN Logo">
-            <img src="<?php echo base_url('assets/images/injourney-logo.png'); ?>" alt="INJOURNEY Logo">
-            <img src="<?php echo base_url('assets/images/logo-soekarno.png'); ?>" alt="Soekarno Logo">
+            <img src="<?php echo base_url('assets/images/injourneyputih.png'); ?>" alt="INJOURNEY Logo">
+            <img src="<?php echo base_url('assets/images/soettaputih.png'); ?>" alt="Soekarno Logo">
             <img src="<?php echo base_url('assets/images/logo-it.png'); ?>" alt="IT Logo">
         </div>
 
@@ -150,7 +150,7 @@
         <!-- Right side - Login form -->
         <div class="login-box">
             <div class="logo-container">
-                <img src="<?php echo base_url('assets/images/amarlogin.png'); ?>" alt="AMAR Logo">
+                <img src="<?php echo base_url('assets/images/amarloginwhite.png'); ?>" alt="AMAR Logo">
             </div>
 
             <form id="loginForm" action="<?php echo base_url('auth/login'); ?>" method="post">
