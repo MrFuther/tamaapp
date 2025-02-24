@@ -20,6 +20,7 @@ class Activity extends CI_Controller
         $data['user'] = $this->session->userdata();
         $data['activities'] = $this->ActivityModel->get_all_activities();
         $data['personel'] = $this->ActivityModel->get_all_personel();
+        $data['users'] = $this->ActivityModel->get_all_users();
         $data['shifts'] = $this->ActivityModel->get_all_shifts();
         $data['areas'] = $this->ActivityModel->get_area_options();
         $data['group_devices'] = $this->ActivityModel->get_group_devices();
@@ -29,14 +30,49 @@ class Activity extends CI_Controller
     }
 
     public function add() {
-        $data = [
-            'personel_id' => $this->input->post('personel_id'),
-            'shift_id' => $this->input->post('shift_id'),
-            'tanggal_kegiatan' => $this->input->post('tanggal_kegiatan')
-        ];
-
-        $this->ActivityModel->insert_activity($data);
-        redirect('activity');
+        try {
+            // Generate kode activity
+            $kode_activity = $this->ActivityModel->generate_activity_code();
+            
+            // Data untuk activity_pm
+            $data = [
+                'shift_id' => $this->input->post('shift_id'),
+                'tanggal_kegiatan' => $this->input->post('tanggal_kegiatan'),
+                'kode_activity' => $kode_activity
+            ];
+    
+            // Start transaction
+            $this->db->trans_start();
+    
+            // Insert ke activity_pm
+            $this->db->insert('activity_pm', $data);
+            $activity_id = $this->db->insert_id();
+    
+            // Insert multiple users
+            $user_ids = $this->input->post('personel_ids');
+            if (!empty($user_ids)) {
+                foreach ($user_ids as $user_id) {
+                    $this->db->insert('activity_personel', [
+                        'activity_id' => $activity_id,
+                        'user_id' => $user_id
+                    ]);
+                }
+            }
+    
+            // Complete transaction
+            $this->db->trans_complete();
+    
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Failed to save activity');
+            }
+    
+            redirect('activity');
+    
+        } catch (Exception $e) {
+            log_message('error', 'Add activity error: ' . $e->getMessage());
+            $this->session->set_flashdata('error', $e->getMessage());
+            redirect('activity');
+        }
     }
 
     public function delete($id) {
@@ -45,31 +81,53 @@ class Activity extends CI_Controller
     }     
 
     public function get_activity_detail($id) {
-        // Add error handling
+        header('Content-Type: application/json'); // Tambahkan header JSON
+        
         try {
-            $activity = $this->ActivityModel->get_activity_detail($id);
-            if ($activity) {
-                $response = [
+            if (!$id) {
+                throw new Exception('Activity ID is required');
+            }
+    
+            $this->db->select('
+                a.*,
+                s.nama_shift,
+                s.jam_mulai,
+                s.jam_selesai,
+                GROUP_CONCAT(DISTINCT ms.username) as personel_name
+            ');
+            $this->db->from('activity_pm a');
+            $this->db->join('shift_kerja s', 's.id_shift = a.shift_id');
+            $this->db->join('activity_personel ap', 'ap.activity_id = a.id_activity', 'left');
+            $this->db->join('ms_account ms', 'ms.id = ap.user_id', 'left');
+            $this->db->where('a.id_activity', $id);
+            $this->db->group_by('a.id_activity');
+            
+            $query = $this->db->get();
+            
+            if ($query->num_rows() > 0) {
+                $result = $query->row();
+                // Format the date and time
+                $result->formatted_date = date('d/m/Y', strtotime($result->tanggal_kegiatan));
+                $result->shift_time = date('H:i', strtotime($result->jam_mulai)) . ' - ' . 
+                                    date('H:i', strtotime($result->jam_selesai));
+                
+                echo json_encode([
                     'status' => 'success',
-                    'data' => $activity
-                ];
+                    'data' => $result
+                ]);
             } else {
-                $response = [
+                echo json_encode([
                     'status' => 'error',
                     'message' => 'Activity not found'
-                ];
+                ]);
             }
         } catch (Exception $e) {
-            $response = [
+            log_message('error', 'Error in get_activity_detail: ' . $e->getMessage());
+            echo json_encode([
                 'status' => 'error',
-                'message' => 'Failed to get activity detail'
-            ];
-            log_message('error', 'Activity detail error: ' . $e->getMessage());
+                'message' => $e->getMessage()
+            ]);
         }
-        
-        $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($response));
     }
     
     public function get_sub_devices() {
@@ -481,17 +539,42 @@ class Activity extends CI_Controller
             $pdf->setPrintFooter(false);
             
             // Set margins
-            $pdf->SetMargins(15, 15, 15);
+            $pdf->SetMargins(15, 30, 15);
             
             // Add a page
             $pdf->AddPage();
             
             // Set font
-            $pdf->SetFont('helvetica', 'B', 14);
+            $pdf->SetFont('helvetica', 'B', 12);
             
-            // Header
-            $pdf->Cell(0, 10, 'DOKUMENTASI PREVENTIVE MAINTENANCE', 0, 1, 'C');
-            $pdf->SetFont('helvetica', '', 11);
+            // Add Header Content
+            // Logo kiri
+            $image_file_left = FCPATH . 'assets/images/logo.jpg';
+            $pdf->Image($image_file_left, 15, 7, 40, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+            
+            // Buat rectangle untuk header
+            $pdf->Rect(15, 7, 180, 0);
+            $pdf->Rect(15, 27, 180, 0);
+            $pdf->Rect(15, 7, 0, 20);
+            $pdf->Rect(55, 7, 0, 20);
+            $pdf->Rect(155, 7, 0, 20);
+            $pdf->Rect(195, 7, 0, 20);
+
+            // Logo kanan
+            $image_file_right = FCPATH . 'assets/images/logo-ias.jpg';
+            $pdf->Image($image_file_right, 163, 8, 25, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+
+            // Title untuk dokumen
+            $pdf->SetY(7);
+            $pdf->Cell(0, 5, 'DOCUMENTATION REPORT', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'PREVENTIVE MAINTENANCE ACTIVITY', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'IT NON-PUBLIC SERVICE SYSTEM EQUIPMENT', 0, 1, 'C');
+            
+            // Berikan jarak setelah header
+            $pdf->Ln(5);
+
+            // Lanjutkan dengan informasi detail
+            $pdf->SetFont('helvetica', '', 10);
             
             // Information table
             $pdf->Ln(5);
@@ -514,18 +597,14 @@ class Activity extends CI_Controller
             
             // Add photos for each form data
             foreach ($formData as $index => $data) {
-                $pdf->Ln(10);
+                $pdf->Ln(2);
+                
                 $pdf->SetFont('helvetica', 'B', 10);
                 $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
                 $pdf->SetFont('helvetica', '', 10);
-                
-                // First row - Labels
-                $pdf->Cell(60, 10, 'Foto Perangkat', 1, 0, 'C');
-                $pdf->Cell(60, 10, 'Foto Lokasi', 1, 0, 'C');
-                $pdf->Cell(60, 10, 'Foto Teknisi', 1, 1, 'C');
-                
+
                 // Second row - Photos
-                $photoHeight = 40;
+                $photoHeight = 35;
                 
                 // Foto Perangkat
                 if (file_exists('./uploads/' . $data->foto_perangkat)) {
@@ -545,20 +624,12 @@ class Activity extends CI_Controller
                 }
                 $pdf->Cell(60, $photoHeight, '', 1, 1);
                 
-                // Third row - Descriptions
-                $pdf->Cell(60, 10, $data->notes, 1, 0, 'C');
-                $pdf->Cell(60, 10, 'Jam: ' . $data->jam_kegiatan, 1, 0, 'C');
-                $pdf->Cell(60, 10, $data->device_hidn_name, 1, 1, 'C');
+                // Descriptions with device name
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->Cell(60, 10, "Memastikan indikator access\npoint(" . $data->device_hidn_name . ")", 1, 0, 'C');
+                $pdf->Cell(60, 10, "Lokasi Perangkat Access Point\n(" . $data->device_hidn_name . ")", 1, 0, 'C');
+                $pdf->Cell(60, 10, "Hasil Speed Test Internet\n(" . $data->device_hidn_name . ")", 1, 1, 'C');
             }
-    
-            // Signature
-            $pdf->Ln(20);
-            $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
-            $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
-            
-            $pdf->Ln(20);
-            $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
-            $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');
             
             // Output PDF
             $pdf->Output('dokumentasi_pm_' . date('Y-m-d') . '.pdf', 'I');
@@ -630,20 +701,37 @@ class Activity extends CI_Controller
             $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
-            $pdf->SetMargins(15, 15, 15);
+            $pdf->SetMargins(15, 30, 15);
             
             // Add page
             $pdf->AddPage();
             
-            // Header
-            $pdf->SetFont('helvetica', 'B', 14);
-            $pdf->Cell(0, 10, 'CHECKLIST PREVENTIVE MAINTENANCE', 0, 1, 'C');
-            $pdf->SetFont('helvetica', '', 12);
-            $pdf->Cell(0, 5, strtoupper($formDetails->report_type), 0, 1, 'C');
+            // Add Header Content
+            // Logo kiri
+            $image_file_left = FCPATH . 'assets/images/logo.jpg';
+            $pdf->Image($image_file_left, 15, 7, 40, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+            
+            // Buat rectangle untuk header
+            $pdf->Rect(15, 7, 180, 0);
+            $pdf->Rect(15, 27, 180, 0);
+            $pdf->Rect(15, 7, 0, 20);
+            $pdf->Rect(55, 7, 0, 20);
+            $pdf->Rect(155, 7, 0, 20);
+            $pdf->Rect(195, 7, 0, 20);
+
+            // Logo kanan
+            $image_file_right = FCPATH . 'assets/images/logo-ias.jpg';
+            $pdf->Image($image_file_right, 163, 8, 25, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+
+            // Title untuk dokumen
+            $pdf->SetY(7);
+            $pdf->Cell(0, 5, 'CHECKLIST REPORT', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'PREVENTIVE MAINTENANCE ACTIVITY', 0, 1, 'C');
+            $pdf->Cell(0, 5, 'IT NON-PUBLIC SERVICE SYSTEM EQUIPMENT', 0, 1, 'C');
             
             // Information
             $pdf->Ln(5);
-            $pdf->SetFont('helvetica', '', 10);
+            $pdf->SetFont('helvetica', 'B', 10);
             
             // Basic information
             $pdf->Cell(40, 7, 'Tanggal', 0, 0);
@@ -664,7 +752,7 @@ class Activity extends CI_Controller
             
             // Add checklist tables for each data entry
             foreach ($formData as $index => $data) {
-                $pdf->Ln(10);
+                $pdf->Ln(5);
                 $pdf->SetFont('helvetica', 'B', 11);
                 $pdf->Cell(0, 7, 'Checklist ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1);
                 $pdf->Cell(0, 7, 'Jam Kegiatan: ' . $data->jam_kegiatan, 0, 1);
@@ -692,11 +780,11 @@ class Activity extends CI_Controller
             }
             
             // Signature
-            $pdf->Ln(20);
+            $pdf->Ln(5);
             $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
             $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
             
-            $pdf->Ln(20);
+            $pdf->Ln(12);
             $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
             $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');
             

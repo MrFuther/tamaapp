@@ -64,7 +64,7 @@
             margin-bottom: 30px;
         }
         .logo-container img {
-            height: 60px;
+            height: 100px;
             margin-bottom: 15px;
         }
         .logo-text {

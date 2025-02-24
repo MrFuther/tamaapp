@@ -18,6 +18,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> 
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
@@ -177,9 +178,16 @@
                           <td><?= $activity->id_activity; ?></td>
                           <td><?= $activity->kode_activity; ?></td>
                           <td>
-                            <?php foreach ($activity->users as $user): ?>
-                              <span class="badge bg-info"><?= $user->username; ?></span>
-                            <?php endforeach; ?>
+                            <?php 
+                            if (!empty($activity->usernames)) {
+                                $usernames = explode(',', $activity->usernames);
+                                foreach ($usernames as $username): ?>
+                                    <span class="badge bg-info"><?= trim($username) ?></span>
+                                <?php endforeach;
+                            } else {
+                                echo '<span class="text-muted">No users assigned</span>';
+                            }
+                            ?>
                           </td>
                           <td><?= $activity->nama_shift; ?></td>
                           <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
@@ -204,23 +212,22 @@
                         <form action="<?= base_url('activity/add'); ?>" method="POST">
                           <div class="modal-body">
                             <div class="mb-3">
-                              <label class="form-label">Pilih Personel</label>
-                              <select class="form-control" name="personel_id" required>
-                              <option value="">-- Pilih Personel --</option>
-                                <?php foreach ($personel as $p): ?>
-                                    <option value="<?= $p->id_personel; ?>"><?= $p->usernames; ?></option>
-                                <?php endforeach; ?>>
-                              </select>
+                                <label class="form-label">Pilih Personel</label>
+                                <select class="form-control select2" name="personel_ids[]" multiple required>
+                                    <?php foreach ($users as $user): ?>
+                                        <option value="<?= $user->id ?>"><?= $user->username ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="mb-3">
-                              <label class="form-label">Pilih Shift</label>
-                              <select class="form-control" name="shift_id" required>
-                                <?php foreach ($shifts as $shift): ?>
-                                  <option value="<?= $shift->id_shift; ?>">
-                                      <?= $shift->nama_shift; ?> (<?= $shift->jam_mulai; ?> - <?= $shift->jam_selesai; ?>)
-                                  </option>
-                                <?php endforeach; ?>
-                              </select>
+                                <label class="form-label">Pilih Shift</label>
+                                <select class="form-control" name="shift_id" required>
+                                    <?php foreach ($shifts as $shift): ?>
+                                        <option value="<?= $shift->id_shift ?>">
+                                            <?= $shift->nama_shift; ?> (<?= $shift->jam_mulai; ?> - <?= $shift->jam_selesai; ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="mb-3">
                               <label class="form-label">Tanggal Kegiatan</label>
@@ -240,9 +247,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Activity Form</h5>
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="row mb-3">
@@ -257,42 +262,116 @@
                                     </div>
                                 </div>
 
-                                <form id="activityForm">
-                                    <input type="hidden" id="activity_id" name="activity_id">
-                                    <div class="form-group">
-                                        <label>Perangkat</label>
-                                        <select class="form-control" name="sub_device_id" required>
-                                            <option value="">Pilih Perangkat</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Lokasi</label>
-                                        <select class="form-control" name="area_id" required>
-                                            <option value="">Pilih Lokasi</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Kelompok Laporan</label>
-                                        <div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Harian" required>
-                                                <label class="form-check-label">Harian</label>
+                                    <!-- Form Content -->
+                                    <form id="activityForm">
+                                        <input type="hidden" id="activity_id" name="activity_id">
+                                        
+                                        <!-- Row 1: Hari/Tanggal -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Hari / Tanggal</label>
                                             </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Mingguan">
-                                                <label class="form-check-label">Mingguan</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Bulanan">
-                                                <label class="form-check-label">Bulanan</label>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <div id="modalTanggal"></div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </form>
+
+                                        <!-- Row 2: Shift/Jam Kerja -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Shift Kerja / Jam Kerja</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <div id="modalShift"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 3: Team/Regu -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Team / Regu</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <div id="modalTeam" class="d-flex flex-wrap gap-1">
+                                                        <!-- Badges will be inserted here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 4: Perangkat -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Perangkat</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <select class="form-control" name="sub_device_id" required>
+                                                        <option value="">Pilih Perangkat</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 5: Lokasi -->
+                                        <div class="row mb-2 align-items-center">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Lokasi</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <span class="me-2">:</span>
+                                                    <select class="form-control" name="area_id" required>
+                                                        <option value="">Pilih Lokasi</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Jadwal Checklist -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Jadwal</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="d-flex align-items-start">
+                                                    <span class="me-2">:</span>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Harian" class="form-check-input" required>
+                                                            <label class="form-check-label">Harian</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Mingguan" class="form-check-input">
+                                                            <label class="form-check-label">Mingguan</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Bulanan" class="form-check-input">
+                                                            <label class="form-check-label">Bulanan</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-end mt-3">
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </div>
+                                    </form>
+                                </div>
 
                                 <div class="mt-4">
                                     <h6>Data Form</h6>
@@ -440,6 +519,7 @@
   </div>
   <script src="<?= base_url('js/jquery-3.7.1.min.js'); ?>"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
   
   <!-- container-scroller -->
   <script>
@@ -452,6 +532,11 @@
         $('#activityForm').on('submit', handleActivityFormSubmit);
         $('#dataModal').on('shown.bs.modal', handleDataModalShown);
         $('#dataModal').on('hidden.bs.modal', handleDataModalHidden);
+        $('.select2').select2({
+            placeholder: "Pilih Personel",
+            allowClear: true,
+            width: '100%'
+        });
     });
 
     // Authentication Functions
@@ -467,36 +552,42 @@
 
     // Form Management Functions
     const openFormModal = (activityId) => {
-            $.ajax({
-                url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        const data = response.data;
-                        $('#activity_id').val(activityId);
-                        $('#modalTanggal').text(data.formatted_date);
-                        $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
-                        $('#modalTeam').text(data.personel_name);
-                        
-                        // Load sub devices and areas
-                        loadSubDevices();
-                        loadAreas();
-                        
-                        // Load existing form data
-                        loadFormData(activityId);
-                        
-                        // Show modal
-                        $('#formModal').modal('show');
-                    } else {
-                        alert('Error: ' + (response.message || 'Failed to load activity details'));
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
-                    alert('Failed to load activity details. Please try again.');
+        $.ajax({
+            url: '<?= base_url("activity/get_activity_detail/") ?>' + activityId,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    const data = response.data;
+                    $('#activity_id').val(activityId);
+                    $('#modalTanggal').text(data.formatted_date);
+                    $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
+                    
+                    // Tampilkan personel names dengan badges
+                    const personelNames = data.personel_name ? data.personel_name.split(',') : [];
+                    const personelHtml = personelNames.map(name => 
+                        `<span class="badge bg-info me-1">${name.trim()}</span>`
+                    ).join('');
+                    $('#modalTeam').html(personelHtml || '<span class="text-muted">No users assigned</span>');
+                    
+                    // Load sub devices and areas
+                    loadSubDevices();
+                    loadAreas();
+                    
+                    // Load existing form data
+                    loadFormData(activityId);
+                    
+                    // Show modal
+                    $('#formModal').modal('show');
+                } else {
+                    alert('Error: ' + (response.message || 'Failed to load activity details'));
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                alert('Failed to load activity details. Please try again.');
+            }
+        });
     };
 
     const loadFormData = (activityId) => {
@@ -521,7 +612,7 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
                                             Delete
                                         </button>
-                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}'">
+                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}' target="_blank" ">
                                             <i class="fas fa-print"></i> Dokumentasi
                                         </button>
                                         <button class="btn btn-primary btn-sm" onclick="window.location.href='<?= base_url('activity/printchecklist/') ?>${form.form_id}'">
