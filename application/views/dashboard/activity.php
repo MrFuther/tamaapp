@@ -335,20 +335,43 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Mingguan">
-                                                <label class="form-check-label">Mingguan</label>
+                                        </div>
+
+                                        <!-- Jadwal Checklist -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-2">
+                                                <label class="mb-0">Jadwal</label>
                                             </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="report_type" 
-                                                      value="Bulanan">
-                                                <label class="form-check-label">Bulanan</label>
+                                            <div class="col-md-10">
+                                                <div class="d-flex align-items-start">
+                                                    <span class="me-2">:</span>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Harian" class="form-check-input" required>
+                                                            <label class="form-check-label">Harian</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Mingguan" class="form-check-input">
+                                                            <label class="form-check-label">Mingguan</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="report_type" value="Bulanan" class="form-check-input">
+                                                            <label class="form-check-label">Bulanan</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </form>
+
+                                        <div class="text-end mt-3">
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </div>
+                                    </form>
+                                </div>
 
                                 <div class="mt-4">
                                     <h6>Data Form</h6>
