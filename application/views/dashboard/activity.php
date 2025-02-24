@@ -346,20 +346,20 @@
                                                     <span class="me-2">:</span>
                                                     <div class="form-check-inline">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Harian" class="custom-control-input" required>
-                                                            <label class="custom-control-label">Harian</label>
+                                                            <input type="radio" name="report_type" value="Harian" class="form-check-input" required>
+                                                            <label class="form-check-label">Harian</label>
                                                         </div>
                                                     </div>
                                                     <div class="form-check-inline">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Mingguan" class="custom-control-input">
-                                                            <label class="custom-control-label">Mingguan</label>
+                                                            <input type="radio" name="report_type" value="Mingguan" class="form-check-input">
+                                                            <label class="form-check-label">Mingguan</label>
                                                         </div>
                                                     </div>
                                                     <div class="form-check-inline">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Bulanan" class="custom-control-input">
-                                                            <label class="custom-control-label">Bulanan</label>
+                                                            <input type="radio" name="report_type" value="Bulanan" class="form-check-input">
+                                                            <label class="form-check-label">Bulanan</label>
                                                         </div>
                                                     </div>
                                                 </div>
