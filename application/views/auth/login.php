@@ -17,7 +17,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: url('<?php echo base_url("assets/images/bglogin.svg"); ?>');
+            background-image: url('<?php echo base_url("assets/images/bglogin.jpg"); ?>');
             background-size: cover;
             background-position: center;
         }

@@ -250,16 +250,17 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <div class="border p-3 mb-4">
-                                    <!-- Header Form -->
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="flex-grow-1">
-                                            <!-- Form Title -->
-                                        </div>
-                                        <div class="text-end border border-dark p-2" style="min-width: 200px;">
-                                            <strong>PREVENTIVE MAINTENANCE</strong>
-                                        </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <strong>Hari/Tanggal:</strong> <span id="modalTanggal"></span>
                                     </div>
+                                    <div class="col-md-4">
+                                        <strong>Shift/Jam Kerja:</strong> <span id="modalShift"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Team/Regu:</strong> <span id="modalTeam"></span>
+                                    </div>
+                                </div>
 
                                     <!-- Form Content -->
                                     <form id="activityForm">
@@ -588,12 +589,6 @@
             }
         });
     };
-
-    // Helper function untuk nama bulan dalam Bahasa Indonesia
-    function getMonthName(month) {
-        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        return months[month];
-    }
 
     const loadFormData = (activityId) => {
             $.ajax({
