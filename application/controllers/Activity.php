@@ -19,6 +19,7 @@ class Activity extends CI_Controller
         $data['title'] = 'Activity';
         $data['user'] = $this->session->userdata();
         $data['activities'] = $this->ActivityModel->get_all_activities();
+        $data['personel'] = $this->ActivityModel->get_all_personel();
         $data['users'] = $this->ActivityModel->get_all_users();
         $data['shifts'] = $this->ActivityModel->get_all_shifts();
         $data['areas'] = $this->ActivityModel->get_area_options();
@@ -495,14 +496,15 @@ class Activity extends CI_Controller
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
-                    GROUP_CONCAT(DISTINCT ms.username) as personel_names
+                    GROUP_CONCAT(ms.username) as personel_names
                 ')
                 ->from('activity_forms af')
                 ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
                 ->join('ms_area ma', 'ma.area_id = af.area_id')
                 ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
-                ->join('activity_personel apr', 'apr.activity_id = ap.id_activity')
-                ->join('ms_account ms', 'ms.id = apr.user_id')
+                ->join('personel p', 'p.id_personel = ap.personel_id')
+                ->join('personel_user pu', 'pu.personel_id = p.id_personel')
+                ->join('ms_account ms', 'ms.id = pu.user_id')
                 ->where('af.form_id', $id)
                 ->group_by('af.form_id')
                 ->get()
@@ -511,7 +513,7 @@ class Activity extends CI_Controller
             if (!$formDetails) {
                 throw new Exception('Form data not found');
             }
-
+    
             // Get form data (photos and details)
             $formData = $this->db->select('afd.*, dh.device_hidn_name')
                 ->from('activity_form_data afd')
@@ -650,24 +652,25 @@ class Activity extends CI_Controller
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
-                    GROUP_CONCAT(DISTINCT ms.username) as personel_names
+                    GROUP_CONCAT(ms.username) as personel_names
                 ')
                 ->from('activity_forms af')
                 ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
                 ->join('ms_area ma', 'ma.area_id = af.area_id')
                 ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
-                ->join('activity_personel apr', 'apr.activity_id = ap.id_activity')
-                ->join('ms_account ms', 'ms.id = apr.user_id')
+                ->join('personel p', 'p.id_personel = ap.personel_id')
+                ->join('personel_user pu', 'pu.personel_id = p.id_personel')
+                ->join('ms_account ms', 'ms.id = pu.user_id')
                 ->where('af.form_id', $id)
                 ->group_by('af.form_id')
                 ->get()
                 ->row();
-            
+    
             if (!$formDetails) {
                 throw new Exception('Form details not found');
             }
-
-            // Get form data with answers
+    
+            // Get form data with checklist answers
             $formData = $this->db->select('
                     afd.*,
                     dh.device_hidn_name
@@ -677,8 +680,12 @@ class Activity extends CI_Controller
                 ->where('afd.form_id', $id)
                 ->get()
                 ->result();
-
-            // Get checklist questions
+    
+            if (empty($formData)) {
+                throw new Exception('No form data found');
+            }
+    
+            // Get checklist questions for the sub device
             $questions = $this->db->select('*')
                 ->from('device_checklist')
                 ->where('sub_device_id', $formDetails->sub_device_id)
