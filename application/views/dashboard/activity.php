@@ -18,6 +18,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> 
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
@@ -177,9 +178,16 @@
                           <td><?= $activity->id_activity; ?></td>
                           <td><?= $activity->kode_activity; ?></td>
                           <td>
-                            <?php foreach ($activity->users as $user): ?>
-                              <span class="badge bg-info"><?= $user->username; ?></span>
-                            <?php endforeach; ?>
+                            <?php 
+                            if (!empty($activity->usernames)) {
+                                $usernames = explode(',', $activity->usernames);
+                                foreach ($usernames as $username): ?>
+                                    <span class="badge bg-info"><?= trim($username) ?></span>
+                                <?php endforeach;
+                            } else {
+                                echo '<span class="text-muted">No users assigned</span>';
+                            }
+                            ?>
                           </td>
                           <td><?= $activity->nama_shift; ?></td>
                           <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
@@ -204,23 +212,22 @@
                         <form action="<?= base_url('activity/add'); ?>" method="POST">
                           <div class="modal-body">
                             <div class="mb-3">
-                              <label class="form-label">Pilih Personel</label>
-                              <select class="form-control" name="personel_id" required>
-                              <option value="">-- Pilih Personel --</option>
-                                <?php foreach ($personel as $p): ?>
-                                    <option value="<?= $p->id_personel; ?>"><?= $p->usernames; ?></option>
-                                <?php endforeach; ?>>
-                              </select>
+                                <label class="form-label">Pilih Personel</label>
+                                <select class="form-control select2" name="personel_ids[]" multiple required>
+                                    <?php foreach ($users as $user): ?>
+                                        <option value="<?= $user->id ?>"><?= $user->username ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="mb-3">
-                              <label class="form-label">Pilih Shift</label>
-                              <select class="form-control" name="shift_id" required>
-                                <?php foreach ($shifts as $shift): ?>
-                                  <option value="<?= $shift->id_shift; ?>">
-                                      <?= $shift->nama_shift; ?> (<?= $shift->jam_mulai; ?> - <?= $shift->jam_selesai; ?>)
-                                  </option>
-                                <?php endforeach; ?>
-                              </select>
+                                <label class="form-label">Pilih Shift</label>
+                                <select class="form-control" name="shift_id" required>
+                                    <?php foreach ($shifts as $shift): ?>
+                                        <option value="<?= $shift->id_shift ?>">
+                                            <?= $shift->nama_shift; ?> (<?= $shift->jam_mulai; ?> - <?= $shift->jam_selesai; ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="mb-3">
                               <label class="form-label">Tanggal Kegiatan</label>
@@ -240,9 +247,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Activity Form</h5>
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="border p-3 mb-4">
@@ -294,7 +299,9 @@
                                             <div class="col-md-10">
                                                 <div class="d-flex">
                                                     <span class="me-2">:</span>
-                                                    <div id="modalTeam"></div>
+                                                    <div id="modalTeam" class="d-flex flex-wrap gap-1">
+                                                        <!-- Badges will be inserted here -->
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -511,6 +518,7 @@
   </div>
   <script src="<?= base_url('js/jquery-3.7.1.min.js'); ?>"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
   
   <!-- container-scroller -->
   <script>
@@ -523,6 +531,11 @@
         $('#activityForm').on('submit', handleActivityFormSubmit);
         $('#dataModal').on('shown.bs.modal', handleDataModalShown);
         $('#dataModal').on('hidden.bs.modal', handleDataModalHidden);
+        $('.select2').select2({
+            placeholder: "Pilih Personel",
+            allowClear: true,
+            width: '100%'
+        });
     });
 
     // Authentication Functions
@@ -546,21 +559,24 @@
                 if (response.status === 'success') {
                     const data = response.data;
                     $('#activity_id').val(activityId);
+                    $('#modalTanggal').text(data.formatted_date);
+                    $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
                     
-                    // Format tanggal ke Bahasa Indonesia
-                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                    const date = new Date(data.tanggal_kegiatan);
-                    const dayName = days[date.getDay()];
-                    const formattedDate = `${dayName} / ${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()}`;
+                    // Tampilkan personel names dengan badges
+                    const personelNames = data.personel_name ? data.personel_name.split(',') : [];
+                    const personelHtml = personelNames.map(name => 
+                        `<span class="badge bg-info me-1">${name.trim()}</span>`
+                    ).join('');
+                    $('#modalTeam').html(personelHtml || '<span class="text-muted">No users assigned</span>');
                     
-                    $('#modalTanggal').text(formattedDate);
-                    $('#modalShift').text(`${data.nama_shift} / ${data.jam_mulai} s/d ${data.jam_selesai}`);
-                    $('#modalTeam').text(data.personel_name);
-                    
+                    // Load sub devices and areas
                     loadSubDevices();
                     loadAreas();
+                    
+                    // Load existing form data
                     loadFormData(activityId);
                     
+                    // Show modal
                     $('#formModal').modal('show');
                 } else {
                     alert('Error: ' + (response.message || 'Failed to load activity details'));
@@ -601,7 +617,7 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
                                             Delete
                                         </button>
-                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}'">
+                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}' target="_blank" ">
                                             <i class="fas fa-print"></i> Dokumentasi
                                         </button>
                                         <button class="btn btn-primary btn-sm" onclick="window.location.href='<?= base_url('activity/printchecklist/') ?>${form.form_id}'">
