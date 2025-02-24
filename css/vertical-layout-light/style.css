@@ -11121,9 +11121,9 @@ fieldset:disabled .wizard > .actions a,
 }
 
 .btn-secondary, .wizard > .actions .disabled a {
-  color: #212529;
-  background-color: #a3a4a5;
-  border-color: #a3a4a5;
+  color: #ffffff;
+  background-color: #4069f7;
+  border-color: #4069f7;
 }
 
 .btn-secondary:hover, .wizard > .actions .disabled a:hover {
@@ -27709,6 +27709,37 @@ table.dataTable tbody td.select-checkbox:after {
 div.tagsinput {
   padding: 15px 15px 10px;
   border-color: #CED4DA;
+}
+
+/* Styling untuk scrollbar */
+.modal-body::-webkit-scrollbar,
+.modal-body div::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track,
+.modal-body div::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb,
+.modal-body div::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover,
+.modal-body div::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Untuk membuat modal lebih responsif */
+@media (max-width: 768px) {
+    .modal-body {
+        padding: 15px;
+    }
 }
 
 div.tagsinput span.tag {
