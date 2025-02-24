@@ -250,17 +250,16 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <strong>Hari/Tanggal:</strong> <span id="modalTanggal"></span>
+                                <div class="border p-3 mb-4">
+                                    <!-- Header Form -->
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            <!-- Form Title -->
+                                        </div>
+                                        <div class="text-end border border-dark p-2" style="min-width: 200px;">
+                                            <strong>PREVENTIVE MAINTENANCE</strong>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <strong>Shift/Jam Kerja:</strong> <span id="modalShift"></span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <strong>Team/Regu:</strong> <span id="modalTeam"></span>
-                                    </div>
-                                </div>
 
                                     <!-- Form Content -->
                                     <form id="activityForm">
@@ -300,9 +299,7 @@
                                             <div class="col-md-10">
                                                 <div class="d-flex">
                                                     <span class="me-2">:</span>
-                                                    <div id="modalTeam" class="d-flex flex-wrap gap-1">
-                                                        <!-- Badges will be inserted here -->
-                                                    </div>
+                                                    <div id="modalTeam"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -347,19 +344,19 @@
                                                     <span class="me-2">:</span>
                                                     <div class="form-check-inline">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Harian" class="form-check-input" required>
+                                                            <input type="radio" name="report_type" value="Harian" class="form_check-input" required>
                                                             <label class="form-check-label">Harian</label>
                                                         </div>
                                                     </div>
                                                     <div class="form-check-inline">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Mingguan" class="form-check-input">
+                                                            <input type="radio" name="report_type" value="Mingguan" class="form_check-input">
                                                             <label class="form-check-label">Mingguan</label>
                                                         </div>
                                                     </div>
                                                     <div class="form-check-inline">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Bulanan" class="form-check-input">
+                                                            <input type="radio" name="report_type" value="Bulanan" class="form_check-input">
                                                             <label class="form-check-label">Bulanan</label>
                                                         </div>
                                                     </div>
@@ -560,24 +557,21 @@
                 if (response.status === 'success') {
                     const data = response.data;
                     $('#activity_id').val(activityId);
-                    $('#modalTanggal').text(data.formatted_date);
-                    $('#modalShift').text(data.nama_shift + ' (' + data.shift_time + ')');
                     
-                    // Tampilkan personel names dengan badges
-                    const personelNames = data.personel_name ? data.personel_name.split(',') : [];
-                    const personelHtml = personelNames.map(name => 
-                        `<span class="badge bg-info me-1">${name.trim()}</span>`
-                    ).join('');
-                    $('#modalTeam').html(personelHtml || '<span class="text-muted">No users assigned</span>');
+                    // Format tanggal ke Bahasa Indonesia
+                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    const date = new Date(data.tanggal_kegiatan);
+                    const dayName = days[date.getDay()];
+                    const formattedDate = `${dayName} / ${date.getDate()} ${getMonthName(date.getMonth())} ${date.getFullYear()}`;
                     
-                    // Load sub devices and areas
+                    $('#modalTanggal').text(formattedDate);
+                    $('#modalShift').text(`${data.nama_shift} / ${data.jam_mulai} s/d ${data.jam_selesai}`);
+                    $('#modalTeam').text(data.personel_name);
+                    
                     loadSubDevices();
                     loadAreas();
-                    
-                    // Load existing form data
                     loadFormData(activityId);
                     
-                    // Show modal
                     $('#formModal').modal('show');
                 } else {
                     alert('Error: ' + (response.message || 'Failed to load activity details'));
@@ -589,6 +583,12 @@
             }
         });
     };
+
+    // Helper function untuk nama bulan dalam Bahasa Indonesia
+    function getMonthName(month) {
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        return months[month];
+    }
 
     const loadFormData = (activityId) => {
             $.ajax({
@@ -612,7 +612,7 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
                                             Delete
                                         </button>
-                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}' target="_blank" ">
+                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}'" target="_blank">
                                             <i class="fas fa-print"></i> Dokumentasi
                                         </button>
                                         <button class="btn btn-primary btn-sm" onclick="window.location.href='<?= base_url('activity/printchecklist/') ?>${form.form_id}'">
