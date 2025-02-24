@@ -19,7 +19,6 @@ class Activity extends CI_Controller
         $data['title'] = 'Activity';
         $data['user'] = $this->session->userdata();
         $data['activities'] = $this->ActivityModel->get_all_activities();
-        $data['personel'] = $this->ActivityModel->get_all_personel();
         $data['users'] = $this->ActivityModel->get_all_users();
         $data['shifts'] = $this->ActivityModel->get_all_shifts();
         $data['areas'] = $this->ActivityModel->get_area_options();
@@ -489,26 +488,21 @@ class Activity extends CI_Controller
         try {
             // Get form details first
             $formDetails = $this->db->select('
-                    af.*,
-                    ap.tanggal_kegiatan,
+                    ap.id_activity,
                     ap.kode_activity,
-                    ma.area_name,
+                    ap.tanggal_kegiatan,
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
-                    GROUP_CONCAT(ms.username) as personel_names
+                    GROUP_CONCAT(DISTINCT ms.username) as usernames
                 ')
-                ->from('activity_forms af')
-                ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
-                ->join('ms_area ma', 'ma.area_id = af.area_id')
+                ->from('activity_pm ap')
                 ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
-                ->join('personel p', 'p.id_personel = ap.personel_id')
-                ->join('personel_user pu', 'pu.personel_id = p.id_personel')
-                ->join('ms_account ms', 'ms.id = pu.user_id')
-                ->where('af.form_id', $id)
-                ->group_by('af.form_id')
-                ->get()
-                ->row();
+                ->join('activity_personel apr', 'apr.activity_id = ap.id_activity', 'left')
+                ->join('ms_account ms', 'ms.id = apr.user_id', 'left')
+                ->group_by('ap.id_activity')
+                ->order_by('ap.tanggal_kegiatan', 'DESC')
+                ->get()->result();
 
             if (!$formDetails) {
                 throw new Exception('Form data not found');
