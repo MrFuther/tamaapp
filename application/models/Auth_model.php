@@ -13,13 +13,8 @@ class Auth_model extends CI_Model {
         $user = $query->row();
         
         if($user) {
-            // Tambahkan log untuk debugging
-            error_log('Stored Hash: ' . $user->password);
-            error_log('Input Password: ' . $password);
-            $verify = password_verify($password, $user->password);
-            error_log('Password Verify Result: ' . ($verify ? 'true' : 'false'));
-            
-            if($verify) {
+            // Ganti ke verifikasi SHA256
+            if(verifyPassword($password, $user->password)) {
                 return $user;
             }
         }

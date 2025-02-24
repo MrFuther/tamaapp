@@ -12,6 +12,7 @@ class ManageUser extends CI_Controller {
             redirect(base_url('forbidden'));
         }
         $this->load->model('UserModel');
+        $this->load->helper('hash');
     }
 
     public function index() {
@@ -49,5 +50,15 @@ class ManageUser extends CI_Controller {
         $this->UserModel->delete_user($id);
 
         redirect('ManageUser/index');
+    }
+
+    public function migrate_passwords() {
+        $users = $this->db->get('ms_account')->result();
+        foreach($users as $user) {
+            // Asumsikan password default adalah username
+            $newHash = createSecureHash($user->username);
+            $this->db->where('id', $user->id);
+            $this->db->update('ms_account', ['password' => $newHash]);
+        }
     }
 }

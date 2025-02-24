@@ -8,6 +8,7 @@ class Auth extends CI_Controller {
         $this->load->model('Auth_model');
         $this->load->library('session');
         $this->load->library('form_validation');
+        $this->load->helper('hash');
         $this->load->helper('url');
     }
 
