@@ -6,19 +6,32 @@ class ActivityModel extends CI_Model {
     private $table = "activity_pm";
 
     public function get_all_activities() {
-        $this->db->select('activity_pm.id_activity, activity_pm.kode_activity, personel.id_personel, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai, activity_pm.tanggal_kegiatan');
-        $this->db->from('activity_pm');
-        $this->db->join('personel', 'activity_pm.personel_id = personel.id_personel');
-        $this->db->join('shift_kerja', 'activity_pm.shift_id = shift_kerja.id_shift');
-        $activities = $this->db->get()->result();
-    
-        foreach ($activities as $activity) {
-            $activity->users = $this->get_users_by_personel($activity->id_personel) ?: [];
-        }
-    
-        return $activities;
+        $this->db->select('
+            ap.id_activity,
+            ap.kode_activity,
+            ap.tanggal_kegiatan,
+            sk.nama_shift,
+            sk.jam_mulai,
+            sk.jam_selesai,
+            GROUP_CONCAT(DISTINCT ms.username SEPARATOR ", ") as usernames
+        ');
+        $this->db->from('activity_pm ap');
+        $this->db->join('shift_kerja sk', 'sk.id_shift = ap.shift_id');
+        $this->db->join('activity_personel apr', 'apr.activity_id = ap.id_activity', 'left');
+        $this->db->join('ms_account ms', 'ms.id = apr.user_id', 'left');
+        $this->db->group_by('ap.id_activity, ap.kode_activity, ap.tanggal_kegiatan, sk.nama_shift, sk.jam_mulai, sk.jam_selesai');
+        $this->db->order_by('ap.tanggal_kegiatan', 'DESC');
+        
+        $query = $this->db->get();
+        return $query->result();
     }
     
+    public function get_all_users() {
+        return $this->db->select('id, username')
+                        ->from('ms_account')
+                        ->get()
+                        ->result();
+    }
 
     public function get_all_personel() {
         $this->db->select('personel.id_personel, GROUP_CONCAT(ms_account.username SEPARATOR ", ") as usernames');
@@ -59,9 +72,9 @@ class ActivityModel extends CI_Model {
     }
     
     public function get_activity_details($activity_id) {
-        $this->db->select('activity_pm.id_activity, activity_pm.kode_activity, personel.id_personel, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai, activity_pm.tanggal_kegiatan');
+        $this->db->select('activity_pm.id_activity, activity_pm.kode_activity, activity_personel.id, shift_kerja.nama_shift, shift_kerja.jam_mulai, shift_kerja.jam_selesai, activity_pm.tanggal_kegiatan');
         $this->db->from('activity_pm');
-        $this->db->join('personel', 'activity_pm.personel_id = personel.id_personel');
+        $this->db->join('activity_personel', 'activity_pm.id_activity = activity_personel.id');
         $this->db->join('shift_kerja', 'activity_pm.shift_id = shift_kerja.id_shift');
         $this->db->where('activity_pm.id_activity', $activity_id);
         return $this->db->get()->row();
@@ -126,7 +139,14 @@ class ActivityModel extends CI_Model {
         return null;
     }
 
-    
+    public function get_activity_users($activity_id) {
+        return $this->db->select('ms.id, ms.username')
+            ->from('activity_personel ap')
+            ->join('ms_account ms', 'ms.id = ap.user_id')
+            ->where('ap.activity_id', $activity_id)
+            ->get()
+            ->result();
+    }
     
     public function get_areas() {
         return $this->db->get('ms_area')->result();

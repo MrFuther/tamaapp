@@ -20,6 +20,7 @@ class Activity extends CI_Controller
         $data['user'] = $this->session->userdata();
         $data['activities'] = $this->ActivityModel->get_all_activities();
         $data['personel'] = $this->ActivityModel->get_all_personel();
+        $data['users'] = $this->ActivityModel->get_all_users();
         $data['shifts'] = $this->ActivityModel->get_all_shifts();
         $data['areas'] = $this->ActivityModel->get_area_options();
         $data['group_devices'] = $this->ActivityModel->get_group_devices();
@@ -29,14 +30,49 @@ class Activity extends CI_Controller
     }
 
     public function add() {
-        $data = [
-            'personel_id' => $this->input->post('personel_id'),
-            'shift_id' => $this->input->post('shift_id'),
-            'tanggal_kegiatan' => $this->input->post('tanggal_kegiatan')
-        ];
-
-        $this->ActivityModel->insert_activity($data);
-        redirect('activity');
+        try {
+            // Generate kode activity
+            $kode_activity = $this->ActivityModel->generate_activity_code();
+            
+            // Data untuk activity_pm
+            $data = [
+                'shift_id' => $this->input->post('shift_id'),
+                'tanggal_kegiatan' => $this->input->post('tanggal_kegiatan'),
+                'kode_activity' => $kode_activity
+            ];
+    
+            // Start transaction
+            $this->db->trans_start();
+    
+            // Insert ke activity_pm
+            $this->db->insert('activity_pm', $data);
+            $activity_id = $this->db->insert_id();
+    
+            // Insert multiple users
+            $user_ids = $this->input->post('personel_ids');
+            if (!empty($user_ids)) {
+                foreach ($user_ids as $user_id) {
+                    $this->db->insert('activity_personel', [
+                        'activity_id' => $activity_id,
+                        'user_id' => $user_id
+                    ]);
+                }
+            }
+    
+            // Complete transaction
+            $this->db->trans_complete();
+    
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Failed to save activity');
+            }
+    
+            redirect('activity');
+    
+        } catch (Exception $e) {
+            log_message('error', 'Add activity error: ' . $e->getMessage());
+            $this->session->set_flashdata('error', $e->getMessage());
+            redirect('activity');
+        }
     }
 
     public function delete($id) {
@@ -45,31 +81,53 @@ class Activity extends CI_Controller
     }     
 
     public function get_activity_detail($id) {
-        // Add error handling
+        header('Content-Type: application/json'); // Tambahkan header JSON
+        
         try {
-            $activity = $this->ActivityModel->get_activity_detail($id);
-            if ($activity) {
-                $response = [
+            if (!$id) {
+                throw new Exception('Activity ID is required');
+            }
+    
+            $this->db->select('
+                a.*,
+                s.nama_shift,
+                s.jam_mulai,
+                s.jam_selesai,
+                GROUP_CONCAT(DISTINCT ms.username) as personel_name
+            ');
+            $this->db->from('activity_pm a');
+            $this->db->join('shift_kerja s', 's.id_shift = a.shift_id');
+            $this->db->join('activity_personel ap', 'ap.activity_id = a.id_activity', 'left');
+            $this->db->join('ms_account ms', 'ms.id = ap.user_id', 'left');
+            $this->db->where('a.id_activity', $id);
+            $this->db->group_by('a.id_activity');
+            
+            $query = $this->db->get();
+            
+            if ($query->num_rows() > 0) {
+                $result = $query->row();
+                // Format the date and time
+                $result->formatted_date = date('d/m/Y', strtotime($result->tanggal_kegiatan));
+                $result->shift_time = date('H:i', strtotime($result->jam_mulai)) . ' - ' . 
+                                    date('H:i', strtotime($result->jam_selesai));
+                
+                echo json_encode([
                     'status' => 'success',
-                    'data' => $activity
-                ];
+                    'data' => $result
+                ]);
             } else {
-                $response = [
+                echo json_encode([
                     'status' => 'error',
                     'message' => 'Activity not found'
-                ];
+                ]);
             }
         } catch (Exception $e) {
-            $response = [
+            log_message('error', 'Error in get_activity_detail: ' . $e->getMessage());
+            echo json_encode([
                 'status' => 'error',
-                'message' => 'Failed to get activity detail'
-            ];
-            log_message('error', 'Activity detail error: ' . $e->getMessage());
+                'message' => $e->getMessage()
+            ]);
         }
-        
-        $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($response));
     }
     
     public function get_sub_devices() {
