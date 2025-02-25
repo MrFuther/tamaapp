@@ -1,12 +1,72 @@
+/* Sidebar styling */
 .sidebar {
-    background-color: #343a40; /* Warna sidebar */
+    width: 250px; /* Ukuran default sidebar */
+    height: 100vh; /* Full tinggi layar */
+    background-color: #2C3E50; /* Warna sidebar */
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: all 0.3s ease;
+    overflow-y: auto; /* Biar bisa scroll kalau menu banyak */
+}
+
+.sidebar-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1A252F;
+}
+
+.logo {
+    width: 80%; /* Sesuaikan ukuran logo */
+    max-width: 150px;
+    height: auto;
+}
+
+/* Menu styling */
+.nav {
+    padding: 0;
+    list-style: none;
+}
+
+.nav-item {
+    padding: 10px 15px;
 }
 
 .nav-link {
-    color: #ffffff;
-    background-color: #00f;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
 }
 
-.nav-link:hover {
-    background-color: #0056b3;
+.nav-link i {
+    margin-right: 10px;
+}
+
+/* RESPONSIVE: Sidebar di Mobile */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 0; /* Sembunyikan sidebar */
+        overflow: hidden;
+    }
+
+    .sidebar.show {
+        width: 250px; /* Munculkan sidebar saat tombol diklik */
+    }
+
+    #mobileMenuToggle {
+        display: block; /* Tombol muncul di mobile */
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: #2C3E50;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 1000;
+    }
 }

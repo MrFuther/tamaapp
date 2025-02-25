@@ -2,7 +2,7 @@
     <link href="<?= base_url('assets/css/sidebar.css'); ?>" rel="stylesheet" type="text/css">
 </head>
 
-<nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <ul class="nav">
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('dashboard'); ?>">
@@ -12,14 +12,14 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('activity'); ?>">
-                    <i class="fas fa-chart-line"></i>
+                    <i class="icon-bar-graph menu-icon"></i>
                     <span class="menu-title">Activity</span>
                     </a>
                 </li>
                 <?php if ($this->session->userdata('role') == 'admin'): ?>
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-                        <i class="fas fa-database"></i>
+                        <i class="icon-paper menu-icon"></i>
                         <span class="menu-title">Master Data</span>
                         <i class="menu-arrow"></i>
                         </a>
