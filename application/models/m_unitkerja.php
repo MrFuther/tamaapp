@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class M_unitkerja extends CI_Model {
+class m_unitkerja extends CI_Model {
     private $table = 'ms_unit_kerja';
     
     public function __construct() {

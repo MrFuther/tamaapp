@@ -11,7 +11,7 @@ class Activity extends CI_Controller
         }
         $this->load->model(['ActivityModel', 'ChecklistModel']);
         $this->load->library('upload'); // Load library untuk upload file
-        $this->load->library('tcpdf');
+        $this->load->library('pdf');
     }
 
     public function index()
