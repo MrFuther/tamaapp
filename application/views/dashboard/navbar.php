@@ -4,14 +4,14 @@
       <img src="<?php echo base_url('assets/images/logosamping.png'); ?>" class="mr-2" alt="logo" style="width: 150px; height: auto;"/>
       </a>
 
-        <a class="navbar-brand brand-logo-mini" href="<?php echo base_url('dashboard'); ?>"><img src="<?php echo base_url('assets/images/logoaja.png'); ?>" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="<?php echo base_url('dashboard'); ?>"><img src="<?php echo base_url('assets/images/amar.png'); ?>" alt="logo"/></a>
         
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
           <span class="icon-menu"></span>
         </button>
-        <ul class="navbar-nav navbar-nav-right">
+        <ul class="navbar-nav navbar-nav-left">
           <li class="nav-item dropdown">
             <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
               <i class="icon-bell mx-0"></i>
