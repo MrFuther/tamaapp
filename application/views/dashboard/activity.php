@@ -401,12 +401,13 @@
                                           <label class="form-label">Notes</label>
                                           <textarea class="form-control" name="notes" rows="3">Normal</textarea>
                                       </div>
-                                      
-                                      <button type="submit" class="btn btn-primary">Save</button>
-                                      <button class="btn btn-secondary" onclick="backToActivityForm()">
-                                        <i class="bi bi-arrow-left"></i> Back
-                                      </button>
                                   </form>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" onclick="backToActivityForm()">
+                                        <i class="bi bi-arrow-left"></i> Back
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('addDataForm').requestSubmit()">Save</button>
+                                 </div>
                               </div>
                           </div>
                       </div>
