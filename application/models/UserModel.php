@@ -20,12 +20,13 @@ class UserModel extends CI_Model {
         return $this->db->get('ms_unit_kerja')->result_array();
     }
 
-    public function add_user($username, $password, $role, $unit_id) {
+    public function add_user($username, $password, $role, $unit_id, $nama_pegawai) {
         $data = [
             'username' => $username,
             'password' => createSecureHash($password), // Ganti ke SHA256
             'role' => $role,
             'unit_id' => $unit_id,
+            'nama_pegawai' => $nama_pegawai,
             'created_at' => date('Y-m-d H:i:s')
         ];
         return $this->db->insert('ms_account', $data);
