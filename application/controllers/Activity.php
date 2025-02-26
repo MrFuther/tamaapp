@@ -92,7 +92,7 @@ class Activity extends CI_Controller
                 s.nama_shift,
                 s.jam_mulai,
                 s.jam_selesai,
-                GROUP_CONCAT(DISTINCT ms.username) as personel_name
+                GROUP_CONCAT(DISTINCT ms.nama_pegawai) as personel_name
             ');
             $this->db->from('activity_pm a');
             $this->db->join('shift_kerja s', 's.id_shift = a.shift_id');
@@ -266,6 +266,86 @@ class Activity extends CI_Controller
         }
     }
     
+    // Add this simple version of the compress image function
+    private function compress_image($source, $destination, $quality = 50) {
+        try {
+            // Verify source file exists
+            if (!file_exists($source)) {
+                log_message('error', 'Source file does not exist: ' . $source);
+                return false;
+            }
+            
+            // Get image info
+            $info = getimagesize($source);
+            if (!$info) {
+                log_message('error', 'Could not get image info for: ' . $source);
+                return false;
+            }
+            
+            // Create image resource based on type
+            switch ($info['mime']) {
+                case 'image/jpeg':
+                    $image = imagecreatefromjpeg($source);
+                    break;
+                case 'image/png':
+                    $image = imagecreatefrompng($source);
+                    break;
+                case 'image/gif':
+                    $image = imagecreatefromgif($source);
+                    break;
+                default:
+                    log_message('error', 'Unsupported image type: ' . $info['mime']);
+                    return false;
+            }
+            
+            // Check if image creation failed
+            if (!$image) {
+                log_message('error', 'Failed to create image resource from: ' . $source);
+                return false;
+            }
+            
+            // Save the compressed image
+            $success = false;
+            switch ($info['mime']) {
+                case 'image/jpeg':
+                    $success = imagejpeg($image, $destination, $quality);
+                    break;
+                case 'image/png':
+                    $png_quality = 9 - round(($quality / 100) * 9); // Convert quality to PNG scale (0-9)
+                    $success = imagepng($image, $destination, $png_quality);
+                    break;
+                case 'image/gif':
+                    $success = imagegif($image, $destination);
+                    break;
+            }
+            
+            // Free memory
+            imagedestroy($image);
+            
+            // Verify compression result
+            if ($success && file_exists($destination)) {
+                $original_size = filesize($source);
+                $compressed_size = filesize($destination);
+                log_message('debug', 'Compression: Original=' . $original_size . ' bytes, Compressed=' . $compressed_size . ' bytes');
+                
+                // If compressed file is larger than original, use original instead
+                if ($compressed_size > $original_size) {
+                    log_message('debug', 'Compressed file is larger than original, using original');
+                    copy($source, $destination);
+                }
+                
+                return true;
+            } else {
+                log_message('error', 'Failed to save compressed image to: ' . $destination);
+                return false;
+            }
+            
+        } catch (Exception $e) {
+            log_message('error', 'Image compression error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     // Di Activity.php controller
     public function add_form_data() {
         try {
@@ -276,27 +356,78 @@ class Activity extends CI_Controller
             if (!$form_id || !$device_hidn_id) {
                 throw new Exception('Missing required fields');
             }
-
+    
+            // Check GD library
+            if (!extension_loaded('gd')) {
+                log_message('error', 'GD Library is not installed or enabled');
+                throw new Exception('Image processing library is not available');
+            }
+    
             // Handle file uploads
             $config['upload_path'] = './uploads/';
             $config['allowed_types'] = 'gif|jpg|jpeg|png';
-            $config['max_size'] = 2048; // 2MB
+            $config['max_size'] = 4048; // 2MB
+            
+            // Ensure upload directory exists and is writable
+            if (!is_dir($config['upload_path'])) {
+                mkdir($config['upload_path'], 0755, true);
+            }
             
             $uploadedFiles = [];
             $uploadFields = ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'];
             
             foreach ($uploadFields as $field) {
                 if (!empty($_FILES[$field]['name'])) {
+                    // Reset upload library for each file
                     $this->upload->initialize($config);
+                    
                     if ($this->upload->do_upload($field)) {
-                        $uploadedFiles[$field] = $this->upload->data('file_name');
+                        $upload_data = $this->upload->data();
+                        $source_path = $upload_data['full_path'];
+                        
+                        // Log original file details
+                        log_message('debug', 'Original file: ' . $source_path . ' Size: ' . filesize($source_path) . ' bytes');
+                        
+                        // Generate a new filename for compressed version
+                        $compressed_filename = 'compressed_' . time() . '_' . $upload_data['file_name'];
+                        $destination_path = $config['upload_path'] . $compressed_filename;
+                        
+                        // Apply compression with explicit quality parameter and feedback
+                        $compression_success = $this->compress_image($source_path, $destination_path, 75);
+                        
+                        if ($compression_success) {
+                            // Check if compressed file exists and log its size
+                            if (file_exists($destination_path)) {
+                                log_message('debug', 'Compressed file: ' . $destination_path . ' Size: ' . filesize($destination_path) . ' bytes');
+                                
+                                // Delete original file
+                                if (file_exists($source_path)) {
+                                    if (unlink($source_path)) {
+                                        log_message('debug', 'Original file deleted: ' . $source_path);
+                                    } else {
+                                        log_message('error', 'Failed to delete original file: ' . $source_path);
+                                    }
+                                }
+                                
+                                // Store only the compressed filename
+                                $uploadedFiles[$field] = $compressed_filename;
+                            } else {
+                                log_message('error', 'Compressed file not created: ' . $destination_path);
+                                // Fallback to original file
+                                $uploadedFiles[$field] = $upload_data['file_name'];
+                            }
+                        } else {
+                            log_message('error', 'Compression failed, using original file');
+                            // Use original file if compression fails
+                            $uploadedFiles[$field] = $upload_data['file_name'];
+                        }
                     } else {
                         throw new Exception($this->upload->display_errors('', ''));
                     }
                 }
             }
             
-            // Prepare data
+            // Prepare data for database
             $data = [
                 'form_id' => $form_id,
                 'device_hidn_id' => $device_hidn_id,
@@ -306,7 +437,7 @@ class Activity extends CI_Controller
                 'tindakan3' => $this->input->post('tindakan3'),
                 'notes' => $this->input->post('notes') ?: 'Normal'
             ];
-
+    
             // Add uploaded files to data
             foreach ($uploadedFiles as $field => $filename) {
                 $data[$field] = $filename;
@@ -325,6 +456,7 @@ class Activity extends CI_Controller
             }
             
         } catch (Exception $e) {
+            log_message('error', 'Add form data error: ' . $e->getMessage());
             $response = [
                 'status' => 'error',
                 'message' => $e->getMessage()
@@ -333,7 +465,7 @@ class Activity extends CI_Controller
         
         header('Content-Type: application/json');
         echo json_encode($response);
-    }
+    }   
     
     public function delete_form_data($formDataId) {
         try {
@@ -495,7 +627,7 @@ class Activity extends CI_Controller
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
-                    GROUP_CONCAT(DISTINCT ms.username) as personel_names
+                    GROUP_CONCAT(DISTINCT ms.nama_pegawai) as personel_names
                 ')
                 ->from('activity_forms af')
                 ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
@@ -647,6 +779,7 @@ class Activity extends CI_Controller
                         }
                     }
                 };
+                
                 
                 // Add Foto Perangkat
                 $fitImageInCell('./uploads/' . $data->foto_perangkat, $startX, $startY, $cellWidth, $cellHeight);
@@ -808,6 +941,7 @@ class Activity extends CI_Controller
                     // Notes for each item
                     $pdf->Cell(40, 7, $data->notes, 1, 1, 'L');
                 }
+                
             }
             
             // Signature

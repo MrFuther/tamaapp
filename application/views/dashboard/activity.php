@@ -12,7 +12,6 @@
 
     <!-- endinject -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/mdi/css/materialdesignicons.min.css'); ?>">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
@@ -21,7 +20,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> 
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('css/style.css'); ?>">
     <!-- endinject -->
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
     <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>x`
@@ -31,54 +30,19 @@
   <!-- Wrapper utama untuk halaman -->
 <div class="container-fluid page-body-wrapper">
 
-<!-- Panel Pengaturan Tema -->
-<div class="theme-setting-wrapper">
-  <div id="theme-settings" class="settings-panel">
-    <i class="settings-close ti-close"></i>
-    
-    <!-- Pengaturan Header -->
-    <p class="settings-heading mt-2">HEADER SKINS</p>
-      <div class="color-tiles mx-0 px-4">
-        <div class="tiles success"></div>
-        <div class="tiles warning"></div>
-        <div class="tiles danger"></div>
-        <div class="tiles info"></div>
-        <div class="tiles dark"></div>
-        <div class="tiles default"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sidebar Kanan untuk To-Do List dan Chat -->
-  <div id="right-sidebar" class="settings-panel">
-    <i class="settings-close ti-close"></i>
-
-        
-        <div class="tab-content" id="setting-content">
-          <div class="tab-pane fade show active scroll-wrapper" id="todo-section" role="tabpanel" aria-labelledby="todo-section">
-            <div class="add-items d-flex px-3 mb-0">
-             
-            </div>
-            <div class="list-wrapper px-3">
-                </div>
-          </div>
-          <!-- To do section tab ends -->
-        </div>
-      </div>
-      <!-- partial -->
-      <!-- partial:partials/_sidebar.html -->
-      <?php include 'sidebar.php'; ?>
-      <!-- partial -->
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-lg-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <h6 class="card-title">Activity Management</h6>
-                  <p class="card-description">
-                  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
-                  </p>
+  <!-- partial:partials/_sidebar.html -->
+  <?php include 'sidebar.php'; ?>
+  <!-- partial -->
+  <div class="main-panel">
+    <div class="content-wrapper">
+      <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Activity Management</h6>
+              <p class="card-description">
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
+              </p>
                   <div class="table-responsive">
                   <input type="text" id="searchInput" class="form-control" placeholder="Cari data...">
                     <table class="table table-striped" id="activityTable" id="activityTable">
@@ -424,24 +388,7 @@
       </div>
       <!-- main-panel ends -->
     </div>
-    <div id="logoutModal" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Konfirmasi Logout</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Apakah Anda yakin ingin logout?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-primary" onclick="logout()">Logout</button>
-          </div>
-        </div>
-      </div>
+   
     </div>  
     <!-- page-body-wrapper ends -->
   </div>
