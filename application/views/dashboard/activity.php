@@ -22,6 +22,7 @@
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('css/activitymodal.css'); ?>">
     <!-- endinject -->
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
     <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>x`
@@ -166,192 +167,191 @@
                     </div>
                   </div>
                   <div class="modal fade" id="formModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document"> <!-- Changed from modal-xl to modal-lg and added modal-dialog-scrollable -->
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Activity Form</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
-                                <div style="min-width: 800px; overflow-x: auto;">
-                                    <div class="border p-3 mb-4">
-                                        <!-- Header Form -->
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div class="flex-grow-1">
-                                                <!-- Form Title -->
-                                            </div>
-                                            <div class="text-end border border-dark p-2" style="min-width: 200px;">
-                                                <strong>PREVENTIVE MAINTENANCE</strong>
-                                            </div>
-                                        </div>
+                        <div class="modal-header">
+                            <h5 class="modal-title">Activity Form</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="overflow-auto"> <!-- Changed from fixed min-width to overflow-auto -->
+                            <div class="border p-3 mb-4">
+                                <!-- Header Form -->
+                                <div class="d-flex flex-wrap justify-content-between align-items-start mb-3"> <!-- Added flex-wrap -->
+                                <div class="flex-grow-1 mb-2 mb-md-0"> <!-- Added responsive margin -->
+                                    <!-- Form Title -->
+                                </div>
+                                <div class="text-end border border-dark p-2">
+                                    <strong>PREVENTIVE MAINTENANCE</strong>
+                                </div>
+                                </div>
 
-                                        <!-- Form Content -->
-                                        <form id="activityForm">
-                                            <input type="hidden" id="activity_id" name="activity_id">
-                                            
-                                            <!-- Row 1: Hari/Tanggal -->
-                                            <div class="row mb-2 align-items-center">
-                                                <div class="col-md-2">
-                                                    <label class="mb-0">Hari / Tanggal</label>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="d-flex">
-                                                        <span class="me-2">:</span>
-                                                        <div id="modalTanggal"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Row 2: Shift/Jam Kerja -->
-                                            <div class="row mb-2 align-items-center">
-                                                <div class="col-md-2">
-                                                    <label class="mb-0">Shift Kerja / Jam Kerja</label>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="d-flex">
-                                                        <span class="me-2">:</span>
-                                                        <div id="modalShift"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Row 3: Team/Regu -->
-                                            <div class="row mb-2 align-items-center">
-                                                <div class="col-md-2">
-                                                    <label class="mb-0">Team / Regu</label>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="d-flex">
-                                                        <span class="me-2">:</span>
-                                                        <div id="modalTeam"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Row 4: Perangkat -->
-                                            <div class="row mb-2 align-items-center">
-                                                <div class="col-md-2">
-                                                    <label class="mb-0">Perangkat</label>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="d-flex">
-                                                        <span class="me-2">:</span>
-                                                        <select class="form-control" name="sub_device_id" required>
-                                                            <option value="">Pilih Perangkat</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Row 5: Lokasi -->
-                                            <div class="row mb-2 align-items-center">
-                                                <div class="col-md-2">
-                                                    <label class="mb-0">Lokasi</label>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="d-flex">
-                                                        <span class="me-2">:</span>
-                                                        <select class="form-control" name="area_id" required>
-                                                            <option value="">Pilih Lokasi</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Jadwal Checklist -->
-                                            <div class="row mb-2">
-                                                <div class="col-md-2">
-                                                    <label class="mb-0">Jadwal</label>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="d-flex align-items-start">
-                                                        <span class="me-2">:</span>
-                                                        <div class="form-check-inline">
-                                                            <div class="custom-control custom-radio">
-                                                                <input type="radio" name="report_type" value="Harian" class="form_check-input" required>
-                                                                <label class="form-check-label">Harian</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-check-inline">
-                                                            <div class="custom-control custom-radio">
-                                                                <input type="radio" name="report_type" value="Mingguan" class="form_check-input">
-                                                                <label class="form-check-label">Mingguan</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-check-inline">
-                                                            <div class="custom-control custom-radio">
-                                                                <input type="radio" name="report_type" value="Bulanan" class="form_check-input">
-                                                                <label class="form-check-label">Bulanan</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="text-end mt-3">
-                                                <button type="submit" class="btn btn-primary">Simpan</button>
-                                            </div>
-                                        </form>
+                                <!-- Form Content -->
+                                <form id="activityForm">
+                                <input type="hidden" id="activity_id" name="activity_id">
+                                
+                                <!-- Row 1: Hari/Tanggal -->
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-md-4 col-lg-2"> <!-- Changed column sizing for mobile -->
+                                    <label class="mb-1 mb-md-0">Hari / Tanggal</label> <!-- Added responsive margin -->
+                                    </div>
+                                    <div class="col-md-8 col-lg-10"> <!-- Changed column sizing for mobile -->
+                                    <div class="d-flex">
+                                        <span class="me-2">:</span>
+                                        <div id="modalTanggal"></div>
+                                    </div>
                                     </div>
                                 </div>
-                                <div class="mt-4">
-                                    <h6>Data Form</h6>
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Perangkat</th>
-                                                <th>Lokasi</th>
-                                                <th>Kelompok Laporan</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="formDataTable">
-                                        </tbody>
-                                    </table>
+
+                                <!-- Similar updates for other rows -->
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-md-4 col-lg-2">
+                                    <label class="mb-1 mb-md-0">Shift Kerja / Jam Kerja</label>
+                                    </div>
+                                    <div class="col-md-8 col-lg-10">
+                                    <div class="d-flex">
+                                        <span class="me-2">:</span>
+                                        <div id="modalShift"></div>
+                                    </div>
+                                    </div>
                                 </div>
+
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-md-4 col-lg-2">
+                                    <label class="mb-1 mb-md-0">Team / Regu</label>
+                                    </div>
+                                    <div class="col-md-8 col-lg-10">
+                                    <div class="d-flex">
+                                        <span class="me-2">:</span>
+                                        <div id="modalTeam"></div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 4: Perangkat -->
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-md-4 col-lg-2">
+                                        <label class="mb-1 mb-md-0">Perangkat</label>
+                                    </div>
+                                    <div class="col-md-8 col-lg-10">
+                                        <div class="d-flex flex-column flex-md-row"> 
+                                        <span class="me-2 mb-1 mb-md-0">:</span>
+                                        <select class="form-control select2-single" name="sub_device_id" required>
+                                            <option value="">Pilih Perangkat</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 5: Lokasi -->
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-md-4 col-lg-2">
+                                        <label class="mb-1 mb-md-0">Lokasi</label>
+                                    </div>
+                                    <div class="col-md-8 col-lg-10">
+                                        <div class="d-flex flex-column flex-md-row">
+                                        <span class="me-2 mb-1 mb-md-0">:</span>
+                                        <select class="form-control select2-single" name="area_id" required>
+                                            <option value="">Pilih Lokasi</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Jadwal Checklist -->
+                                <div class="row mb-2">
+                                    <div class="col-md-4 col-lg-2">
+                                    <label class="mb-1 mb-md-0">Jadwal</label>
+                                    </div>
+                                    <div class="col-md-8 col-lg-10">
+                                    <div class="d-flex flex-column flex-md-row align-items-start"> <!-- Fixed for mobile -->
+                                        <span class="me-2 mb-1 mb-md-0">:</span>
+                                        <div>
+                                        <div class="form-check mb-1">
+                                            <input type="radio" name="report_type" value="Harian" class="form-check-input" required>
+                                            <label class="form-check-label">Harian</label>
+                                        </div>
+                                        <div class="form-check mb-1">
+                                            <input type="radio" name="report_type" value="Mingguan" class="form-check-input">
+                                            <label class="form-check-label">Mingguan</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" name="report_type" value="Bulanan" class="form-check-input">
+                                            <label class="form-check-label">Bulanan</label>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end mt-3">
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                                </form>
                             </div>
+                            </div>
+                            <div class="mt-4">
+                            <h6>Data Form</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                    <th>Perangkat</th>
+                                    <th>Lokasi</th>
+                                    <th>Kelompok Laporan</th>
+                                    <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="formDataTable">
+                                </tbody>
+                                </table>
+                            </div>
+                            </div>
+                        </div>
                         </div>
                     </div>
                   </div>
                   <!-- Modal for viewing data -->
                   <div class="modal fade" id="dataModal" tabindex="-1">
-                      <div class="modal-dialog modal-xl">
-                          <div class="modal-content">
-                              <div class="modal-header">
-                                  <h5 class="modal-title">Form Data</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                              </div>
-                              <div class="modal-body">
-                              <button class="btn btn-primary mb-3" onclick="backToActivityForm()">
-                                 <i class="bi bi-arrow-left"></i> Back
-                              </button>
-                              <button id="addDataButton" class="btn btn-primary mb-3" onclick="openAddDataModal()">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable"> <!-- Changed from modal-xl to modal-lg -->
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Form Data</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex flex-wrap gap-2 mb-3"> <!-- Made buttons stack nicely on mobile -->
+                            <button class="btn btn-primary" onclick="backToActivityForm()">
+                                <i class="bi bi-arrow-left"></i> Back
+                            </button>
+                            <button id="addDataButton" class="btn btn-primary" onclick="openAddDataModal()">
                                 Add Data
-                              </button>
-                                  <div class="table-responsive">
-                                    <table class="table table-bordered" id="formDataItemsTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Device</th>
-                                                <th>Jam Kegiatan</th>
-                                                <th>Tindakan 1</th>
-                                                <th>Tindakan 2</th>
-                                                <th>Tindakan 3</th>
-                                                <th>Photo 1</th>
-                                                <th>Photo 2</th>
-                                                <th>Photo 3</th>
-                                                <th>Notes</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Data will be loaded here -->
-                                        </tbody>
-                                    </table>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
+                            </button>
+                            </div>
+                            <div class="table-responsive">
+                            <table class="table table-bordered" id="formDataItemsTable">
+                                <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Jam</th> <!-- Shortened headers for mobile -->
+                                    <th>T1</th>
+                                    <th>T2</th>
+                                    <th>T3</th>
+                                    <th>P1</th>
+                                    <th>P2</th>
+                                    <th>P3</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
                   </div>
 
                   <!-- Modal for adding data -->
@@ -367,9 +367,10 @@
                                       <input type="hidden" name="form_id">
                                       
                                       <div class="mb-3">
-                                          <label class="form-label">Device</label>
-                                          <select class="form-control" id="device_hidn_id" name="device_hidn_id" required>
-                                          </select>
+                                        <label class="form-label">Device</label>
+                                        <select class="form-control select2-single" id="device_hidn_id" name="device_hidn_id" required>
+                                            <option value="">Select Device</option>
+                                        </select>
                                       </div>
                                       
                                       <div class="mb-3">
@@ -453,6 +454,39 @@
   <script>
     // Global Variables
     let currentFormId = null;
+    $(window).resize(function() {
+        formatMobileTable();
+    });
+
+    function initializeSelect2Elements() {
+        // Initialize single-select elements with search functionality
+        $('.select2-single').each(function() {
+        $(this).select2({
+            placeholder: $(this).attr('placeholder') || $(this).find('option:first').text(),
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $(this).closest('.modal'), // Important: This ensures the dropdown appears inside the modal
+            language: {
+            noResults: function() {
+                return "Tidak ada hasil yang ditemukan";
+            },
+            searching: function() {
+                return "Mencari...";
+            }
+            }
+        });
+        });
+        
+        // Mobile device optimizations for select2
+        if (window.innerWidth < 768) {
+        // When select2 is opened on mobile, scroll to make sure it's visible
+        $('.select2-single').on('select2:open', function() {
+            setTimeout(function() {
+            $('.select2-search__field').focus();
+            }, 100);
+        });
+        }
+    }
 
     // Document Ready Function
     $(document).ready(function() {
@@ -464,6 +498,23 @@
             placeholder: "Pilih Personel",
             allowClear: true,
             width: '100%'
+        });
+        initializeSelect2Elements();
+        if (window.innerWidth < 768) {
+        // For modal overflow issues on small screens
+        $('.modal-body').css('max-height', (window.innerHeight * 0.7) + 'px');
+        formatMobileTable();
+        }
+        $('#formModal').on('shown.bs.modal', function() {
+            setTimeout(function() {
+                initializeSelect2Elements();
+            }, 100);
+        });
+        
+        $('#addDataModal').on('shown.bs.modal', function() {
+            setTimeout(function() {
+                initializeSelect2Elements();
+            }, 100);
         });
     });
 
@@ -579,146 +630,158 @@
         $('#formModal').modal('hide');
     };
 
-    const loadFormDataItems = (formId) => {
+    function loadFormDataItems(formId) {
         if (!formId) {
-            console.error('No form ID provided to loadFormDataItems');
-            return;
+        console.error('No form ID provided to loadFormDataItems');
+        return;
         }
 
         $.ajax({
-            url: '<?= base_url("activity/get_form_data/") ?>' + formId,
-            method: 'GET',
-            dataType: 'json', // Pastikan response dianggap sebagai JSON
-            success: function(response) {
-                try {
-                    console.log('Response received:', response); // Debug log
-                    
-                    const dataTable = $('#formDataItemsTable tbody');
-                    dataTable.empty();
-                    
-                    if (response.status === 'success' && Array.isArray(response.data)) {
-                        if (response.data.length > 0) {
-                            response.data.forEach(item => {
-                                const row = `
-                                    <tr>
-                                        <td>${item.device_hidn_name || '-'}</td>
-                                        <td>${item.jam_kegiatan || '-'}</td>
-                                        <td>${item.tindakan1 || '-'}</td>
-                                        <td>${item.tindakan2 || '-'}</td>
-                                        <td>${item.tindakan3 || '-'}</td>
-                                        <td>
-                                            ${item.foto_perangkat ? 
-                                                `<img src="<?= base_url('uploads/') ?>${item.foto_perangkat}" width="50" class="img-thumbnail">` : 
-                                                '-'}
-                                        </td>
-                                        <td>
-                                            ${item.foto_lokasi ? 
-                                                `<img src="<?= base_url('uploads/') ?>${item.foto_lokasi}" width="50" class="img-thumbnail">` : 
-                                                '-'}
-                                        </td>
-                                        <td>
-                                            ${item.foto_teknisi ? 
-                                                `<img src="<?= base_url('uploads/') ?>${item.foto_teknisi}" width="50" class="img-thumbnail">` : 
-                                                '-'}
-                                        </td>
-                                        <td>${item.notes || 'Normal'}</td>
-                                        <td>
-                                            <button class="btn btn-danger btn-sm" onclick="deleteFormData(${item.form_data_id})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
-                                dataTable.append(row);
-                            });
-                        } else {
-                            dataTable.append(`
-                                <tr>
-                                    <td colspan="10" class="text-center">No data available</td>
-                                </tr>
-                            `);
-                        }
-
-                        // Update add button state
-                        const addButton = $('#addDataButton');
-                        if (response.data.length >= 4) {
-                            addButton.prop('disabled', true);
-                            addButton.attr('title', 'Maximum 4 data entries reached');
-                        } else {
-                            addButton.prop('disabled', false);
-                            addButton.attr('title', '');
-                        }
-                    } else {
-                        throw new Error('Invalid response format');
-                    }
-                } catch (error) {
-                    console.error('Error processing response:', error);
-                    $('#formDataItemsTable tbody').html(`
-                        <tr>
-                            <td colspan="10" class="text-center text-danger">Error loading data: ${error.message}</td>
-                        </tr>
-                    `);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', error);
-                console.error('Status:', status);
-                console.error('Response:', xhr.responseText);
-                
-                $('#formDataItemsTable tbody').html(`
+        url: '<?= base_url("activity/get_form_data/") ?>' + formId,
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            try {
+            console.log('Response received:', response);
+            
+            const dataTable = $('#formDataItemsTable tbody');
+            dataTable.empty();
+            
+            if (response.status === 'success' && Array.isArray(response.data)) {
+                if (response.data.length > 0) {
+                response.data.forEach(item => {
+                    // For mobile, use a more compact display
+                    const isMobile = window.innerWidth < 768;
+                    const row = `
                     <tr>
-                        <td colspan="10" class="text-center text-danger">Failed to load data. Please try again.</td>
+                        <td>${item.device_hidn_name || '-'}</td>
+                        <td>${item.jam_kegiatan || '-'}</td>
+                        <td>${item.tindakan1 || '-'}</td>
+                        <td>${item.tindakan2 || '-'}</td>
+                        <td>${item.tindakan3 || '-'}</td>
+                        <td>
+                        ${item.foto_perangkat ? 
+                            `<img src="<?= base_url('uploads/') ?>${item.foto_perangkat}" 
+                                width="${isMobile ? '40' : '50'}" class="img-thumbnail">` : 
+                            '-'}
+                        </td>
+                        <td>
+                        ${item.foto_lokasi ? 
+                            `<img src="<?= base_url('uploads/') ?>${item.foto_lokasi}" 
+                                width="${isMobile ? '40' : '50'}" class="img-thumbnail">` : 
+                            '-'}
+                        </td>
+                        <td>
+                        ${item.foto_teknisi ? 
+                            `<img src="<?= base_url('uploads/') ?>${item.foto_teknisi}" 
+                                width="${isMobile ? '40' : '50'}" class="img-thumbnail">` : 
+                            '-'}
+                        </td>
+                        <td>${item.notes || 'Normal'}</td>
+                        <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteFormData(${item.form_data_id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        </td>
+                    </tr>
+                    `;
+                    dataTable.append(row);
+                });
+                } else {
+                dataTable.append(`
+                    <tr>
+                    <td colspan="10" class="text-center">No data available</td>
                     </tr>
                 `);
+                }
+
+                // Update add button state
+                const addButton = $('#addDataButton');
+                if (response.data.length >= 4) {
+                addButton.prop('disabled', true);
+                addButton.attr('title', 'Maximum 4 data entries reached');
+                } else {
+                addButton.prop('disabled', false);
+                addButton.attr('title', '');
+                }
+                
+                // Format table for mobile if needed
+                formatMobileTable();
+            } else {
+                throw new Error('Invalid response format');
             }
+            } catch (error) {
+            console.error('Error processing response:', error);
+            $('#formDataItemsTable tbody').html(`
+                <tr>
+                <td colspan="10" class="text-center text-danger">Error loading data: ${error.message}</td>
+                </tr>
+            `);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+            console.error('Status:', status);
+            console.error('Response:', xhr.responseText);
+            
+            $('#formDataItemsTable tbody').html(`
+            <tr>
+                <td colspan="10" class="text-center text-danger">Failed to load data. Please try again.</td>
+            </tr>
+            `);
+        }
         });
-    };
+    }
 
     // Device and Area Loading Functions
     const loadSubDevices = () => {
-            $.ajax({
-                url: '<?= base_url("activity/get_sub_devices") ?>',
-                method: 'GET',
-                dataType: 'json',
-                success: function(devices) {
-                    var deviceSelect = $('select[name="sub_device_id"]');
-                    deviceSelect.empty().append('<option value="">Pilih Perangkat</option>');
-                    if (Array.isArray(devices)) {
-                        devices.forEach(function(device) {
-                            deviceSelect.append(
-                                `<option value="${device.sub_device_id}">${device.sub_device_name}</option>`
-                            );
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Failed to load devices:', error);
-                    alert('Failed to load devices. Please try again.');
-                }
+        $.ajax({
+        url: '<?= base_url("activity/get_sub_devices") ?>',
+        method: 'GET',
+        dataType: 'json',
+        success: function(devices) {
+            var deviceSelect = $('select[name="sub_device_id"]');
+            deviceSelect.empty().append('<option value="">Pilih Perangkat</option>');
+            if (Array.isArray(devices)) {
+            devices.forEach(function(device) {
+                deviceSelect.append(
+                `<option value="${device.sub_device_id}">${device.sub_device_name}</option>`
+                );
             });
+            }
+            // Refresh select2 after loading data
+            deviceSelect.trigger('change');
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to load devices:', error);
+            alert('Failed to load devices. Please try again.');
+        }
+        });
     };
 
     const loadAreas = () => {
-            $.ajax({
-                url: '<?= base_url("activity/get_areas") ?>',
-                method: 'GET',
-                dataType: 'json',
-                success: function(areas) {
-                    var areaSelect = $('select[name="area_id"]');
-                    areaSelect.empty().append('<option value="">Pilih Lokasi</option>');
-                    if (Array.isArray(areas)) {
-                        areas.forEach(function(area) {
-                            areaSelect.append(
-                                `<option value="${area.area_id}">${area.area_name}</option>`
-                            );
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Failed to load areas:', error);
-                    alert('Failed to load areas. Please try again.');
-                }
+        $.ajax({
+        url: '<?= base_url("activity/get_areas") ?>',
+        method: 'GET',
+        dataType: 'json',
+        success: function(areas) {
+            var areaSelect = $('select[name="area_id"]');
+            areaSelect.empty().append('<option value="">Pilih Lokasi</option>');
+            if (Array.isArray(areas)) {
+            areas.forEach(function(area) {
+                areaSelect.append(
+                `<option value="${area.area_id}">${area.area_name}</option>`
+                );
             });
+            }
+            // Refresh select2 after loading data
+            areaSelect.trigger('change');
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to load areas:', error);
+            alert('Failed to load areas. Please try again.');
+        }
+        });
     };
 
     const loadAllDeviceHidnOptions = async (subDeviceId) => {
@@ -766,46 +829,49 @@
     };
 
     const loadDeviceAndChecklist = async (formId) => {
-            try {
-                console.log('Loading device and checklist for formId:', formId);
+        try {
+        console.log('Loading device and checklist for formId:', formId);
 
-                // Load devices dengan error handling yang lebih baik
-                const deviceResponse = await $.ajax({
-                    url: '<?= base_url("activity/get_all_device_hidn") ?>',
-                    method: 'GET',
-                    dataType: 'json',
-                    error: function(xhr, status, error) {
-                        console.error('XHR Status:', status);
-                        console.error('Error:', error);
-                        console.error('Response:', xhr.responseText);
-                        throw new Error('Failed to load devices');
-                    }
-                });
-
-                console.log('Device response:', deviceResponse);
-                
-                const select = $('#device_hidn_id');
-                select.empty();
-                select.append('<option value="">Select Device</option>');
-                
-                if (deviceResponse.status === 'success' && Array.isArray(deviceResponse.data)) {
-                    deviceResponse.data.forEach(device => {
-                        select.append(
-                            $('<option>', {
-                                value: device.device_hidn_id,
-                                text: device.device_hidn_name
-                            })
-                        );
-                    });
-                }
-
-                // Load checklist questions setelah devices berhasil dimuat
-                await loadChecklistQuestions(formId);
-
-            } catch (error) {
-                console.error('Error in loadDeviceAndChecklist:', error);
-                alert('Failed to load devices. Please try again.');
+        // Load devices with better error handling
+        const deviceResponse = await $.ajax({
+            url: '<?= base_url("activity/get_all_device_hidn") ?>',
+            method: 'GET',
+            dataType: 'json',
+            error: function(xhr, status, error) {
+            console.error('XHR Status:', status);
+            console.error('Error:', error);
+            console.error('Response:', xhr.responseText);
+            throw new Error('Failed to load devices');
             }
+        });
+
+        console.log('Device response:', deviceResponse);
+        
+        const select = $('#device_hidn_id');
+        select.empty();
+        select.append('<option value="">Select Device</option>');
+        
+        if (deviceResponse.status === 'success' && Array.isArray(deviceResponse.data)) {
+            deviceResponse.data.forEach(device => {
+            select.append(
+                $('<option>', {
+                value: device.device_hidn_id,
+                text: device.device_hidn_name
+                })
+            );
+            });
+        }
+
+        // Refresh select2 after loading data
+        select.trigger('change');
+        
+        // Load checklist questions after devices are loaded
+        await loadChecklistQuestions(formId);
+
+        } catch (error) {
+        console.error('Error in loadDeviceAndChecklist:', error);
+        alert('Failed to load devices. Please try again.');
+        }
     };
 
     const loadChecklistQuestions = async (formId) => {
@@ -969,6 +1035,10 @@
     function handleDataModalShown() {
         const formId = $('#current_form_id').val() || localStorage.getItem('currentFormId');
         console.log('Modal shown, current form ID:', formId);
+
+        if (window.innerWidth < 768) {
+            $('.modal-body').scrollTop(0);
+        }
     }
 
     function handleDataModalHidden() {
@@ -977,8 +1047,30 @@
 
     function backToActivityForm() {
         $('#dataModal').modal('hide');  // Tutup modal data
+        $('#addDataModal').modal('hide');  // Tutup modal add data
         $('#formModal').modal('show');  // Tampilkan modal form activity sebelumnya
     }
+
+    function formatMobileTable() {
+        if (window.innerWidth < 768) {
+        // Replace long text with shorter versions for mobile
+        $('#formDataItemsTable th').each(function() {
+            const text = $(this).text();
+            if (text === 'Jam Kegiatan') $(this).text('Jam');
+            if (text === 'Tindakan 1') $(this).text('T1');
+            if (text === 'Tindakan 2') $(this).text('T2');
+            if (text === 'Tindakan 3') $(this).text('T3');
+            if (text === 'Photo 1') $(this).text('P1');
+            if (text === 'Photo 2') $(this).text('P2');
+            if (text === 'Photo 3') $(this).text('P3');
+        });
+        }
+    }
+
+    $('#formModal, #addDataModal, #dataModal').on('hidden.bs.modal', function() {
+        // Destroy select2 instances when modal is closed to prevent duplicates
+        $(this).find('.select2-single').select2('destroy');
+    });
   </script>
 
   <script>
