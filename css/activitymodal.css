@@ -1,0 +1,38 @@
+@media (max-width: 768px) {
+    .table-responsive {
+      overflow-x: auto;
+    }
+    
+    /* Make modal take up more of the screen on mobile */
+    .modal-dialog {
+      margin: 0.5rem;
+      max-width: calc(100% - 1rem);
+    }
+    
+    /* Adjust form layouts for mobile */
+    .modal-body .row label {
+      margin-bottom: 0.25rem;
+    }
+    
+    /* Make images in tables responsive */
+    .table img {
+      max-width: 40px;
+      height: auto;
+    }
+    
+    /* Fix radio buttons on mobile */
+    .form-check {
+      margin-left: 4rem;
+    }
+    
+    /* Better button spacing for mobile */
+    .modal-footer {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    /* Make sure select2 containers don't overflow */
+    .select2-container {
+      width: 100% !important;
+    }
+  }

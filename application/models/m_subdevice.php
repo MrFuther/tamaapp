@@ -11,7 +11,7 @@ class M_subdevice extends CI_Model {
 
     // Mendapatkan semua sub device
     public function get_all() {
-        return $this->db->get($this->table)->result();  // Mengembalikan data sebagai objek
+        return $this->db->get('ms_sub_device')->result();
     }
 
     // Menyimpan data sub device baru

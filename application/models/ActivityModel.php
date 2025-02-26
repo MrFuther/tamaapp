@@ -13,7 +13,7 @@ class ActivityModel extends CI_Model {
             sk.nama_shift,
             sk.jam_mulai,
             sk.jam_selesai,
-            GROUP_CONCAT(DISTINCT ms.username SEPARATOR ", ") as usernames
+            GROUP_CONCAT(DISTINCT ms.nama_pegawai SEPARATOR ", ") as usernames
         ');
         $this->db->from('activity_pm ap');
         $this->db->join('shift_kerja sk', 'sk.id_shift = ap.shift_id');
@@ -27,14 +27,14 @@ class ActivityModel extends CI_Model {
     }
     
     public function get_all_users() {
-        return $this->db->select('id, username')
+        return $this->db->select('id, nama_pegawai')
                         ->from('ms_account')
                         ->get()
                         ->result();
     }
 
     public function get_all_personel() {
-        $this->db->select('personel.id_personel, GROUP_CONCAT(ms_account.username SEPARATOR ", ") as usernames');
+        $this->db->select('personel.id_personel, GROUP_CONCAT(ms_account.nama_pegawai SEPARATOR ", ") as nama_pegawai');
         $this->db->from('personel');
         $this->db->join('personel_user', 'personel.id_personel = personel_user.personel_id');
         $this->db->join('ms_account', 'personel_user.user_id = ms_account.id');
@@ -48,7 +48,7 @@ class ActivityModel extends CI_Model {
     }
 
     public function get_users_by_personel($personel_id) {
-        $this->db->select('ms_account.username');
+        $this->db->select('ms_account.nama_pegawai');
         $this->db->from('personel_user');
         $this->db->join('ms_account', 'personel_user.user_id = ms_account.id');
         $this->db->where('personel_user.personel_id', $personel_id);
@@ -140,7 +140,7 @@ class ActivityModel extends CI_Model {
     }
 
     public function get_activity_users($activity_id) {
-        return $this->db->select('ms.id, ms.username')
+        return $this->db->select('ms.id, ms.nama_pegawai')
             ->from('activity_personel ap')
             ->join('ms_account ms', 'ms.id = ap.user_id')
             ->where('ap.activity_id', $activity_id)
