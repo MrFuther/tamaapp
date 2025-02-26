@@ -85,7 +85,7 @@
                     <table class="table table-striped" id="activityTable" id="activityTable">
                       <thead>
                         <tr>
-                          <th>#</th>
+                          <th>NO</th>
                           <th>ID</th>
                           <th>Kode Activity</th>
                           <th>Personel</th>
@@ -139,7 +139,7 @@
                                 <label class="form-label">Pilih Personel</label>
                                 <select class="form-control select2" name="personel_ids[]" multiple required>
                                     <?php foreach ($users as $user): ?>
-                                        <option value="<?= $user->id ?>"><?= $user->username ?></option>
+                                        <option value="<?= $user->id ?>"><?= $user->nama_pegawai ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
