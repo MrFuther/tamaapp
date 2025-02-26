@@ -190,6 +190,10 @@
                                         <div class="modal-content">
                                         <form action="<?php echo base_url('manageuser/update_role/'.$user['id']); ?>" method="POST">
                                           <div class="modal-body">
+
+                                              <label for="nama_pegawai" class="form-label">Nama Pegawai</label>
+                                              <input type="text" name="nama_pegawai" class="form-control" value="<?php echo $user['nama_pegawai']; ?>">
+
                                               <label for="role" class="form-label">Select Role</label>
                                               <select name="role" class="form-select">
                                                   <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>

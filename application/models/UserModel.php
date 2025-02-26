@@ -32,10 +32,11 @@ class UserModel extends CI_Model {
         return $this->db->insert('ms_account', $data);
     }
 
-    public function update_user($id, $role, $unit_id) {
+    public function update_user($id, $role, $unit_id, $nama_pegawai) {
         $data = [
             'role' => $role,
-            'unit_id' => $unit_id
+            'unit_id' => $unit_id,
+            'nama_pegawai' => $nama_pegawai
         ];
         $this->db->where('id', $id);
         return $this->db->update('ms_account', $data);
