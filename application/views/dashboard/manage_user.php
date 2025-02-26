@@ -159,6 +159,7 @@
                     <thead>
                         <tr>
                         <th>ID</th>
+                        <th>Nama Pegawai</th>
                         <th>Username</th>
                         <th>Role</th>
                         <th>Unit Kerja</th>
@@ -169,6 +170,7 @@
                         <?php if (!empty($users)): ?>
                             <?php foreach ($users as $user): ?>
                               <td><?php echo $user['id']; ?></td>
+                              <td><?php echo $user['nama_pegawai']; ?></td>
                               <td><?php echo $user['username']; ?></td>
                               <td><span class="badge bg-secondary text-capitalize"><?php echo $user['role']; ?></span></td>
                               <td><?php echo $user['unit_name'] ?? '-'; ?></td>
@@ -259,6 +261,10 @@
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nama_pegawai" class="form-label">Nama Pegawai</label>
+                            <input type="text" name="nama_pegawai" id="nama_pegawai" class="form-control" placeholder="Enter nama pegawai" required>
                         </div>
                         <div class="mb-3">
                             <label for="role" class="form-label">Role</label>

@@ -172,127 +172,128 @@
                                 <h5 class="modal-title">Activity Form</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
-                                <div class="border p-3 mb-4">
-                                    <!-- Header Form -->
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="flex-grow-1">
-                                            <!-- Form Title -->
+                            <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                                <div style="min-width: 800px; overflow-x: auto;">
+                                    <div class="border p-3 mb-4">
+                                        <!-- Header Form -->
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div class="flex-grow-1">
+                                                <!-- Form Title -->
+                                            </div>
+                                            <div class="text-end border border-dark p-2" style="min-width: 200px;">
+                                                <strong>PREVENTIVE MAINTENANCE</strong>
+                                            </div>
                                         </div>
-                                        <div class="text-end border border-dark p-2" style="min-width: 200px;">
-                                            <strong>PREVENTIVE MAINTENANCE</strong>
-                                        </div>
+
+                                        <!-- Form Content -->
+                                        <form id="activityForm">
+                                            <input type="hidden" id="activity_id" name="activity_id">
+                                            
+                                            <!-- Row 1: Hari/Tanggal -->
+                                            <div class="row mb-2 align-items-center">
+                                                <div class="col-md-2">
+                                                    <label class="mb-0">Hari / Tanggal</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="d-flex">
+                                                        <span class="me-2">:</span>
+                                                        <div id="modalTanggal"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Row 2: Shift/Jam Kerja -->
+                                            <div class="row mb-2 align-items-center">
+                                                <div class="col-md-2">
+                                                    <label class="mb-0">Shift Kerja / Jam Kerja</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="d-flex">
+                                                        <span class="me-2">:</span>
+                                                        <div id="modalShift"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Row 3: Team/Regu -->
+                                            <div class="row mb-2 align-items-center">
+                                                <div class="col-md-2">
+                                                    <label class="mb-0">Team / Regu</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="d-flex">
+                                                        <span class="me-2">:</span>
+                                                        <div id="modalTeam"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Row 4: Perangkat -->
+                                            <div class="row mb-2 align-items-center">
+                                                <div class="col-md-2">
+                                                    <label class="mb-0">Perangkat</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="d-flex">
+                                                        <span class="me-2">:</span>
+                                                        <select class="form-control" name="sub_device_id" required>
+                                                            <option value="">Pilih Perangkat</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Row 5: Lokasi -->
+                                            <div class="row mb-2 align-items-center">
+                                                <div class="col-md-2">
+                                                    <label class="mb-0">Lokasi</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="d-flex">
+                                                        <span class="me-2">:</span>
+                                                        <select class="form-control" name="area_id" required>
+                                                            <option value="">Pilih Lokasi</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Jadwal Checklist -->
+                                            <div class="row mb-2">
+                                                <div class="col-md-2">
+                                                    <label class="mb-0">Jadwal</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="d-flex align-items-start">
+                                                        <span class="me-2">:</span>
+                                                        <div class="form-check-inline">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="report_type" value="Harian" class="form_check-input" required>
+                                                                <label class="form-check-label">Harian</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-check-inline">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="report_type" value="Mingguan" class="form_check-input">
+                                                                <label class="form-check-label">Mingguan</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-check-inline">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="report_type" value="Bulanan" class="form_check-input">
+                                                                <label class="form-check-label">Bulanan</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-end mt-3">
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                            </div>
+                                        </form>
                                     </div>
-
-                                    <!-- Form Content -->
-                                    <form id="activityForm">
-                                        <input type="hidden" id="activity_id" name="activity_id">
-                                        
-                                        <!-- Row 1: Hari/Tanggal -->
-                                        <div class="row mb-2 align-items-center">
-                                            <div class="col-md-2">
-                                                <label class="mb-0">Hari / Tanggal</label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="d-flex">
-                                                    <span class="me-2">:</span>
-                                                    <div id="modalTanggal"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Row 2: Shift/Jam Kerja -->
-                                        <div class="row mb-2 align-items-center">
-                                            <div class="col-md-2">
-                                                <label class="mb-0">Shift Kerja / Jam Kerja</label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="d-flex">
-                                                    <span class="me-2">:</span>
-                                                    <div id="modalShift"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Row 3: Team/Regu -->
-                                        <div class="row mb-2 align-items-center">
-                                            <div class="col-md-2">
-                                                <label class="mb-0">Team / Regu</label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="d-flex">
-                                                    <span class="me-2">:</span>
-                                                    <div id="modalTeam"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Row 4: Perangkat -->
-                                        <div class="row mb-2 align-items-center">
-                                            <div class="col-md-2">
-                                                <label class="mb-0">Perangkat</label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="d-flex">
-                                                    <span class="me-2">:</span>
-                                                    <select class="form-control" name="sub_device_id" required>
-                                                        <option value="">Pilih Perangkat</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Row 5: Lokasi -->
-                                        <div class="row mb-2 align-items-center">
-                                            <div class="col-md-2">
-                                                <label class="mb-0">Lokasi</label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="d-flex">
-                                                    <span class="me-2">:</span>
-                                                    <select class="form-control" name="area_id" required>
-                                                        <option value="">Pilih Lokasi</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Jadwal Checklist -->
-                                        <div class="row mb-2">
-                                            <div class="col-md-2">
-                                                <label class="mb-0">Jadwal</label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="d-flex align-items-start">
-                                                    <span class="me-2">:</span>
-                                                    <div class="form-check-inline">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Harian" class="form_check-input" required>
-                                                            <label class="form-check-label">Harian</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-check-inline">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Mingguan" class="form_check-input">
-                                                            <label class="form-check-label">Mingguan</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-check-inline">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="report_type" value="Bulanan" class="form_check-input">
-                                                            <label class="form-check-label">Bulanan</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-end mt-3">
-                                            <button type="submit" class="btn btn-primary">Simpan</button>
-                                        </div>
-                                    </form>
                                 </div>
-
                                 <div class="mt-4">
                                     <h6>Data Form</h6>
                                     <table class="table table-bordered">
@@ -321,6 +322,9 @@
                                   <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                               </div>
                               <div class="modal-body">
+                              <button class="btn btn-primary mb-3" onclick="backToActivityForm()">
+                                 <i class="bi bi-arrow-left"></i> Back
+                              </button>
                               <button id="addDataButton" class="btn btn-primary mb-3" onclick="openAddDataModal()">
                                 Add Data
                               </button>
@@ -352,7 +356,7 @@
 
                   <!-- Modal for adding data -->
                   <div class="modal fade" id="addDataModal" tabindex="-1">
-                      <div class="modal-dialog">
+                      <div class="modal-dialog modal-dialog-scrollable">
                           <div class="modal-content">
                               <div class="modal-header">
                                   <h5 class="modal-title">Add Form Data</h5>
@@ -396,9 +400,13 @@
                                           <label class="form-label">Notes</label>
                                           <textarea class="form-control" name="notes" rows="3">Normal</textarea>
                                       </div>
-                                      
-                                      <button type="submit" class="btn btn-primary">Save</button>
                                   </form>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" onclick="backToActivityForm()">
+                                        <i class="bi bi-arrow-left"></i> Back
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('addDataForm').requestSubmit()">Save</button>
+                                 </div>
                               </div>
                           </div>
                       </div>
@@ -965,6 +973,11 @@
 
     function handleDataModalHidden() {
         localStorage.removeItem('currentFormId');
+    }
+
+    function backToActivityForm() {
+        $('#dataModal').modal('hide');  // Tutup modal data
+        $('#formModal').modal('show');  // Tampilkan modal form activity sebelumnya
     }
   </script>
 

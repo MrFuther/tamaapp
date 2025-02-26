@@ -11,7 +11,7 @@ class Activity extends CI_Controller
         }
         $this->load->model(['ActivityModel', 'ChecklistModel']);
         $this->load->library('upload'); // Load library untuk upload file
-        $this->load->library('tcpdf');
+        $this->load->library('pdf');
     }
 
     public function index()
@@ -601,32 +601,70 @@ class Activity extends CI_Controller
                 $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
                 $pdf->SetFont('helvetica', '', 10);
 
-                // Second row - Photos
-                $photoHeight = 35;
+                // Define cell dimensions
+                $cellWidth = 60;
+                $cellHeight = 40; // Increased height to accommodate images
                 
-                // Foto Perangkat
-                if (file_exists('./uploads/' . $data->foto_perangkat)) {
-                    $pdf->Image('./uploads/' . $data->foto_perangkat, $pdf->GetX() + 1, $pdf->GetY() + 1, 58);
-                }
-                $pdf->Cell(60, $photoHeight, '', 1, 0);
+                // Start positions
+                $startX = $pdf->GetX();
+                $startY = $pdf->GetY();
                 
-                // Foto Lokasi
-                if (file_exists('./uploads/' . $data->foto_lokasi)) {
-                    $pdf->Image('./uploads/' . $data->foto_lokasi, $pdf->GetX() + 1, $pdf->GetY() + 1, 58);
-                }
-                $pdf->Cell(60, $photoHeight, '', 1, 0);
+                // Draw cells first
+                $pdf->Cell($cellWidth, $cellHeight, '', 1, 0);
+                $pdf->Cell($cellWidth, $cellHeight, '', 1, 0);
+                $pdf->Cell($cellWidth, $cellHeight, '', 1, 1);
                 
-                // Foto Teknisi
-                if (file_exists('./uploads/' . $data->foto_teknisi)) {
-                    $pdf->Image('./uploads/' . $data->foto_teknisi, $pdf->GetX() + 1, $pdf->GetY() + 1, 58);
-                }
-                $pdf->Cell(60, $photoHeight, '', 1, 1);
+                // Reset position to add images
+                $pdf->SetXY($startX, $startY);
+                
+                // Function to fit image within cell
+                $fitImageInCell = function($imagePath, $x, $y, $cellWidth, $cellHeight) use ($pdf) {
+                    if (file_exists($imagePath)) {
+                        $imgSize = getimagesize($imagePath);
+                        if ($imgSize) {
+                            $imgWidth = $imgSize[0];
+                            $imgHeight = $imgSize[1];
+                            
+                            // Calculate scaling ratio to fit image within cell (with margin)
+                            $margin = 2; // 2mm margin
+                            $maxWidth = $cellWidth - (2 * $margin);
+                            $maxHeight = $cellHeight - (2 * $margin);
+                            
+                            $widthRatio = $maxWidth / $imgWidth;
+                            $heightRatio = $maxHeight / $imgHeight;
+                            
+                            // Use the smaller ratio to ensure image fits both dimensions
+                            $ratio = min($widthRatio, $heightRatio);
+                            
+                            $newWidth = $imgWidth * $ratio;
+                            $newHeight = $imgHeight * $ratio;
+                            
+                            // Center image in cell
+                            $imageX = $x + (($cellWidth - $newWidth) / 2);
+                            $imageY = $y + (($cellHeight - $newHeight) / 2);
+                            
+                            $pdf->Image($imagePath, $imageX, $imageY, $newWidth, $newHeight);
+                        }
+                    }
+                };
+                
+                // Add Foto Perangkat
+                $fitImageInCell('./uploads/' . $data->foto_perangkat, $startX, $startY, $cellWidth, $cellHeight);
+                
+                // Add Foto Lokasi
+                $fitImageInCell('./uploads/' . $data->foto_lokasi, $startX + $cellWidth, $startY, $cellWidth, $cellHeight);
+                
+                // Add Foto Teknisi
+                $fitImageInCell('./uploads/' . $data->foto_teknisi, $startX + (2 * $cellWidth), $startY, $cellWidth, $cellHeight);
+                
+                // Reset position for labels
+                $pdf->SetXY($startX, $startY + $cellHeight);
                 
                 // Descriptions with device name
                 $pdf->SetFont('helvetica', '', 8);
-                $pdf->Cell(60, 10, "Memastikan indikator access\npoint(" . $data->device_hidn_name . ")", 1, 0, 'C');
-                $pdf->Cell(60, 10, "Lokasi Perangkat Access Point\n(" . $data->device_hidn_name . ")", 1, 0, 'C');
-                $pdf->Cell(60, 10, "Hasil Speed Test Internet\n(" . $data->device_hidn_name . ")", 1, 1, 'C');
+                $pdf->Cell($cellWidth, 10, "Memastikan indikator access\npoint(" . $data->device_hidn_name . ")", 1, 0, 'C');
+                $pdf->Cell($cellWidth, 10, "Lokasi Perangkat Access Point\n(" . $data->device_hidn_name . ")", 1, 0, 'C');
+                $pdf->Cell($cellWidth, 10, "Hasil Speed Test Internet\n(" . $data->device_hidn_name . ")", 1, 1, 'C');
             }
             
             // Output PDF

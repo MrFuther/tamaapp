@@ -9,7 +9,7 @@ class ManageUser extends CI_Controller {
             redirect('auth');
         }
         if ($this->session->userdata('role') !== 'admin') {
-            redirect(base_url('forbidden'));
+            show_error('You do not have permission to access this page.', 403, 'Forbidden');
         }
         $this->load->model('UserModel');
         $this->load->helper('hash');
@@ -29,8 +29,9 @@ class ManageUser extends CI_Controller {
         $password = $this->input->post('password');
         $role = $this->input->post('role');
         $unit_id = $this->input->post('unit_id');
+        $nama_pegawai = $this->input->post('nama_pegawai');
 
-        $this->UserModel->add_user($username, $password, $role, $unit_id);
+        $this->UserModel->add_user($username, $password, $role, $unit_id, $nama_pegawai);
 
         redirect('ManageUser/index');
     }

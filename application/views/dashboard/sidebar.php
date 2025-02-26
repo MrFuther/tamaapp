@@ -37,9 +37,7 @@
                         </ul>
                         </div>
                     </li> 
-                <?php endif; ?>
-
-                <?php if ($this->session->userdata('role') == 'admin'): ?>
+                
                     <li class="nav-item">
                         <a class="nav-link" href="<?= base_url('m_user'); ?>">
                         <i class="icon-head menu-icon"></i>
