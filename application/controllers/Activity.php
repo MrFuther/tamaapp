@@ -92,7 +92,7 @@ class Activity extends CI_Controller
                 s.nama_shift,
                 s.jam_mulai,
                 s.jam_selesai,
-                GROUP_CONCAT(DISTINCT ms.username) as personel_name
+                GROUP_CONCAT(DISTINCT ms.nama_pegawai) as personel_name
             ');
             $this->db->from('activity_pm a');
             $this->db->join('shift_kerja s', 's.id_shift = a.shift_id');
@@ -627,7 +627,7 @@ class Activity extends CI_Controller
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
-                    GROUP_CONCAT(DISTINCT ms.username) as personel_names
+                    GROUP_CONCAT(DISTINCT ms.nama_pegawai) as personel_names
                 ')
                 ->from('activity_forms af')
                 ->join('activity_pm ap', 'ap.id_activity = af.activity_id')

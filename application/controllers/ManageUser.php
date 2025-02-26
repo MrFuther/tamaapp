@@ -37,12 +37,12 @@ class ManageUser extends CI_Controller {
     }
 
     public function update_role($id) {
+        $nama_pegawai = $this->input->post('nama_pegawai');
         $role = $this->input->post('role');
         $unit_id = $this->input->post('unit_id');
         
-
-        $this->UserModel->update_user($id, $role, $unit_id);
-
+        $this->UserModel->update_user($id, $role, $unit_id, $nama_pegawai);
+    
         redirect('ManageUser/index');
     }
 
