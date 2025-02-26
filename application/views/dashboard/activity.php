@@ -33,10 +33,9 @@
 
 <!-- Panel Pengaturan Tema -->
 <div class="theme-setting-wrapper">
-  <div id="settings-trigger"><i class="ti-settings"></i></div>
   <div id="theme-settings" class="settings-panel">
     <i class="settings-close ti-close"></i>
-
+    
     <!-- Pengaturan Header -->
     <p class="settings-heading mt-2">HEADER SKINS</p>
       <div class="color-tiles mx-0 px-4">
