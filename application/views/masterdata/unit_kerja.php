@@ -14,23 +14,23 @@
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
-    <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/mdi/css/materialdesignicons.min.css'); ?>">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('css/style.css'); ?>">
     <!-- endinject -->
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
 </head>
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
-    <?php include APPPATH . 'views\dashboard\navbar.php'; ?>
+    <?php include 'navbar.php'?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
       <div class="theme-setting-wrapper">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
         <div id="theme-settings" class="settings-panel">
           <i class="settings-close ti-close"></i>
           <p class="settings-heading">SIDEBAR SKINS</p>
@@ -76,7 +76,7 @@
       </div>
       <!-- partial -->
       <!-- partial:partials/_sidebar.html -->
-      <?php include APPPATH . 'views\dashboard\sidebar.php'; ?>
+      <?php include 'sidebar.php' ?>
       <!-- partial -->
       <div class="main-panel">
       <div class="content-wrapper">
@@ -124,33 +124,32 @@
                         </div>
                         
                         <div class="modal fade" id="editUnitKerja" tabindex="-1" aria-labelledby="editUnitKerjaLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h5 class="modal-title" id="editUnitKerjaLabel">Edit Unit Kerja</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <form action="<?= base_url('unitkerja/update') ?>" method="POST">
-              <input type="hidden" id="unit_id" name="unit_id"> <!-- ID Unit Kerja -->
-              <div class="modal-body">
-                  <div class="form-group">
-                      <label for="edit_nama_unitkerja">Nama Unit Kerja</label>
-                      <input type="text" class="form-control" id="edit_nama_unitkerja" name="nama_unitkerja" required>
-                  </div>
-                  <div class="form-group">
-                      <label for="edit_inisial_unit">Inisial Unit Kerja</label>
-                      <input type="text" class="form-control" id="edit_inisial_unit" name="inisial_unit" required>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                  <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-              </div>
-          </form>
-        </div>
-    </div>
-</div>
-
+                          <div class="modal-dialog">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title" id="editUnitKerjaLabel">Edit Unit Kerja</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <form action="<?= base_url('unitkerja/update') ?>" method="POST">
+                                    <input type="hidden" id="unit_id" name="unit_id"> <!-- ID Unit Kerja -->
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="edit_nama_unitkerja">Nama Unit Kerja</label>
+                                            <input type="text" class="form-control" id="edit_nama_unitkerja" name="nama_unitkerja" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit_inisial_unit">Inisial Unit Kerja</label>
+                                            <input type="text" class="form-control" id="edit_inisial_unit" name="inisial_unit" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                    </div>
+                                </form>
+                              </div>
+                          </div>
+                        </div>
                         <!-- Modal untuk Tambah Unit Kerja -->
                         <div class="modal fade" id="addUnitKerjaModal" tabindex="-1" aria-labelledby="addUnitKerjaModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg">
@@ -201,44 +200,7 @@ $(document).ready(function () {
 
         <!-- partial -->
       </div>
-      <!-- main-panel ends -->
-    </div>
-    <div id="logoutModal" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Konfirmasi Logout</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Apakah Anda yakin ingin logout?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-primary" onclick="logout()">Logout</button>
-          </div>
-        </div>
-      </div>
-    </div>  
-    <!-- page-body-wrapper ends -->
-  </div>
-  <!-- container-scroller -->
-  <script>
-    function showLogoutConfirmation() {
-    // Menampilkan modal
-    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
-    modal.show();
-    }
-
-    function logout() {
-    // Implementasi logika logout di sini
-    alert("Anda telah logout.");
-    // Redirect ke halaman login atau halaman utama setelah logout
-    window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
-    }
-  </script>
+      
   <!-- plugins:js -->
   <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->

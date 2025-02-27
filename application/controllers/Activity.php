@@ -12,20 +12,163 @@ class Activity extends CI_Controller
         $this->load->model(['ActivityModel', 'ChecklistModel']);
         $this->load->library('upload'); // Load library untuk upload file
         $this->load->library('pdf');
+        $this->load->library('pagination');
     }
 
     public function index()
     {
+
+        $config['base_url'] = base_url('activity/index');
+        $config['total_rows'] = $this->ActivityModel->count_all_activities();
+        $config['per_page'] = 10; // Number of records per page
+        $config['uri_segment'] = 3;
+        
+       // Bootstrap 5 pagination styling
+        $config['full_tag_open'] = '<ul class="pagination pagination-sm justify-content-center">';
+        $config['full_tag_close'] = '</ul>';
+        $config['first_link'] = 'First';
+        $config['last_link'] = 'Last';
+        $config['first_tag_open'] = '<li class="page-item">';
+        $config['first_tag_close'] = '</li>';
+        $config['prev_link'] = '&laquo';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_link'] = '&raquo';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li class="page-item">';
+        $config['last_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['attributes'] = array('class' => 'page-link');
+        
+        // Initialize pagination
+        $this->pagination->initialize($config);
+        
+        // Get current page offset
+        $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
+
         $data['title'] = 'Activity';
         $data['user'] = $this->session->userdata();
-        $data['activities'] = $this->ActivityModel->get_all_activities();
+        $data['activities'] = $this->ActivityModel->get_activities_paginated($config['per_page'], $page);
         $data['users'] = $this->ActivityModel->get_all_users();
         $data['shifts'] = $this->ActivityModel->get_all_shifts();
         $data['areas'] = $this->ActivityModel->get_area_options();
         $data['group_devices'] = $this->ActivityModel->get_group_devices();
         $data['sub_devices'] = $this->ActivityModel->get_sub_devices();
         $data['devices'] = $this->ActivityModel->get_device_hidn();
+        $data['pagination'] = $this->pagination->create_links();
+        $data['start'] = $page + 1;
         $this->load->view('dashboard/activity', $data);
+    }
+
+    public function ajax_paginate()
+    {
+        // Load pagination library
+        $this->load->library('pagination');
+        
+        // Pagination configuration (same as in index method)
+        $config['base_url'] = base_url('activity/ajax_paginate');
+        $config['total_rows'] = $this->ActivityModel->count_all_activities();
+        $config['per_page'] = 10;
+        $config['uri_segment'] = 3;
+        
+        // Bootstrap 5 pagination styling
+        $config['full_tag_open'] = '<ul class="pagination pagination-sm justify-content-center">';
+        $config['full_tag_close'] = '</ul>';
+        $config['first_link'] = 'First';
+        $config['last_link'] = 'Last';
+        $config['first_tag_open'] = '<li class="page-item">';
+        $config['first_tag_close'] = '</li>';
+        $config['prev_link'] = '&laquo';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_link'] = '&raquo';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li class="page-item">';
+        $config['last_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['attributes'] = array('class' => 'page-link');
+        
+        // Initialize pagination
+        $this->pagination->initialize($config);
+        
+        // Get current page offset
+        $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
+        
+        // Get activities for this page
+        $activities = $this->ActivityModel->get_activities_paginated($config['per_page'], $page);
+        
+        // Check if this is an AJAX request
+        if ($this->input->is_ajax_request()) {
+            // Return JSON data for AJAX requests
+            echo json_encode([
+                'activities' => $activities,
+                'pagination' => $this->pagination->create_links()
+            ]);
+        } else {
+            // For direct URL access, redirect to the normal index method
+            redirect('activity/index/' . $page);
+        }
+    }
+
+    public function search() {
+        $search_term = $this->input->get('search', TRUE);
+        
+        // Load pagination library
+        $this->load->library('pagination');
+        
+        // Add search function to ActivityModel.php
+        // Count results
+        $config['total_rows'] = $this->ActivityModel->count_search_activities($search_term);
+        $config['base_url'] = base_url('activity/search?search=' . urlencode($search_term));
+        $config['per_page'] = 10;
+        $config['uri_segment'] = 3;
+        $config['use_page_numbers'] = TRUE;
+        $config['page_query_string'] = TRUE;
+        $config['query_string_segment'] = 'page';
+        
+        // Bootstrap 5 pagination styling (same as above)
+        $config['full_tag_open'] = '<ul class="pagination pagination-sm justify-content-center">';
+        $config['full_tag_close'] = '</ul>';
+        // ... (same as above)
+        
+        // Initialize pagination
+        $this->pagination->initialize($config);
+        
+        // Get current page
+        $page = $this->input->get('page') ? $this->input->get('page') : 1;
+        $offset = ($page - 1) * $config['per_page'];
+        
+        // Get activities
+        $data['activities'] = $this->ActivityModel->search_activities($search_term, $config['per_page'], $offset);
+        $data['pagination'] = $this->pagination->create_links();
+        $data['search_term'] = $search_term;
+        
+        // Also include other required data
+        $data['title'] = 'Activity Search Results';
+        $data['user'] = $this->session->userdata();
+        $data['users'] = $this->ActivityModel->get_all_users();
+        $data['shifts'] = $this->ActivityModel->get_all_shifts();
+        $data['areas'] = $this->ActivityModel->get_area_options();
+        $data['group_devices'] = $this->ActivityModel->get_group_devices();
+        $data['sub_devices'] = $this->ActivityModel->get_sub_devices();
+        $data['devices'] = $this->ActivityModel->get_device_hidn();
+        
+        if ($this->input->is_ajax_request()) {
+            echo json_encode([
+                'activities' => $data['activities'],
+                'pagination' => $data['pagination']
+            ]);
+        } else {
+            $this->load->view('dashboard/activity', $data);
+        }
     }
 
     public function add() {
@@ -365,7 +508,7 @@ class Activity extends CI_Controller
     
             // Handle file uploads
             $config['upload_path'] = './uploads/';
-            $config['allowed_types'] = 'gif|jpg|jpeg|png';
+            $config['allowed_types'] = 'jpg|jpeg|png';
             $config['max_size'] = 4048; // 2MB
             
             // Ensure upload directory exists and is writable
@@ -780,6 +923,7 @@ class Activity extends CI_Controller
                     }
                 };
                 
+                
                 // Add Foto Perangkat
                 $fitImageInCell('./uploads/' . $data->foto_perangkat, $startX, $startY, $cellWidth, $cellHeight);
                 
@@ -820,7 +964,7 @@ class Activity extends CI_Controller
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
-                    GROUP_CONCAT(DISTINCT ms.username) as personel_names
+                    GROUP_CONCAT(DISTINCT ms.nama_pegawai) as personel_names
                 ')
                 ->from('activity_forms af')
                 ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
@@ -900,19 +1044,19 @@ class Activity extends CI_Controller
             $pdf->Cell(40, 7, 'Tanggal', 0, 0);
             $pdf->Cell(5, 7, ':', 0, 0);
             $pdf->Cell(0, 7, date('d F Y', strtotime($formDetails->tanggal_kegiatan)), 0, 1);
-            
+
             $pdf->Cell(40, 7, 'Lokasi', 0, 0);
             $pdf->Cell(5, 7, ':', 0, 0);
             $pdf->Cell(0, 7, $formDetails->area_name, 0, 1);
-    
+
             $pdf->Cell(40, 7, 'Shift/Jam Kerja', 0, 0);
             $pdf->Cell(5, 7, ':', 0, 0);
             $pdf->Cell(0, 7, $formDetails->nama_shift . ' (' . $formDetails->jam_mulai . ' - ' . $formDetails->jam_selesai . ')', 0, 1);
-    
+
             $pdf->Cell(40, 7, 'Personel', 0, 0);
             $pdf->Cell(5, 7, ':', 0, 0);
             $pdf->Cell(0, 7, $formDetails->personel_names, 0, 1);
-            
+
             // Add checklist tables for each data entry
             foreach ($formData as $index => $data) {
                 $pdf->Ln(5);
@@ -924,8 +1068,7 @@ class Activity extends CI_Controller
                 $pdf->SetFont('helvetica', 'B', 10);
                 $pdf->Cell(10, 7, 'No', 1, 0, 'C');
                 $pdf->Cell(100, 7, 'Item Check', 1, 0, 'C');
-                $pdf->Cell(30, 7, 'Status', 1, 0, 'C');
-                $pdf->Cell(40, 7, 'Keterangan', 1, 1, 'C');
+                $pdf->Cell(30, 7, 'Status', 1, 1, 'C');
                 
                 // Table content
                 $pdf->SetFont('helvetica', '', 10);
@@ -935,18 +1078,21 @@ class Activity extends CI_Controller
                     
                     // Get corresponding tindakan based on question number
                     $tindakan = 'tindakan' . ($key + 1);
-                    $pdf->Cell(30, 7, $data->$tindakan, 1, 0, 'C');
-                    
-                    // Notes for each item
-                    $pdf->Cell(40, 7, $data->notes, 1, 1, 'L');
+                    $pdf->Cell(30, 7, $data->$tindakan, 1, 1, 'C');
                 }
+                
+                // Notes section below the table
+                $pdf->Ln(2);
+                $pdf->SetFont('helvetica', 'I', 10);
+                $pdf->Cell(20, 7, 'Catatan:', 0, 0);
+                $pdf->Cell(0, 7, $data->notes, 0, 1);
             }
-            
+
             // Signature
             $pdf->Ln(5);
             $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
             $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
-            
+
             $pdf->Ln(12);
             $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
             $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');

@@ -4,10 +4,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class M_devicehidn extends CI_Model {
 
     public function get_all_devicehidn() {
-        $this->db->select('d.*, s.sub_device_id');
-        $this->db->from('ms_device_hidn d');
-        $this->db->join('ms_sub_device s', 'd.sub_device_name = s.sub_device_name', 'left');
-        return $this->db->get()->result();
+        $this->db->select('d.*, s.sub_device_id');  // Pilih kolom yang akan diambil
+        $this->db->from('ms_device_hidn d');  // Pilih tabel yang akan diambil
+        $this->db->join('ms_sub_device s', 'd.sub_device_name = s.sub_device_name', 'left');  // Gabungkan tabel ms_device_hidn dengan ms_sub_device
+        return $this->db->get()->result(); // Mengambil semua data dari ms_device_hidn
     }
 
     public function get_by_id($id) {
