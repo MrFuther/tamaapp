@@ -13,7 +13,17 @@ class Dashboard extends CI_Controller {
     // Halaman Dashboard (Dapat diakses oleh semua role)
     public function index() {
         $data['title'] = 'Dashboard';
-        $data['user'] = $this->session->userdata();
+        $user_session = $this->session->userdata();
+        $username = $user_session['username']; // Asumsi session menyimpan username
+
+        // Load model
+        $this->load->model('UserModel');
+
+        // Ambil data lengkap dari ms_account berdasarkan username
+        $nama_pegawai = $this->UserModel->get_nama_pegawai_by_username($username);
+
+        // Simpan ke dalam $data untuk digunakan di view
+        $data['user'] = $nama_pegawai;
         $this->load->view('dashboard/index', $data);
     }
 
