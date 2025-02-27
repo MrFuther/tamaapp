@@ -26,11 +26,12 @@
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
-    <?php include APPPATH . 'views\dashboard\navbar.php'; ?>
+    <?php include 'navbar.php'?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
       <div class="theme-setting-wrapper">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
         <div id="theme-settings" class="settings-panel">
           <i class="settings-close ti-close"></i>
           <p class="settings-heading">SIDEBAR SKINS</p>
@@ -76,7 +77,7 @@
       </div>
       <!-- partial -->
       <!-- partial:partials/_sidebar.html -->
-      <?php include APPPATH . 'views\dashboard\sidebar.php'; ?>
+      <?php include 'sidebar.php' ?>
       <!-- partial -->
       <div class="main-panel">
       <div class="content-wrapper">
@@ -124,33 +125,32 @@
                         </div>
                         
                         <div class="modal fade" id="editUnitKerja" tabindex="-1" aria-labelledby="editUnitKerjaLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h5 class="modal-title" id="editUnitKerjaLabel">Edit Unit Kerja</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <form action="<?= base_url('unitkerja/update') ?>" method="POST">
-              <input type="hidden" id="unit_id" name="unit_id"> <!-- ID Unit Kerja -->
-              <div class="modal-body">
-                  <div class="form-group">
-                      <label for="edit_nama_unitkerja">Nama Unit Kerja</label>
-                      <input type="text" class="form-control" id="edit_nama_unitkerja" name="nama_unitkerja" required>
-                  </div>
-                  <div class="form-group">
-                      <label for="edit_inisial_unit">Inisial Unit Kerja</label>
-                      <input type="text" class="form-control" id="edit_inisial_unit" name="inisial_unit" required>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                  <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-              </div>
-          </form>
-        </div>
-    </div>
-</div>
-
+                          <div class="modal-dialog">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title" id="editUnitKerjaLabel">Edit Unit Kerja</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <form action="<?= base_url('unitkerja/update') ?>" method="POST">
+                                    <input type="hidden" id="unit_id" name="unit_id"> <!-- ID Unit Kerja -->
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="edit_nama_unitkerja">Nama Unit Kerja</label>
+                                            <input type="text" class="form-control" id="edit_nama_unitkerja" name="nama_unitkerja" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit_inisial_unit">Inisial Unit Kerja</label>
+                                            <input type="text" class="form-control" id="edit_inisial_unit" name="inisial_unit" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                    </div>
+                                </form>
+                              </div>
+                          </div>
+                        </div>
                         <!-- Modal untuk Tambah Unit Kerja -->
                         <div class="modal fade" id="addUnitKerjaModal" tabindex="-1" aria-labelledby="addUnitKerjaModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg">

@@ -26,12 +26,13 @@
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
-    <?php include APPPATH . 'views\dashboard\navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_settings-panel.html -->
       <div class="theme-setting-wrapper">
-         <div id="theme-settings" class="settings-panel">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
+        <div id="theme-settings" class="settings-panel">
           <i class="settings-close ti-close"></i>
           <p class="settings-heading">SIDEBAR SKINS</p>
           <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
@@ -159,7 +160,6 @@
                     <thead>
                         <tr>
                         <th>ID</th>
-                        <th>Nama Pegawai</th>
                         <th>Username</th>
                         <th>Role</th>
                         <th>Unit Kerja</th>
@@ -170,7 +170,6 @@
                         <?php if (!empty($users)): ?>
                             <?php foreach ($users as $user): ?>
                               <td><?php echo $user['id']; ?></td>
-                              <td><?php echo $user['nama_pegawai']; ?></td>
                               <td><?php echo $user['username']; ?></td>
                               <td><span class="badge bg-secondary text-capitalize"><?php echo $user['role']; ?></span></td>
                               <td><?php echo $user['unit_name'] ?? '-'; ?></td>
@@ -265,10 +264,6 @@
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" name="password" id="password" class="form-control" placeholder="Enter password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="nama_pegawai" class="form-label">Nama Pegawai</label>
-                            <input type="text" name="nama_pegawai" id="nama_pegawai" class="form-control" placeholder="Enter nama pegawai" required>
                         </div>
                         <div class="mb-3">
                             <label for="role" class="form-label">Role</label>

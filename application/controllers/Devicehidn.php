@@ -23,7 +23,7 @@ class Devicehidn extends CI_Controller {
         // Mendapatkan semua data devicehidn dari database
         $data['devicehidn'] = $this->m_devicehidn->get_all_devicehidn();
         // Mendapatkan daftar grup device, sub area, dan area untuk dropdown di form
-        $data['subdevice'] = $this->m_subdevice->get_all();
+        $data['sub_devices'] = $this->m_subdevice->get_all();
 
         // Load tampilan untuk masterdata/devicehidn
         $this->load->view('masterdata/devicehidn', $data);
@@ -34,6 +34,7 @@ class Devicehidn extends CI_Controller {
         $data = [
             'device_hidn_name' => $this->input->post('device_hidn_name'),
             'jum_device_hidn' => $this->input->post('jum_device_hidn'),
+            'sub_device_id' => $this->input->post('sub_device_id'),
             'created_by' => $this->session->userdata('username'),  // Assuming username is stored in session
             'created_date' => date('Y-m-d H:i:s')
         ];

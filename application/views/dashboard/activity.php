@@ -78,15 +78,24 @@
                 <div class="card-body">
                   <h6 class="card-title">Activity Management</h6>
                   <p class="card-description">
-                  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
-                  </p>
+                  <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahActivityModal">Tambah Aktivitas</button>
+                    </div>
+                    <div class="col-md-4">
+                        <form id="searchForm" action="<?= base_url('activity/search') ?>" method="GET" class="d-flex">
+                        <input type="text" id="searchInput" name="search" class="form-control" placeholder="Cari data..." value="<?= isset($search_term) ? $search_term : '' ?>">
+                        <button type="submit" class="btn btn-outline-primary ms-2">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        </form>
+                    </div>
+                  </div>
                   <div class="table-responsive">
-                  <input type="text" id="searchInput" class="form-control" placeholder="Cari data...">
                     <table class="table table-striped" id="activityTable" id="activityTable">
                       <thead>
                         <tr>
-                          <th>NO</th>
-                          <th>ID</th>
+                          <th>#</th>
                           <th>Kode Activity</th>
                           <th>Personel</th>
                           <th>Shift</th>
@@ -98,10 +107,9 @@
                       <tbody>
                         <?php foreach ($activities as $index => $activity): ?>
                         <tr>
-                          <td><?= $index + 1; ?></td>
-                          <td><?= $activity->id_activity; ?></td>
-                          <td><?= $activity->kode_activity; ?></td>
-                          <td>
+                            <td><?= $start + $index; ?></td>
+                            <td><?= $activity->kode_activity; ?></td>
+                            <td>
                             <?php 
                             if (!empty($activity->usernames)) {
                                 $usernames = explode(',', $activity->usernames);
@@ -112,18 +120,26 @@
                                 echo '<span class="text-muted">No users assigned</span>';
                             }
                             ?>
-                          </td>
-                          <td><?= $activity->nama_shift; ?></td>
-                          <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
-                          <td><?= $activity->tanggal_kegiatan; ?></td>
-                          <td>
+                            </td>
+                            <td><?= $activity->nama_shift; ?></td>
+                            <td><?= $activity->jam_mulai; ?> - <?= $activity->jam_selesai; ?></td>
+                            <td><?= $activity->tanggal_kegiatan; ?></td>
+                            <td>
                             <button type="button" class="btn btn-primary btn-sm" onclick="openFormModal(<?= $activity->id_activity ?>)">Form</button>
                             <a href="<?= base_url('activity/delete/'.$activity->id_activity); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
-                          </td>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                       </tbody>
                     </table>
+                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted">Showing <?= count($activities) ?> of <?= $this->ActivityModel->count_all_activities() ?> entries</span>
+                        </div>
+                        <div>
+                            <?= $pagination ?>
+                        </div>
+                    </div>
                   </div>
                   <!-- Modal Tambah Aktivitas -->
                   <div class="modal fade" id="tambahActivityModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -356,62 +372,66 @@
 
                   <!-- Modal for adding data -->
                   <div class="modal fade" id="addDataModal" tabindex="-1">
-                      <div class="modal-dialog modal-dialog-scrollable">
-                          <div class="modal-content">
-                              <div class="modal-header">
-                                  <h5 class="modal-title">Add Form Data</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                              </div>
-                              <div class="modal-body">
-                                  <form id="addDataForm" onsubmit="submitFormData(event)">
-                                      <input type="hidden" name="form_id">
-                                      
-                                      <div class="mb-3">
-                                        <label class="form-label">Device</label>
-                                        <select class="form-control select2-single" id="device_hidn_id" name="device_hidn_id" required>
-                                            <option value="">Select Device</option>
-                                        </select>
-                                      </div>
-                                      
-                                      <div class="mb-3">
-                                          <label class="form-label">Jam Kegiatan</label>
-                                          <input type="time" class="form-control" name="jam_kegiatan" required>
-                                      </div>
-                                      
-                                      <div id="checklistContainer">
-                                          <!-- Checklist questions will be loaded here -->
-                                      </div>
-                                      
-                                      <div class="mb-3">
-                                          <label class="form-label">Foto Perangkat</label>
-                                          <input type="file" class="form-control" name="foto_perangkat" accept="image/*" required>
-                                      </div>
-                                      
-                                      <div class="mb-3">
-                                          <label class="form-label">Foto Lokasi</label>
-                                          <input type="file" class="form-control" name="foto_lokasi" accept="image/*" required>
-                                      </div>
-                                      
-                                      <div class="mb-3">
-                                          <label class="form-label">Foto Teknisi</label>
-                                          <input type="file" class="form-control" name="foto_teknisi" accept="image/*" required>
-                                      </div>
-                                      
-                                      <div class="mb-3">
-                                          <label class="form-label">Notes</label>
-                                          <textarea class="form-control" name="notes" rows="3">Normal</textarea>
-                                      </div>
-                                  </form>
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" onclick="backToActivityForm()">
-                                        <i class="bi bi-arrow-left"></i> Back
-                                    </button>
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('addDataForm').requestSubmit()">Save</button>
-                                 </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Form Data</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addDataForm" enctype="multipart/form-data">
+                            <input type="hidden" name="form_id">
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Device</label>
+                                <select class="form-control select2-single" id="device_hidn_id" name="device_hidn_id" required>
+                                <option value="">Select Device</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Jam Kegiatan</label>
+                                <input type="time" class="form-control" name="jam_kegiatan" required>
+                            </div>
+                            
+                            <div id="checklistContainer">
+                                <!-- Checklist questions will be loaded here -->
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Foto Perangkat <small class="text-muted">(Max 4MB)</small></label>
+                                <input type="file" class="form-control" name="foto_perangkat" accept="image/*" required>
+                                <div class="form-text">Photo will be automatically compressed if too large</div>
+                                <div id="preview-foto_perangkat" class="mt-2 image-preview"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Foto Lokasi <small class="text-muted">(Max 4MB)</small></label>
+                                <input type="file" class="form-control" name="foto_lokasi" accept="image/*" required>
+                                <div class="form-text">Photo will be automatically compressed if too large</div>
+                                <div id="preview-foto_lokasi" class="mt-2 image-preview"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Foto Teknisi <small class="text-muted">(Max 4MB)</small></label>
+                                <input type="file" class="form-control" name="foto_teknisi" accept="image/*" required>
+                                <div class="form-text">Photo will be automatically compressed if too large</div>
+                                <div id="preview-foto_teknisi" class="mt-2 image-preview"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" rows="3">Normal</textarea>
+                            </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="cancelAddData()">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="submitFormData(event)">Save</button>
+                        </div>
+                        </div>
+                    </div>
+                   </div>
                 </div>
               </div>
             </div>
@@ -488,6 +508,22 @@
         }
     }
 
+    function sortActivityTable() {
+        const tbody = $('#activityTable tbody');
+        const rows = tbody.find('tr').toArray();
+        
+        // Sort by date column (assuming index 6 contains the date)
+        rows.sort(function(a, b) {
+            const dateA = new Date($(a).find('td:eq(6)').text());
+            const dateB = new Date($(b).find('td:eq(6)').text());
+            return dateB - dateA; // Descending order (newest first)
+        });
+        
+        $.each(rows, function(index, row) {
+            tbody.append(row);
+        });
+    }
+
     // Document Ready Function
     $(document).ready(function() {
         // Event Handlers
@@ -499,11 +535,16 @@
             allowClear: true,
             width: '100%'
         });
+
         initializeSelect2Elements();
+        sortActivityTable();
+        initializePagination();
+        initializeSearch();
+        
         if (window.innerWidth < 768) {
         // For modal overflow issues on small screens
         $('.modal-body').css('max-height', (window.innerHeight * 0.7) + 'px');
-        formatMobileTable();
+            formatMobileTable();
         }
         $('#formModal').on('shown.bs.modal', function() {
             setTimeout(function() {
@@ -516,6 +557,26 @@
                 initializeSelect2Elements();
             }, 100);
         });
+
+        $('#addDataModal').on('hidden.bs.modal', function (e) {
+        // Only show dataModal if we're not showing another modal
+        if (!$('#formModal').hasClass('show') && !$('#dataModal').hasClass('show')) {
+            const formId = $('#current_form_id').val() || localStorage.getItem('currentFormId');
+            if (formId) {
+                setTimeout(() => {
+                    $('#dataModal').modal('show');
+                }, 300);
+            }
+        }
+
+        $('#searchInput').on('keyup', function() {
+            sortActivityTable();
+        });
+    });
+    
+    // Prevent modals from closing when clicking outside (optional)
+    $('.modal').attr('data-bs-backdrop', 'static');
+    $('.modal').attr('data-bs-keyboard', 'false');
     });
 
     // Authentication Functions
@@ -528,6 +589,175 @@
         alert("Anda telah logout.");
         window.location.href = "<?php echo base_url('auth/logout'); ?>";
     }
+
+    function initializePagination() {
+    // Convert normal pagination links to AJAX
+        $('.pagination .page-link').on('click', function(e) {
+        e.preventDefault();
+        
+        const url = $(this).attr('href');
+        if (!url) return;
+        
+        loadPageData(url);
+        
+        // Update URL for browser history without reloading the page
+        window.history.pushState({path: url}, '', url);
+        });
+    }
+
+    function loadPageData(url) {
+        // Show loading indicator
+        $('#activityTable tbody').html('<tr><td colspan="8" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+        
+        $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'html',
+        success: function(response) {
+            // Extract only the table content from the response
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = response;
+            
+            // Replace table content
+            $('#activityTable tbody').html($(tempDiv).find('#activityTable tbody').html());
+            
+            // Replace pagination
+            $('.pagination').replaceWith($(tempDiv).find('.pagination'));
+            
+            // Re-initialize pagination events
+            initializePagination();
+            
+            // Re-initialize table functionality
+            sortActivityTable();
+            
+            // Scroll to top of table
+            $('html, body').animate({
+            scrollTop: $("#activityTable").offset().top - 70
+            }, 300);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', error);
+            $('#activityTable tbody').html('<tr><td colspan="8" class="text-center text-danger">Failed to load data. Please try again.</td></tr>');
+        }
+        });
+    }
+
+    function initializeSearch() {
+        // Submit search form via AJAX
+        $('#searchForm').on('submit', function(e) {
+        e.preventDefault();
+        const searchTerm = $('#searchInput').val();
+        
+        // Build the search URL
+        const searchUrl = $(this).attr('action') + '?search=' + encodeURIComponent(searchTerm);
+        
+        // Load search results
+        loadSearchResults(searchUrl);
+        
+        // Update URL for browser history
+        window.history.pushState({path: searchUrl}, '', searchUrl);
+        });
+        
+        // Add debounce for typing in search box (optional)
+        let searchTimeout;
+        $('#searchInput').on('keyup', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            $('#searchForm').submit();
+        }, 500); // 500ms delay after typing stops
+        });
+    }
+
+    function loadSearchResults(url) {
+        // Show loading indicator
+        $('#activityTable tbody').html('<tr><td colspan="8" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+        
+        $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            // Clear the table
+            $('#activityTable tbody').empty();
+            
+            if (response.activities && response.activities.length > 0) {
+            // Populate table with search results
+            $.each(response.activities, function(index, activity) {
+                let usernamesHtml = '';
+                
+                if (activity.usernames) {
+                const usernames = activity.usernames.split(',');
+                $.each(usernames, function(i, username) {
+                    usernamesHtml += '<span class="badge bg-info">' + username.trim() + '</span> ';
+                });
+                } else {
+                usernamesHtml = '<span class="text-muted">No users assigned</span>';
+                }
+                
+                $('#activityTable tbody').append(`
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${activity.id_activity}</td>
+                    <td>${activity.kode_activity}</td>
+                    <td>${usernamesHtml}</td>
+                    <td>${activity.nama_shift}</td>
+                    <td>${activity.jam_mulai} - ${activity.jam_selesai}</td>
+                    <td>${activity.tanggal_kegiatan}</td>
+                    <td>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openFormModal(${activity.id_activity})">Form</button>
+                    <a href="<?= base_url('activity/delete/') ?>${activity.id_activity}" class="btn btn-danger btn-sm" onclick="return confirm('Hapus aktivitas ini?')">Hapus</a>
+                    </td>
+                </tr>
+                `);
+            });
+            
+            // Update pagination links
+            $('.pagination').html(response.pagination);
+            
+            // Re-initialize pagination events
+            initializePagination();
+            } else {
+            // Show no results message
+            $('#activityTable tbody').html('<tr><td colspan="8" class="text-center">No activities found matching your search.</td></tr>');
+            $('.pagination').empty();
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', error);
+            $('#activityTable tbody').html('<tr><td colspan="8" class="text-center text-danger">Failed to load data. Please try again.</td></tr>');
+        }
+        });
+    }
+
+    function initializePagination() {
+        $('.pagination .page-link').off('click').on('click', function(e) {
+        e.preventDefault();
+        
+        const url = $(this).attr('href');
+        if (!url) return;
+        
+        // Check if this is a search page or regular page
+        if (url.includes('search')) {
+            loadSearchResults(url);
+        } else {
+            loadPageData(url);
+        }
+        
+        // Update URL for browser history
+        window.history.pushState({path: url}, '', url);
+        });
+    }
+
+    $(window).on('popstate', function(e) {
+        if (e.originalEvent.state !== null) {
+        const url = location.href;
+        if (url.includes('search')) {
+            loadSearchResults(url);
+        } else {
+            loadPageData(url);
+        }
+        }
+    });
 
     // Form Management Functions
     const openFormModal = (activityId) => {
@@ -823,9 +1053,18 @@
         }
 
         $('#addDataForm input[name="form_id"]').val(formId);
-        loadDeviceAndChecklist(formId);
-        $('#addDataModal').modal('show');
+        
+        // Hide dataModal but don't remove it from DOM
         $('#dataModal').modal('hide');
+        
+        // After a short delay, show the add data modal
+        setTimeout(() => {
+            loadDeviceAndChecklist(formId);
+            $('#addDataModal').modal('show');
+            
+            // Set up the form submission handler
+            $('#addDataForm').off('submit').on('submit', submitFormData);
+        }, 300); // Small delay to avoid modal conflicts
     };
 
     const loadDeviceAndChecklist = async (formId) => {
@@ -915,51 +1154,121 @@
 
     // Form Submission Functions
     const submitFormData = (e) => {
-            e.preventDefault();
-            
-            const formId = $('#addDataForm input[name="form_id"]').val();
-            if (!formId) {
-                alert('Form ID is missing');
-                return;
-            }
-            
-            const formData = new FormData($('#addDataForm')[0]);
-            
-            // Add validation
-            if (!formData.get('device_hidn_id')) {
-                alert('Please select a device');
-                return;
-            }
-            
-            $.ajax({
-                url: '<?= base_url("activity/add_form_data") ?>',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    try {
-                        const result = typeof response === 'string' ? JSON.parse(response) : response;
+        e.preventDefault();
+        
+        const formId = $('#addDataForm input[name="form_id"]').val();
+        if (!formId) {
+            alert('Form ID is missing');
+            return;
+        }
+        
+        const formData = new FormData($('#addDataForm')[0]);
+        
+        // Add validation
+        if (!formData.get('device_hidn_id')) {
+            alert('Please select a device');
+            return;
+        }
+        
+        // Show a loading indicator
+        const saveButton = $('#addDataModal').find('button[type="button"]').last();
+        const originalText = saveButton.html();
+        saveButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+        saveButton.prop('disabled', true);
+        
+        $.ajax({
+            url: '<?= base_url("activity/add_form_data") ?>',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                try {
+                    const result = typeof response === 'string' ? JSON.parse(response) : response;
+                    
+                    if(result.status === 'success') {
+                        // Close only the addDataModal
+                        $('#addDataModal').modal('hide');
                         
-                        if(result.status === 'success') {
-                            $('#addDataModal').modal('hide');
-                            $('#addDataForm')[0].reset();
-                            loadFormDataItems(formId);
-                            alert('Data saved successfully');
-                        } else {
-                            alert(result.message || 'Failed to save data');
-                        }
-                    } catch (error) {
-                        console.error('Error processing response:', error);
-                        alert('Failed to process server response');
+                        // Reset the form
+                        $('#addDataForm')[0].reset();
+                        
+                        // Show the dataModal again and refresh the data
+                        $('#dataModal').modal('show');
+                        loadFormDataItems(formId);
+                        
+                        // Optional: Show a success message
+                        showToast('Success', 'Data saved successfully', 'success');
+                    } else {
+                        alert(result.message || 'Failed to save data');
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error saving form data:', error);
-                    alert('Failed to save form data. Error: ' + error);
+                } catch (error) {
+                    console.error('Error processing response:', error);
+                    alert('Failed to process server response');
+                } finally {
+                    // Restore the button state regardless of outcome
+                    saveButton.html(originalText);
+                    saveButton.prop('disabled', false);
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error saving form data:', error);
+                alert('Failed to save form data. Error: ' + error);
+                
+                // Restore the button state
+                saveButton.html(originalText);
+                saveButton.prop('disabled', false);
+            }
+        });
     };
+
+    function showToast(title, message, type = 'info') {
+        // Create toast container if it doesn't exist
+        if ($('#toast-container').length === 0) {
+            $('body').append('<div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;"></div>');
+        }
+        
+        // Create a unique ID for this toast
+        const toastId = 'toast-' + Date.now();
+        
+        // Set the appropriate background color based on type
+        let bgClass = 'bg-info';
+        if (type === 'success') bgClass = 'bg-success';
+        if (type === 'warning') bgClass = 'bg-warning';
+        if (type === 'error') bgClass = 'bg-danger';
+        
+        // Create the toast HTML
+        const toast = `
+            <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                <div class="toast-header ${bgClass} text-white">
+                    <strong class="me-auto">${title}</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            </div>
+        `;
+        
+        // Add the toast to the container
+        $('#toast-container').append(toast);
+        
+        // Initialize and show the toast
+        const toastElement = new bootstrap.Toast(document.getElementById(toastId));
+        toastElement.show();
+        
+        // Remove the toast from the DOM after it's hidden
+        $(`#${toastId}`).on('hidden.bs.toast', function() {
+            $(this).remove();
+        });
+    }
+
+    function cancelAddData() {
+        $('#addDataModal').modal('hide');
+        setTimeout(() => {
+            $('#dataModal').modal('show');
+        }, 300);
+    }
 
     // Delete Functions
     const deleteForm = (formId) => {
@@ -1046,9 +1355,19 @@
     }
 
     function backToActivityForm() {
-        $('#dataModal').modal('hide');  // Tutup modal data
-        $('#addDataModal').modal('hide');  // Tutup modal add data
-        $('#formModal').modal('show');  // Tampilkan modal form activity sebelumnya
+        // Hide current modal
+        if ($('#dataModal').hasClass('show')) {
+            $('#dataModal').modal('hide');
+        }
+        
+        if ($('#addDataModal').hasClass('show')) {
+            $('#addDataModal').modal('hide');
+        }
+        
+        // Show the activity form modal after a short delay
+        setTimeout(() => {
+            $('#formModal').modal('show');
+        }, 300);
     }
 
     function formatMobileTable() {
