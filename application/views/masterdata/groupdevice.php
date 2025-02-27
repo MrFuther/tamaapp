@@ -14,15 +14,15 @@
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
-    <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/mdi/css/materialdesignicons.min.css'); ?>">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('css/style.css'); ?>">
     <!-- endinject -->
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
 </head>
+<body>
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
@@ -124,7 +124,7 @@
 
                         <!-- Modal untuk Tambah Group Device -->
                         <div class="modal fade" id="addGroupDeviceModal" tabindex="-1" aria-labelledby="addGroupDeviceModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
+                            <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="addGroupDeviceModalLabel">Tambah Group Device</h5>

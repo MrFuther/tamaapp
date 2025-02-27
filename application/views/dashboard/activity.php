@@ -12,7 +12,6 @@
 
     <!-- endinject -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/mdi/css/materialdesignicons.min.css'); ?>">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
@@ -21,8 +20,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> 
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
-    <link rel="stylesheet" href="<?php echo base_url('css/activitymodal.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('css/style.css'); ?>">
     <!-- endinject -->
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
     <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>x`
@@ -445,24 +443,7 @@
       </div>
       <!-- main-panel ends -->
     </div>
-    <div id="logoutModal" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Konfirmasi Logout</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Apakah Anda yakin ingin logout?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button type="button" class="btn btn-primary" onclick="logout()">Logout</button>
-          </div>
-        </div>
-      </div>
+   
     </div>  
     <!-- page-body-wrapper ends -->
   </div>

@@ -923,6 +923,7 @@ class Activity extends CI_Controller
                     }
                 };
                 
+                
                 // Add Foto Perangkat
                 $fitImageInCell('./uploads/' . $data->foto_perangkat, $startX, $startY, $cellWidth, $cellHeight);
                 

@@ -19,7 +19,7 @@ class Devicehidn extends CI_Controller {
     }
 
     public function index() {
-        $data['user'] = $this->session->userdata();  // Menyimpan data user yang sedang login
+        $data['user'] = $this->session->userdata();
         // Mendapatkan semua data devicehidn dari database
         $data['devicehidn'] = $this->m_devicehidn->get_all_devicehidn();
         // Mendapatkan daftar grup device, sub area, dan area untuk dropdown di form
@@ -38,7 +38,15 @@ class Devicehidn extends CI_Controller {
             'created_by' => $this->session->userdata('username'),  // Assuming username is stored in session
             'created_date' => date('Y-m-d H:i:s')
         ];
-
+        
+        // Jika menggunakan sub_device_id juga
+        if ($this->input->post('sub_device_id')) {
+            $sub_device = $this->m_subdevice->get_by_id($this->input->post('sub_device_id'));
+            if ($sub_device) {
+                $data['sub_device_name'] = $sub_device->sub_device_name;
+            }
+        }
+    
         if ($this->input->post('device_hidn_id')) {
             // Update device hidn jika sudah ada
             $this->m_devicehidn->update($this->input->post('device_hidn_id'), $data);
@@ -46,7 +54,7 @@ class Devicehidn extends CI_Controller {
             // Insert device hidn baru
             $this->m_devicehidn->insert($data);
         }
-
+    
         // Redirect kembali ke halaman utama
         redirect('devicehidn');
     }

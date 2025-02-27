@@ -14,12 +14,11 @@
     <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="<?php echo base_url('vendors/datatables.net-bs4/dataTables.bootstrap4.css'); ?>">
-    <link rel="stylesheet" href="<?php echo base_url('vendors/ti-icons/css/themify-icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('vendors/mdi/css/materialdesignicons.min.css'); ?>">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('js/select.dataTables.min.css'); ?>">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?php echo base_url('css/vertical-layout-light/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('css/style.css'); ?>">
     <!-- endinject -->
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/amar.png'); ?>" />
 </head>
@@ -72,7 +71,9 @@
                 <div class="card-body">
                   <h6 class="card-title">Shift Kerja</h6>
                   <p class="card-description">
-                  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahShiftModal">Tambah Shift</button>
+                  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahShiftModal">
+                    <i class="fas fa-plus-circle"></i> Tambah Shift
+                      </button>
                   </p>
                   <div class="table-responsive">
                     <table class="table table-hover">
