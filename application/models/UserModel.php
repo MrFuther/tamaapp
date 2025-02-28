@@ -32,6 +32,15 @@ class UserModel extends CI_Model {
         return $this->db->insert('ms_account', $data);
     }
 
+    public function get_nama_pegawai_by_username($username) {
+        $this->db->select('*');
+        $this->db->from('ms_account');
+        $this->db->where('username', $username);
+        $query = $this->db->get();
+        
+        return $query->row_array();
+    }
+
     public function update_user($id, $role, $unit_id, $nama_pegawai) {
         $data = [
             'role' => $role,

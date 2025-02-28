@@ -1,6 +1,6 @@
 /* Sidebar styling */
 .sidebar {
-    width: 250px; /* Ukuran default sidebar */
+    width: 200px; /* Ukuran default sidebar */
     height: 100vh; /* Full tinggi layar */
     background-color: #2C3E50; /* Warna sidebar */
     color: white;
