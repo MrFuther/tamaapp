@@ -68,7 +68,45 @@ class ActivityModel extends CI_Model {
     }
 
     public function delete_activity($id) {
-        return $this->db->delete($this->table, ['id_activity' => $id]);
+        // Begin transaction
+        $this->db->trans_begin();
+        
+        try {
+            // First get all form IDs associated with this activity
+            $this->db->select('form_id');
+            $this->db->from('activity_forms');
+            $this->db->where('activity_id', $id);
+            $query = $this->db->get();
+            $forms = $query->result();
+            
+            // Delete all form data records associated with these forms
+            if (!empty($forms)) {
+                $form_ids = array_map(function($form) {
+                    return $form->form_id;
+                }, $forms);
+                
+                $this->db->where_in('form_id', $form_ids);
+                $this->db->delete('activity_form_data');
+            }
+            
+            // Now delete the forms
+            $this->db->delete('activity_forms', ['activity_id' => $id]);
+            
+            // Then delete the personnel assignments
+            $this->db->delete('activity_personel', ['activity_id' => $id]);
+            
+            // Finally delete the activity itself
+            $this->db->delete($this->table, ['id_activity' => $id]);
+            
+            // Commit the transaction
+            $this->db->trans_commit();
+            return true;
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $this->db->trans_rollback();
+            log_message('error', 'Delete activity failed: ' . $e->getMessage());
+            return false;
+        }
     }
     
     public function get_activity_details($activity_id) {
@@ -185,6 +223,88 @@ class ActivityModel extends CI_Model {
     
     public function delete_form($form_id) {
         return $this->db->delete('activity_forms', ['form_id' => $form_id]);
+    }
+
+    public function get_activities_paginated($limit, $offset) {
+        $this->db->select('
+            ap.id_activity,
+            ap.kode_activity,
+            ap.tanggal_kegiatan,
+            sk.nama_shift,
+            sk.jam_mulai,
+            sk.jam_selesai,
+            GROUP_CONCAT(DISTINCT ms.nama_pegawai SEPARATOR ", ") as usernames
+        ');
+        $this->db->from('activity_pm ap');
+        $this->db->join('shift_kerja sk', 'sk.id_shift = ap.shift_id');
+        $this->db->join('activity_personel apr', 'apr.activity_id = ap.id_activity', 'left');
+        $this->db->join('ms_account ms', 'ms.id = apr.user_id', 'left');
+        $this->db->group_by('ap.id_activity, ap.kode_activity, ap.tanggal_kegiatan, sk.nama_shift, sk.jam_mulai, sk.jam_selesai');
+        $this->db->order_by('ap.tanggal_kegiatan', 'DESC');
+        $this->db->limit($limit, $offset);
+        
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function count_all_activities() {
+        // We need to count the distinct activities since we're using GROUP BY in the main query
+        $this->db->select('COUNT(DISTINCT ap.id_activity) as count');
+        $this->db->from('activity_pm ap');
+        $query = $this->db->get();
+        $result = $query->row();
+        return $result->count;
+    }
+
+    public function search_activities($search_term, $limit, $offset) {
+        $this->db->select('
+            ap.id_activity,
+            ap.kode_activity,
+            ap.tanggal_kegiatan,
+            sk.nama_shift,
+            sk.jam_mulai,
+            sk.jam_selesai,
+            GROUP_CONCAT(DISTINCT ms.nama_pegawai SEPARATOR ", ") as usernames
+        ');
+        $this->db->from('activity_pm ap');
+        $this->db->join('shift_kerja sk', 'sk.id_shift = ap.shift_id');
+        $this->db->join('activity_personel apr', 'apr.activity_id = ap.id_activity', 'left');
+        $this->db->join('ms_account ms', 'ms.id = apr.user_id', 'left');
+        
+        // Apply search conditions
+        $this->db->group_start();
+        $this->db->like('ap.kode_activity', $search_term);
+        $this->db->or_like('ap.tanggal_kegiatan', $search_term);
+        $this->db->or_like('sk.nama_shift', $search_term);
+        $this->db->or_like('ms.nama_pegawai', $search_term);
+        $this->db->group_end();
+        
+        $this->db->group_by('ap.id_activity, ap.kode_activity, ap.tanggal_kegiatan, sk.nama_shift, sk.jam_mulai, sk.jam_selesai');
+        $this->db->order_by('ap.tanggal_kegiatan', 'DESC');
+        $this->db->limit($limit, $offset);
+        
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function count_search_activities($search_term) {
+        $this->db->select('COUNT(DISTINCT ap.id_activity) as count');
+        $this->db->from('activity_pm ap');
+        $this->db->join('shift_kerja sk', 'sk.id_shift = ap.shift_id');
+        $this->db->join('activity_personel apr', 'apr.activity_id = ap.id_activity', 'left');
+        $this->db->join('ms_account ms', 'ms.id = apr.user_id', 'left');
+        
+        // Apply search conditions
+        $this->db->group_start();
+        $this->db->like('ap.kode_activity', $search_term);
+        $this->db->or_like('ap.tanggal_kegiatan', $search_term);
+        $this->db->or_like('sk.nama_shift', $search_term);
+        $this->db->or_like('ms.nama_pegawai', $search_term);
+        $this->db->group_end();
+        
+        $query = $this->db->get();
+        $result = $query->row();
+        return $result->count;
     }
 }
 ?>

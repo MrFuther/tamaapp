@@ -24,12 +24,45 @@
 </head>
 <body>
   <div class="container-scroller">
-    <!-- Navbar -->
-    <?php include APPPATH . 'views/dashboard/navbar.php'; ?>
-
+    <!-- partial:partials/_navbar.html -->
+    <?php include 'navbar.php'?>
+    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-      <!-- Sidebar -->
-      <?php include APPPATH . 'views/dashboard/sidebar.php'; ?>
+      <!-- partial:partials/_settings-panel.html -->
+      <div class="theme-setting-wrapper">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
+        <div id="theme-settings" class="settings-panel">
+          <i class="settings-close ti-close"></i>
+          <p class="settings-heading">SIDEBAR SKINS</p>
+          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
+          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark</div>
+          <p class="settings-heading mt-2">HEADER SKINS</p>
+          <div class="color-tiles mx-0 px-4">
+            <div class="tiles success"></div>
+            <div class="tiles warning"></div>
+            <div class="tiles danger"></div>
+            <div class="tiles info"></div>
+            <div class="tiles dark"></div>
+            <div class="tiles default"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="right-sidebar" class="settings-panel">
+        <i class="settings-close ti-close"></i>
+        <ul class="nav nav-tabs border-top" id="setting-panel" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="todo-tab" data-toggle="tab" href="#todo-section" role="tab" aria-controls="todo-section" aria-expanded="true">TO DO LIST</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="chats-tab" data-toggle="tab" href="#chats-section" role="tab" aria-controls="chats-section">CHATS</a>
+          </li>
+        </ul>
+      </div>
+      <!-- partial -->
+      <!-- partial:partials/_sidebar.html -->
+      <?php include 'sidebar.php' ?>
+      <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
@@ -101,7 +134,43 @@
                     </div>
                 </div>
                 </div>
-    
+                <!-- Logout Confirmation Modal -->
+                <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-confirm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to logout?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <a href="<?php echo base_url('auth/logout'); ?>" class="btn btn-danger">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+<script>
+    function showLogoutConfirmation() {
+    // Menampilkan modal
+    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    modal.show();
+    }
+
+    function logout() {
+    // Implementasi logika logout di sini
+    alert("Anda telah logout.");
+    // Redirect ke halaman login atau halaman utama setelah logout
+    window.location.href = "<?php echo base_url('auth/logout'); ?>";  // Ganti dengan URL halaman login Anda
+    }
+  </script>
 <!-- plugins:js -->
 <script src="<?php echo base_url('vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->

@@ -24,12 +24,60 @@
 </head>
 <body>
   <div class="container-scroller">
-    <!-- Navbar -->
-    <?php include APPPATH . 'views/dashboard/navbar.php'; ?>
-
+    <!-- partial:partials/_navbar.html -->
+    <?php include 'navbar.php'?>
+    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-      <!-- Sidebar -->
-      <?php include APPPATH . 'views/dashboard/sidebar.php'; ?>
+      <!-- partial:partials/_settings-panel.html -->
+      <div class="theme-setting-wrapper">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
+        <div id="theme-settings" class="settings-panel">
+          <i class="settings-close ti-close"></i>
+          <p class="settings-heading">SIDEBAR SKINS</p>
+          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
+          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark</div>
+          <p class="settings-heading mt-2">HEADER SKINS</p>
+          <div class="color-tiles mx-0 px-4">
+            <div class="tiles success"></div>
+            <div class="tiles warning"></div>
+            <div class="tiles danger"></div>
+            <div class="tiles info"></div>
+            <div class="tiles dark"></div>
+            <div class="tiles default"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="right-sidebar" class="settings-panel">
+        <i class="settings-close ti-close"></i>
+        <ul class="nav nav-tabs border-top" id="setting-panel" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="todo-tab" data-toggle="tab" href="#todo-section" role="tab" aria-controls="todo-section" aria-expanded="true">TO DO LIST</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="chats-tab" data-toggle="tab" href="#chats-section" role="tab" aria-controls="chats-section">CHATS</a>
+          </li>
+        </ul>
+        <div class="tab-content" id="setting-content">
+          <div class="tab-pane fade show active scroll-wrapper" id="todo-section" role="tabpanel" aria-labelledby="todo-section">
+            <div class="add-items d-flex px-3 mb-0">
+              <form class="form w-100">
+                <div class="form-group d-flex">
+                  <input type="text" class="form-control todo-list-input" placeholder="Add To-do">
+                  <button type="submit" class="add btn btn-primary todo-list-add-btn" id="add-task">Add</button>
+                </div>
+              </form>
+            </div>
+            <div class="list-wrapper px-3">
+            </div>
+          </div>
+          <!-- To do section tab ends -->
+        </div>
+      </div>
+      <!-- partial -->
+      <!-- partial:partials/_sidebar.html -->
+      <?php include 'sidebar.php' ?>
+      <!-- partial -->
       <div class="main-panel">
       <div class="content-wrapper">
         <div class="row">
@@ -76,33 +124,32 @@
                         </div>
                         
                         <div class="modal fade" id="editUnitKerja" tabindex="-1" aria-labelledby="editUnitKerjaLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h5 class="modal-title" id="editUnitKerjaLabel">Edit Unit Kerja</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <form action="<?= base_url('unitkerja/update') ?>" method="POST">
-              <input type="hidden" id="unit_id" name="unit_id"> <!-- ID Unit Kerja -->
-              <div class="modal-body">
-                  <div class="form-group">
-                      <label for="edit_nama_unitkerja">Nama Unit Kerja</label>
-                      <input type="text" class="form-control" id="edit_nama_unitkerja" name="nama_unitkerja" required>
-                  </div>
-                  <div class="form-group">
-                      <label for="edit_inisial_unit">Inisial Unit Kerja</label>
-                      <input type="text" class="form-control" id="edit_inisial_unit" name="inisial_unit" required>
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                  <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-              </div>
-          </form>
-        </div>
-    </div>
-</div>
-
+                          <div class="modal-dialog">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title" id="editUnitKerjaLabel">Edit Unit Kerja</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <form action="<?= base_url('unitkerja/update') ?>" method="POST">
+                                    <input type="hidden" id="unit_id" name="unit_id"> <!-- ID Unit Kerja -->
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="edit_nama_unitkerja">Nama Unit Kerja</label>
+                                            <input type="text" class="form-control" id="edit_nama_unitkerja" name="nama_unitkerja" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit_inisial_unit">Inisial Unit Kerja</label>
+                                            <input type="text" class="form-control" id="edit_inisial_unit" name="inisial_unit" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                    </div>
+                                </form>
+                              </div>
+                          </div>
+                        </div>
                         <!-- Modal untuk Tambah Unit Kerja -->
                         <div class="modal fade" id="addUnitKerjaModal" tabindex="-1" aria-labelledby="addUnitKerjaModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg">

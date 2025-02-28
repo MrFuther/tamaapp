@@ -25,10 +25,10 @@
     
     <div class="container-scroller">
         <!-- Navbar -->
-        <?php include APPPATH . 'views/dashboard/navbar.php'; ?>
+        <?php include 'navbar.php' ?>
         <!-- Sidebar -->
         <div class="container-fluid page-body-wrapper">
-            <?php include APPPATH . 'views/dashboard/sidebar.php'; ?>
+            <?php include 'sidebar.php' ?>
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="row">
