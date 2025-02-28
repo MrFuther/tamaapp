@@ -354,7 +354,16 @@
                             
                             <div class="mb-3">
                                 <label class="form-label">Jam Kegiatan</label>
-                                <input type="time" class="form-control" name="jam_kegiatan" required>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Mulai</label>
+                                        <input type="time" class="form-control" name="jam_kegiatan" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Selesai</label>
+                                        <input type="time" class="form-control" name="jam_selesai" required>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div id="checklistContainer">
@@ -1346,6 +1355,24 @@
         rows.forEach(row => {
             let text = row.textContent.toLowerCase();
             row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validasi input jam
+        document.querySelector('input[name="jam_selesai"]').addEventListener('change', function() {
+            var jamMulai = document.querySelector('input[name="jam_kegiatan"]').value;
+            var jamSelesai = this.value;
+            
+            if (jamMulai && jamSelesai) {
+                var mulai = new Date('2000-01-01T' + jamMulai);
+                var selesai = new Date('2000-01-01T' + jamSelesai);
+                
+                if (selesai <= mulai) {
+                    alert('Jam selesai harus lebih besar dari jam mulai');
+                    this.value = '';
+                }
+            }
         });
     });
   </script>

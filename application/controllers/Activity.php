@@ -575,6 +575,7 @@ class Activity extends CI_Controller
                 'form_id' => $form_id,
                 'device_hidn_id' => $device_hidn_id,
                 'jam_kegiatan' => $this->input->post('jam_kegiatan'),
+                'jam_selesai' => $this->input->post('jam_selesai'), // Tambahkan field ini
                 'tindakan1' => $this->input->post('tindakan1'),
                 'tindakan2' => $this->input->post('tindakan2'),
                 'tindakan3' => $this->input->post('tindakan3'),
@@ -1062,7 +1063,10 @@ class Activity extends CI_Controller
                 $pdf->Ln(5);
                 $pdf->SetFont('helvetica', 'B', 11);
                 $pdf->Cell(0, 7, 'Checklist ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1);
-                $pdf->Cell(0, 7, 'Jam Kegiatan: ' . $data->jam_kegiatan, 0, 1);
+                $jam_mulai = $data->jam_kegiatan;
+                $jam_selesai = $data->jam_selesai ? $data->jam_selesai : ''; // Cek jika jam_selesai ada
+                $format_jam = $jam_selesai ? $jam_mulai . ' s/d ' . $jam_selesai : $jam_mulai;
+                $pdf->Cell(0, 7, 'Jam Kegiatan: ' . $format_jam, 0, 1);
                 
                 // Table header
                 $pdf->SetFont('helvetica', 'B', 10);
