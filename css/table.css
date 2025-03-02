@@ -1,0 +1,142 @@
+.clean-table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  .clean-table {
+    width: 100%;
+    background: #fff;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .clean-table thead th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .clean-table tbody tr {
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .clean-table tbody tr:hover {
+    background-color: rgba(0,123,255,0.04);
+  }
+  
+  .clean-table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+  }
+  
+  /* Detail row selalu hidden secara default */
+  .detail-row {
+    display: none;
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 767.98px) {
+    .clean-table thead {
+      display: none;
+    }
+    
+    .clean-table tbody tr.main-row {
+      display: block;
+      margin-bottom: 0;
+      border: 1px solid #dee2e6;
+      border-radius: 4px 4px 0 0;
+      position: relative;
+    }
+    
+    .clean-table tbody tr.main-row:last-child {
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    
+    /* Menampilkan detail row saat memiliki class 'show' */
+    .detail-row.show {
+      display: table-row;
+    }
+    
+    .detail-row .row-detail {
+      display: block;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      margin-bottom: 1rem;
+    }
+    
+    .clean-table tbody td {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      text-align: right;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .clean-table tbody td:last-child {
+      border-bottom: none;
+    }
+    
+    .clean-table tbody td:before {
+      content: attr(data-label);
+      font-weight: 600;
+      margin-right: 10px;
+      text-align: left;
+      flex: 1;
+    }
+    
+    /* Row with expandable content */
+    .clean-table .row-main {
+      padding-right: 40px; /* Space for expand button */
+    }
+    
+    .clean-table .row-expand {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      background: #007bff;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+      font-weight: bold;
+    }
+    
+    /* Hide non-essential columns on mobile */
+    .mobile-hide {
+      display: none !important;
+    }
+    
+    /* Button styles for mobile */
+    .btn-actions {
+      display: flex;
+      gap: 5px;
+      justify-content: flex-end;
+    }
+    
+    /* Badge/chip display for mobile */
+    .badges-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+    
+    /* Spacing between row groups */
+    .main-row:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }
