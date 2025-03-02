@@ -1120,7 +1120,7 @@ class Activity extends CI_Controller
                 
                 // Define the cell dimensions
                 $cellWidth = 85;  // Width of each photo cell
-                $cellHeight = 60; // Height of each photo cell
+                $cellHeight = 50; // Height of each photo cell
                 $captionHeight = 10; // Height of the caption
                 
                 // Add the data item header/title
