@@ -1121,7 +1121,7 @@ class Activity extends CI_Controller
                 // Define the cell dimensions
                 $cellWidth = 85;  // Width of each photo cell
                 $cellHeight = 50; // Height of each photo cell
-                $captionHeight = 10; // Height of the caption
+                $captionHeight = 8; // Height of the caption
                 
                 // Add the data item header/title
                 $pdf->SetFont('helvetica', 'B', 10);
@@ -1188,7 +1188,7 @@ class Activity extends CI_Controller
                     $caption = isset($questions[$i]) ? $questions[$i]->question_text : 'Photo ' . ($i + 1);
                     
                     // Add caption with border
-                    $pdf->Cell($cellWidth, $captionHeight, $caption, 1, 0, 'L');
+                    $pdf->MultiCell($cellWidth, $captionHeight, $caption, 1, 'L', false, 1);
                     
                     // Move to next cell position
                     $currentCol++;
@@ -1211,7 +1211,7 @@ class Activity extends CI_Controller
         // Table dimensions
         $fullWidth = 180;
         $logoWidth = 40;
-        $headerHeight = 25;
+        $headerHeight = 26;
         
         // Create outer table border
         $pdf->Rect(15, 15, $fullWidth, $headerHeight);
@@ -1274,63 +1274,75 @@ class Activity extends CI_Controller
         // Create PDF header
         $this->createPdfHeaderTable($pdf, $formDetails);
         
-        // Add photos for each form data
-        foreach ($formData as $index => $data) {
-            $pdf->Ln(2);
-            $pdf->SetFont('helvetica', 'B', 10);
-            $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
-            $pdf->SetFont('helvetica', '', 10);
-            
-            // Determine number of photos based on report type
-            $photoFields = ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'];
-            $photoDescriptions = [];
-            
-            if ($formDetails->report_type === 'Harian' && count($questions) > 3) {
-                // For Harian form, add additional photo fields
-                for ($i = 4; $i <= count($questions); $i++) {
-                    $photoFields[] = 'foto_' . $i;
-                }
-                
-                // Prepare descriptions for each photo based on checklist questions
-                for ($i = 0; $i < count($questions); $i++) {
-                    if (isset($questions[$i])) {
-                        $photoDescriptions[] = $questions[$i]->question_text;
-                    } else {
-                        $photoDescriptions[] = 'Foto ' . ($i + 1);
-                    }
-                }
-            } else {
-                // Default descriptions for non-Harian forms
-                $photoDescriptions = [
-                    'Memastikan indikator access point',
-                    'Lokasi Perangkat Access Point',
-                    'Hasil Speed Test Internet'
-                ];
+        // Photo layout settings
+        $devicesPerPage = 4; // 4 data device per halaman
+        $photosPerRow = 3; // 3 foto per baris
+        $cellWidth = 180 / $photosPerRow; // Lebar sel foto
+        $cellHeight = 35; // Tinggi sel foto - dikurangi agar lebih kompak
+        $captionHeight = 5; // Tinggi keterangan
+        $deviceSpacing = 3; // Jarak antar device
+        
+        // Proses data per halaman
+        for ($pageIndex = 0; $pageIndex < ceil(count($formData) / $devicesPerPage); $pageIndex++) {
+            // Jika bukan halaman pertama, tambahkan halaman baru
+            if ($pageIndex > 0) {
+                $pdf->AddPage();
+                $this->createPdfHeaderTable($pdf, $formDetails);
             }
             
-            // Photo layout settings
-            $photosPerRow = 3;
-            $cellWidth = 180 / $photosPerRow;
-            $cellHeight = 40;
+            // Tentukan data yang akan ditampilkan di halaman ini
+            $startIdx = $pageIndex * $devicesPerPage;
+            $endIdx = min(($pageIndex + 1) * $devicesPerPage, count($formData));
             
-            // Loop through available photos
-            for ($i = 0; $i < count($photoFields); $i += $photosPerRow) {
-                // Starting position for this row
-                $startX = $pdf->GetX();
-                $startY = $pdf->GetY();
+            // Posisi awal
+            $yPos = 75; // Posisi Y setelah header
+            
+            // Loop untuk setiap device di halaman ini
+            for ($deviceIdx = $startIdx; $deviceIdx < $endIdx; $deviceIdx++) {
+                $data = $formData[$deviceIdx];
                 
-                // Draw boxes for photos
-                for ($j = 0; $j < $photosPerRow && ($i + $j) < count($photoFields); $j++) {
-                    $pdf->Cell($cellWidth, $cellHeight, '', 1, 0);
+                // Judul device
+                $pdf->SetY($yPos);
+                $pdf->SetFont('helvetica', 'B', 10);
+                $pdf->Cell(0, 7, 'Data ' . ($deviceIdx + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
+                $yPos += 7;
+                
+                // Determine photo fields and descriptions
+                $photoFields = ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'];
+                
+                if ($formDetails->report_type === 'Harian' && count($questions) > 3) {
+                    // Prepare descriptions for each photo based on checklist questions
+                    $photoDescriptions = [];
+                    for ($i = 0; $i < count($photoFields); $i++) {
+                        if (isset($questions[$i])) {
+                            $photoDescriptions[] = $questions[$i]->question_text;
+                        } else {
+                            $photoDescriptions[] = 'Foto ' . ($i + 1);
+                        }
+                    }
+                } else {
+                    // Default descriptions for non-Harian forms
+                    $photoDescriptions = [
+                        'Memastikan indikator access point',
+                        'Lokasi Perangkat Access Point',
+                        'Hasil Speed Test Internet'
+                    ];
                 }
-                $pdf->Ln();
                 
-                // Reset position to add images
-                $pdf->SetXY($startX, $startY);
+                // Mulai menggambar kotak foto
+                $startX = 15;
+                $startY = $yPos;
                 
-                // Add images
-                for ($j = 0; $j < $photosPerRow && ($i + $j) < count($photoFields); $j++) {
-                    $field = $photoFields[$i + $j];
+                // Gambar kotak foto
+                for ($j = 0; $j < count($photoFields); $j++) {
+                    $x = $startX + ($j * $cellWidth);
+                    $pdf->Rect($x, $startY, $cellWidth, $cellHeight);
+                }
+                
+                // Tambahkan gambar
+                for ($j = 0; $j < count($photoFields); $j++) {
+                    $field = $photoFields[$j];
+                    $x = $startX + ($j * $cellWidth);
                     
                     if (!empty($data->$field)) {
                         $imgPath = './uploads/' . $data->$field;
@@ -1352,35 +1364,30 @@ class Activity extends CI_Controller
                                 $newWidth = $imgWidth * $ratio;
                                 $newHeight = $imgHeight * $ratio;
                                 
-                                $imageX = $startX + ($j * $cellWidth) + (($cellWidth - $newWidth) / 2);
+                                $imageX = $x + (($cellWidth - $newWidth) / 2);
                                 $imageY = $startY + (($cellHeight - $newHeight) / 2);
                                 
                                 $pdf->Image($imgPath, $imageX, $imageY, $newWidth, $newHeight);
                             }
                         }
                     }
-                    
-                    // Move to next column position
-                    $pdf->SetX($startX + ($j + 1) * $cellWidth);
                 }
                 
-                // Reset position to add labels
-                $pdf->SetXY($startX, $startY + $cellHeight);
+                // Tambahkan keterangan foto
+                $captionY = $startY + $cellHeight;
                 $pdf->SetFont('helvetica', '', 8);
                 
-                // Add labels for each photo
-                for ($j = 0; $j < $photosPerRow && ($i + $j) < count($photoFields); $j++) {
-                    $description = isset($photoDescriptions[$i + $j]) ?
-                        $photoDescriptions[$i + $j] : 'Foto ' . ($i + $j + 1);
+                for ($j = 0; $j < count($photoFields); $j++) {
+                    $x = $startX + ($j * $cellWidth);
+                    $description = isset($photoDescriptions[$j]) ? $photoDescriptions[$j] : 'Foto ' . ($j + 1);
                     
-                    $pdf->Cell($cellWidth, 5, $description, 'LBR', 0, 'C');
+                    // Gunakan MultiCell dengan nilai height 0 untuk auto-fit content
+                    $pdf->SetXY($x, $captionY);
+                    $pdf->MultiCell($cellWidth, $captionHeight, $description, 'LBR', 'C', false, 0);
                 }
-                $pdf->Ln();
                 
-                // Add device name below each photo
-                $pdf->SetX($startX);
-                $pdf->SetFont('helvetica', 'B', 6);
-                $pdf->Ln(10); // Space for next row of photos
+                // Perbarui posisi Y untuk device berikutnya
+                $yPos = $captionY + $captionHeight + $deviceSpacing;
             }
         }
     }
@@ -1480,7 +1487,7 @@ class Activity extends CI_Controller
             $pdf->Cell(40, 4, 'Lokasi', 0, 0);
             $pdf->Cell(5, 4, ':', 0, 0);
             $pdf->Cell(0, 4, $formDetails->area_name, 0, 1);
-
+    
             $pdf->Cell(40, 4, 'Perangkat', 0, 0);
             $pdf->Cell(5, 4, ':', 0, 0);
             $pdf->Cell(0, 4, $formDetails->sub_device_name, 0, 1);
@@ -1509,26 +1516,51 @@ class Activity extends CI_Controller
                 
                 // Table header
                 $pdf->SetFont('helvetica', 'B', 8);
-                $pdf->Cell(10, 5, 'No', 1, 0, 'C');
-                $pdf->Cell(130, 5, 'Item Check', 1, 0, 'C');
-                $pdf->Cell(20, 5, 'Status', 1, 1, 'C');
+                
+                // Tentukan lebar kolom
+                $noWidth = 10;
+                $statusWidth = 20;
+                $itemWidth = 150; // Lebar kolom Item Check diperbesar
+                
+                $pdf->Cell($noWidth, 5, 'No', 1, 0, 'C');
+                $pdf->Cell($itemWidth, 5, 'Item Check', 1, 0, 'C');
+                $pdf->Cell($statusWidth, 5, 'Status', 1, 1, 'C');
                 
                 // Parse tindakan JSON
                 $tindakan = json_decode($data->tindakan, true) ?: [];
                 
                 // Table content
-                $pdf->SetFont('helvetica', '', 9);
+                $pdf->SetFont('helvetica', '', 8); // Ukuran font dikurangi untuk muat lebih banyak teks
                 foreach ($questions as $key => $question) {
                     $questionNumber = $question->question_number;
-                    $pdf->Cell(10, 3, $questionNumber, 1, 0, 'C');
-                    $pdf->Cell(130, 3, $question->question_text, 1, 0, 'L');
                     
-                    // Get corresponding tindakan value
+                    // Hitung tinggi yang dibutuhkan untuk teks
+                    $questionText = $question->question_text;
+                    
+                    // Dapatkan nilai tindakan yang sesuai
                     $tindakanValue = isset($tindakan[$questionNumber]) ? $tindakan[$questionNumber] : 'N/A';
-                    $pdf->Cell(20, 3, $tindakanValue, 1, 1, 'C');
+                    
+                    // Gunakan MultiCell untuk item check agar bisa menangani teks panjang
+                    $pdf->Cell($noWidth, 5, $questionNumber, 1, 0, 'C');
+                    
+                    // Simpan posisi Y saat ini
+                    $currentY = $pdf->GetY();
+                    $currentX = $pdf->GetX();
+                    
+                    // Tulis teks item dengan word wrapping
+                    $pdf->MultiCell($itemWidth, 5, $questionText, 1, 'L');
+                    
+                    // Hitung tinggi yang digunakan
+                    $usedHeight = $pdf->GetY() - $currentY;
+                    
+                    // Atur ulang posisi untuk kolom status
+                    $pdf->SetXY($currentX + $itemWidth, $currentY);
+                    
+                    // Sel status dengan tinggi yang sama dengan sel multiline
+                    $pdf->Cell($statusWidth, $usedHeight, $tindakanValue, 1, 1, 'C');
                 }
                 
-                // // Notes section below the table
+                // Bagian catatan di bawah tabel
                 $pdf->Ln(2);
                 $pdf->SetFont('helvetica', 'I', 9);
                 $pdf->Cell(20, 5, 'Catatan:', 0, 0);
@@ -1543,7 +1575,7 @@ class Activity extends CI_Controller
     
             $pdf->Ln(12);
             $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
-            $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');
+            $pdf->Cell(91, 7, '(.............................)', 0, 1, 'C');
             
             // Output PDF
             $pdf->Output('checklist_pm_' . date('Y-m-d') . '.pdf', 'I');
