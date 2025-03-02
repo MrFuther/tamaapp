@@ -137,7 +137,23 @@ class Activity extends CI_Controller
         // Bootstrap 5 pagination styling (same as above)
         $config['full_tag_open'] = '<ul class="pagination pagination-sm justify-content-center">';
         $config['full_tag_close'] = '</ul>';
-        // ... (same as above)
+        $config['first_link'] = 'First';
+        $config['last_link'] = 'Last';
+        $config['first_tag_open'] = '<li class="page-item">';
+        $config['first_tag_close'] = '</li>';
+        $config['prev_link'] = '&laquo';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_link'] = '&raquo';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li class="page-item">';
+        $config['last_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a class="page-link" href="#">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['attributes'] = array('class' => 'page-link');
         
         // Initialize pagination
         $this->pagination->initialize($config);
@@ -160,6 +176,7 @@ class Activity extends CI_Controller
         $data['group_devices'] = $this->ActivityModel->get_group_devices();
         $data['sub_devices'] = $this->ActivityModel->get_sub_devices();
         $data['devices'] = $this->ActivityModel->get_device_hidn();
+        $data['start'] = $page + 1;
         
         if ($this->input->is_ajax_request()) {
             echo json_encode([
@@ -310,6 +327,15 @@ class Activity extends CI_Controller
                 throw new Exception('Form ID is required');
             }
     
+            // Get the form details to know the report_type and sub_device_id
+            $form = $this->db->get_where('activity_forms', ['form_id' => $formId])->row();
+            if (!$form) {
+                throw new Exception('Form not found');
+            }
+            
+            // Get the checklist questions for this form
+            $questions = $this->ChecklistModel->get_checklist_questions($form->sub_device_id, $form->report_type);
+            
             // Query data
             $this->db->select('afd.*, dh.device_hidn_name')
                      ->from('activity_form_data afd')
@@ -326,11 +352,33 @@ class Activity extends CI_Controller
             }
     
             $data = $query->result();
+            
+            // Process each data item to expand tindakan JSON
+            foreach ($data as &$item) {
+                if (isset($item->tindakan)) {
+                    $tindakan = json_decode($item->tindakan, true);
+                    if ($tindakan) {
+                        // Assign individual tindakan properties
+                        foreach ($tindakan as $index => $value) {
+                            $propName = 'tindakan' . $index;
+                            $item->$propName = $value;
+                        }
+                    }
+                    // Keep the JSON for reference
+                    $item->tindakan_json = $item->tindakan;
+                }
+                
+                // Add question details
+                $item->questions = $questions;
+                $item->question_count = count($questions);
+            }
     
             // Return response
             echo json_encode([
                 'status' => 'success',
-                'data' => $data
+                'data' => $data,
+                'questions' => $questions,
+                'question_count' => count($questions)
             ]);
     
         } catch (Exception $e) {
@@ -363,6 +411,26 @@ class Activity extends CI_Controller
         }
     }
 
+    public function get_checklist_questions() {
+        $sub_device_id = $this->input->get('sub_device_id');
+        $report_type = $this->input->get('report_type');
+        
+        if (!$sub_device_id || !$report_type) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Missing required parameters'
+            ]);
+            return;
+        }
+        
+        $questions = $this->ChecklistModel->get_checklist_questions($sub_device_id, $report_type);
+        
+        echo json_encode([
+            'status' => 'success',
+            'data' => $questions
+        ]);
+    }
+
     // Get checklist questions for a specific form
     public function get_checklist_for_form($formId) {
         try {
@@ -371,31 +439,93 @@ class Activity extends CI_Controller
             if ($formId <= 0) {
                 throw new Exception('Invalid form ID');
             }
-
-            // First get the sub_device_id from the form
-            $form = $this->db->get_where('activity_forms', ['form_id' => $formId])->row();
+    
+            // Add detailed logging
+            log_message('debug', 'Getting checklist for form ID: ' . $formId);
+    
+            // First get the form details
+            $this->db->select('*');
+            $this->db->from('activity_forms');
+            $this->db->where('form_id', $formId);
+            $query = $this->db->get();
             
-            if (!$form) {
-                throw new Exception('Form not found');
+            log_message('debug', 'Form query SQL: ' . $this->db->last_query());
+            
+            if (!$query || $query->num_rows() == 0) {
+                throw new Exception('Form not found with ID: ' . $formId);
             }
-
-            // Then get the checklist questions for this sub_device_id
+            
+            $form = $query->row();
+            log_message('debug', 'Form details found: ' . json_encode($form));
+            
+            // Ensure we have valid sub_device_id and report_type
+            if (empty($form->sub_device_id)) {
+                throw new Exception('Form has no sub_device_id');
+            }
+            
+            if (empty($form->report_type)) {
+                throw new Exception('Form has no report_type');
+            }
+            
+            // Special handling for specific devices and daily reports
+            if ($form->report_type === 'Harian' && ($form->sub_device_id == 267 || $form->sub_device_id == 269)) {
+                // Load specialized questions for these devices
+                $questions = $this->load_specialized_questions($form->sub_device_id);
+                
+                log_message('debug', 'Loaded specialized questions for device: ' . $form->sub_device_id);
+                log_message('debug', 'Questions count: ' . count($questions));
+                
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode([
+                        'status' => 'success',
+                        'data' => $questions,
+                        'form' => $form,
+                        'specialized' => true
+                    ]));
+                return;
+            }
+            
+            // Regular processing for other devices/report types
             $this->db->select('checklist_id, question_number, question_text');
+            $this->db->from('device_checklist');
             $this->db->where('sub_device_id', $form->sub_device_id);
+            $this->db->where('report_type', $form->report_type);
             $this->db->order_by('question_number', 'ASC');
-            $query = $this->db->get('device_checklist');
-
+            $query = $this->db->get();
+            
+            log_message('debug', 'Questions query SQL: ' . $this->db->last_query());
+            log_message('debug', 'Questions count: ' . $query->num_rows());
+            
+            // If no specific questions for this report type, fallback to the default ones
+            if ($query->num_rows() == 0) {
+                log_message('debug', 'No specific questions found, falling back to default questions');
+                $this->db->select('checklist_id, question_number, question_text');
+                $this->db->from('device_checklist');
+                $this->db->where('sub_device_id', $form->sub_device_id);
+                $this->db->order_by('question_number', 'ASC');
+                $query = $this->db->get();
+                
+                log_message('debug', 'Fallback query SQL: ' . $this->db->last_query());
+                log_message('debug', 'Fallback questions count: ' . $query->num_rows());
+            }
+    
             if (!$query) {
                 throw new Exception('Database query failed');
             }
-
+    
+            $questions = $query->result();
+            log_message('debug', 'Questions found: ' . json_encode($questions));
+    
             $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode([
                     'status' => 'success',
-                    'data' => $query->result()
+                    'data' => $questions,
+                    'form' => $form,
+                    'specialized' => false
                 ]));
-
+    
         } catch (Exception $e) {
             log_message('error', 'Get checklist for form error: ' . $e->getMessage());
             
@@ -407,6 +537,98 @@ class Activity extends CI_Controller
                     'message' => $e->getMessage()
                 ]));
         }
+    }
+
+    private function load_specialized_questions($deviceId, $forDocumentation = false) {
+        // Define specialized questions based on device ID
+        $questions = [];
+        
+        if ($deviceId == 267) { // PERANGKAT RUANG RAPAT
+            if ($forDocumentation) {
+                // Documentation labels (for PDF)
+                $questionTexts = [
+                    'Memastikan Screen Motorized / Barco Video Controll',
+                    'Koneksi Tampilan Screen & Proyektor / Wall Display / Internet Perkantoran',
+                    'Koneksi HDMI / Dongle / Digibird',
+                    'Cek perangkat Server Datapath dan Wall Display berfungsi dengan baik',
+                    'Cek koneksi PC, Server Datapath, Projector dan Wall Display saling terhubung',
+                    'Pastikan perangkat DigiBird Video Wall Controller dan Wall Panel berfungsi dengan baik',
+                    'Pastikan perangkat monitor di meja rapat kondisi aktif',
+                    'Pastikan perangkat PC operator terhubung jaringan internet dengan baik',
+                    'Pastikan Proyektor, Screen Proyektor, dan kabel HDMI berfungsi dengan baik',
+                    'Cek perangkat Screen Projector Motorized',
+                    'Cek kondisi VGA Splitter/Amplifier',
+                    'Cek HDMI Extender',
+                    'Pastikan Microphone berfungsi dengan baik',
+                    'Cek Sound System di ruang rapat',
+                    'Pastikan terkoneksi ke jaringan wireless',
+                    'Pastikan webcam berfungsi dengan baik',
+                    'Cek koneksi audio output ke speaker',
+                    'Cek koneksi kabel power dan pastikan tersedia steker listrik cadangan'
+                ];
+            } else {
+                // Checklist questions (for form)
+                $questionTexts = [
+                    'Cek kondisi perangkat display dan perangkat pendukung terhubung dan aktif',
+                    'Cek dan memastikan koneksi jaringan perangkat Mini PC Display normal',
+                    'Cek Aplikasi yang berjalan di perangkat display berfungsi dengan normal',
+                    'Cek perangkat Server Datapath dan Wall Display berfungsi dengan baik',
+                    'Cek koneksi PC, Server Datapath, Projector dan Wall Display saling terhubung',
+                    'Pastikan Perangkat Digibird Video Wall Controller dan Wall Panel berfungsi dengan baik',
+                    'Pastikan perangkat monitor di meja rapat kondisi aktif',
+                    'Pastikan perangkat PC operator terhubung jaringan internet dengan baik',
+                    'Pastikan Proyektor, Screen Proyektor, dan Kabel HDMI berfungsi dengan baik',
+                    'Cek Perangkat Screen Projector Motorized'
+                ];
+            }
+        } elseif ($deviceId == 269) { // INFRASTRUKTUR SERVER PERKANTORAN
+            if ($forDocumentation) {
+                // Documentation labels (for PDF)
+                $questionTexts = [
+                    'Cek Kondisi Jaringan Jalur FO Antar Gedung Jaringan IT Perkantoran BSH',
+                    'Cek Kondisi Jaringan IT BSH Gedung 601 T1-T2-T3',
+                    'Cek Kondisi Jarigan Switch Access Gedung 601',
+                    'Cek Monitoring jaringan Access Point Perkantoran BSH',
+                    'Cek Penggunaan Resources Infrastruktur Server Perkantoran svt01-cgk',
+                    'Cek Penggunaan Resources Infrastruktur Server Perkantoran sct02-cgk',
+                    'Cek Status Temperature Server Room IT',
+                    'Cek Update Server Trend Micro Deep Security',
+                    'Cek Status Server Deep Discovery Inspector',
+                    'Cek Update Database Kaspersky',
+                    'Cek Status Server cgk-Infoblox-01',
+                    'Cek Status Server cgk-Infoblox-02',
+                    'Cek Monitoring Jaringan Access Point Perkantoran BSH',
+                    'Cek Status Grid Manager Infoblox',
+                    'Cek Status license Kaspersky',
+                    'Cek Update Backup Server Atlantis (172.17.45.11)',
+                    'Cek Status Local Backup Server'
+                ];
+            } else {
+                // Checklist questions (for form)
+                $questionTexts = [
+                    'Cek suhu ruang server dengan aplikasi monitoring ruang server',
+                    'Cek penggunaan resources infrastruktur server perkantoran',
+                    'Cek update database Kaspersky',
+                    'Cek update Server Trend Micro Deep Security',
+                    'Monitoring Threat MAlware di Trend Micro Deep Discovery Inspector (DDI)',
+                    'Cek kondisi jaringan switch access Gedung 601 melalui network monitoring system NAGVIS',
+                    'Cek kondisi jaringan switch access terminal dan non terminal perkantoran di network monitoring system NAGVIS',
+                    'Monitoring kondisi Wireless Controller beroperasi dan terhubung dengan selurung access point',
+                    'Cek dan pastikan semua perangkat access point aktif dengan wifi monitoring system'
+                ];
+            }
+        }
+        
+        // Create question objects
+        foreach ($questionTexts as $i => $text) {
+            $question = new stdClass();
+            $question->checklist_id = $i + 1;
+            $question->question_number = $i + 1;
+            $question->question_text = $text;
+            $questions[] = $question;
+        }
+        
+        return $questions;
     }
     
     // Add this simple version of the compress image function
@@ -500,67 +722,94 @@ class Activity extends CI_Controller
                 throw new Exception('Missing required fields');
             }
     
-            // Check GD library
-            if (!extension_loaded('gd')) {
-                log_message('error', 'GD Library is not installed or enabled');
-                throw new Exception('Image processing library is not available');
+            // Get the form to determine the report_type and sub_device_id
+            $form = $this->db->get_where('activity_forms', ['form_id' => $form_id])->row();
+            if (!$form) {
+                throw new Exception('Form not found');
             }
-    
+            
+            // Get checklist questions
+            $specialized = false;
+            if ($form->report_type === 'Harian' && ($form->sub_device_id == 267 || $form->sub_device_id == 269)) {
+                $questions = $this->load_specialized_questions($form->sub_device_id);
+                $specialized = true;
+            } else {
+                $questions = $this->ChecklistModel->get_checklist_questions(
+                    $form->sub_device_id, 
+                    $form->report_type
+                );
+            }
+            
+            // Collect tindakan values
+            $tindakan = [];
+            foreach ($questions as $question) {
+                $field = 'tindakan' . $question->question_number;
+                if ($this->input->post($field) !== null) {
+                    $tindakan[$question->question_number] = $this->input->post($field);
+                }
+            }
+            
             // Handle file uploads
             $config['upload_path'] = './uploads/';
             $config['allowed_types'] = 'jpg|jpeg|png';
-            $config['max_size'] = 4048; // 2MB
+            $config['max_size'] = 4048; // 4MB
             
-            // Ensure upload directory exists and is writable
+            // Ensure upload directory exists
             if (!is_dir($config['upload_path'])) {
                 mkdir($config['upload_path'], 0755, true);
             }
             
             $uploadedFiles = [];
-            $uploadFields = ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'];
             
-            foreach ($uploadFields as $field) {
+            // Determine photo fields based on device and report type
+            $photoFields = ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'];
+            
+            // For specialized forms, use all available photo fields
+            if ($specialized) {
+                // For device 267, use up to 18 photos
+                if ($form->sub_device_id == 267) {
+                    for ($i = 4; $i <= 18; $i++) {
+                        $photoFields[] = 'foto_' . $i;
+                    }
+                } 
+                // For device 269, use up to 17 photos
+                elseif ($form->sub_device_id == 269) {
+                    for ($i = 4; $i <= 17; $i++) {
+                        $photoFields[] = 'foto_' . $i;
+                    }
+                }
+            } 
+            // For regular Harian forms, add fields based on question count
+            elseif ($form->report_type === 'Harian') {
+                for ($i = 4; $i <= count($questions); $i++) {
+                    $photoFields[] = 'foto_' . $i;
+                }
+            }
+            
+            // Process each photo field
+            foreach ($photoFields as $field) {
                 if (!empty($_FILES[$field]['name'])) {
-                    // Reset upload library for each file
                     $this->upload->initialize($config);
                     
                     if ($this->upload->do_upload($field)) {
                         $upload_data = $this->upload->data();
                         $source_path = $upload_data['full_path'];
                         
-                        // Log original file details
-                        log_message('debug', 'Original file: ' . $source_path . ' Size: ' . filesize($source_path) . ' bytes');
-                        
-                        // Generate a new filename for compressed version
+                        // Compress image
                         $compressed_filename = 'compressed_' . time() . '_' . $upload_data['file_name'];
                         $destination_path = $config['upload_path'] . $compressed_filename;
                         
-                        // Apply compression with explicit quality parameter and feedback
                         $compression_success = $this->compress_image($source_path, $destination_path, 75);
                         
                         if ($compression_success) {
-                            // Check if compressed file exists and log its size
-                            if (file_exists($destination_path)) {
-                                log_message('debug', 'Compressed file: ' . $destination_path . ' Size: ' . filesize($destination_path) . ' bytes');
-                                
-                                // Delete original file
-                                if (file_exists($source_path)) {
-                                    if (unlink($source_path)) {
-                                        log_message('debug', 'Original file deleted: ' . $source_path);
-                                    } else {
-                                        log_message('error', 'Failed to delete original file: ' . $source_path);
-                                    }
-                                }
-                                
-                                // Store only the compressed filename
-                                $uploadedFiles[$field] = $compressed_filename;
-                            } else {
-                                log_message('error', 'Compressed file not created: ' . $destination_path);
-                                // Fallback to original file
-                                $uploadedFiles[$field] = $upload_data['file_name'];
+                            // Remove original file after compression
+                            if (file_exists($source_path)) {
+                                unlink($source_path);
                             }
+                            
+                            // Save compressed filename
+                            $uploadedFiles[$field] = $compressed_filename;
                         } else {
-                            log_message('error', 'Compression failed, using original file');
                             // Use original file if compression fails
                             $uploadedFiles[$field] = $upload_data['file_name'];
                         }
@@ -575,22 +824,20 @@ class Activity extends CI_Controller
                 'form_id' => $form_id,
                 'device_hidn_id' => $device_hidn_id,
                 'jam_kegiatan' => $this->input->post('jam_kegiatan'),
-                'jam_selesai' => $this->input->post('jam_selesai'), // Tambahkan field ini
-                'tindakan1' => $this->input->post('tindakan1'),
-                'tindakan2' => $this->input->post('tindakan2'),
-                'tindakan3' => $this->input->post('tindakan3'),
+                'jam_selesai' => $this->input->post('jam_selesai'),
+                'tindakan' => json_encode($tindakan),
                 'notes' => $this->input->post('notes') ?: 'Normal'
             ];
-    
+            
             // Add uploaded files to data
             foreach ($uploadedFiles as $field => $filename) {
                 $data[$field] = $filename;
             }
             
             // Save to database
-            $this->db->insert('activity_form_data', $data);
+            $result = $this->db->insert('activity_form_data', $data);
             
-            if ($this->db->affected_rows() > 0) {
+            if ($result) {
                 $response = [
                     'status' => 'success',
                     'message' => 'Data saved successfully'
@@ -609,7 +856,7 @@ class Activity extends CI_Controller
         
         header('Content-Type: application/json');
         echo json_encode($response);
-    }   
+    }
     
     public function delete_form_data($formDataId) {
         try {
@@ -783,11 +1030,11 @@ class Activity extends CI_Controller
                 ->group_by('af.form_id')
                 ->get()
                 ->row();
-
+    
             if (!$formDetails) {
                 throw new Exception('Form data not found');
             }
-
+    
             // Get form data (photos and details)
             $formData = $this->db->select('afd.*, dh.device_hidn_name')
                 ->from('activity_form_data afd')
@@ -798,6 +1045,21 @@ class Activity extends CI_Controller
     
             if (empty($formData)) {
                 throw new Exception('No form data found');
+            }
+            
+            // Determine if this is a specialized form
+            $isSpecialized = ($formDetails->report_type === 'Harian' && 
+                             ($formDetails->sub_device_id == 267 || $formDetails->sub_device_id == 269));
+            
+            // Get checklist questions based on form type
+            // For documentation, we use the documentation version of specialized questions
+            if ($isSpecialized) {
+                $questions = $this->load_specialized_questions($formDetails->sub_device_id, true);
+            } else {
+                $questions = $this->ChecklistModel->get_checklist_questions(
+                    $formDetails->sub_device_id, 
+                    $formDetails->report_type
+                );
             }
     
             // Create new PDF instance
@@ -813,135 +1075,15 @@ class Activity extends CI_Controller
             $pdf->setPrintFooter(false);
             
             // Set margins
-            $pdf->SetMargins(15, 30, 15);
+            $pdf->SetMargins(15, 10, 15);
+            $pdf->SetAutoPageBreak(TRUE, 10);
             
-            // Add a page
-            $pdf->AddPage();
-            
-            // Set font
-            $pdf->SetFont('helvetica', 'B', 12);
-            
-            // Add Header Content
-            // Logo kiri
-            $image_file_left = FCPATH . 'assets/images/logo.jpg';
-            $pdf->Image($image_file_left, 15, 7, 40, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-            
-            // Buat rectangle untuk header
-            $pdf->Rect(15, 7, 180, 0);
-            $pdf->Rect(15, 27, 180, 0);
-            $pdf->Rect(15, 7, 0, 20);
-            $pdf->Rect(55, 7, 0, 20);
-            $pdf->Rect(155, 7, 0, 20);
-            $pdf->Rect(195, 7, 0, 20);
-
-            // Logo kanan
-            $image_file_right = FCPATH . 'assets/images/logo-ias.jpg';
-            $pdf->Image($image_file_right, 163, 8, 25, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-
-            // Title untuk dokumen
-            $pdf->SetY(7);
-            $pdf->Cell(0, 5, 'DOCUMENTATION REPORT', 0, 1, 'C');
-            $pdf->Cell(0, 5, 'PREVENTIVE MAINTENANCE ACTIVITY', 0, 1, 'C');
-            $pdf->Cell(0, 5, 'IT NON-PUBLIC SERVICE SYSTEM EQUIPMENT', 0, 1, 'C');
-            
-            // Berikan jarak setelah header
-            $pdf->Ln(5);
-
-            // Lanjutkan dengan informasi detail
-            $pdf->SetFont('helvetica', '', 10);
-            
-            // Information table
-            $pdf->Ln(5);
-            $pdf->SetFont('helvetica', '', 10);
-            $pdf->Cell(40, 7, 'Tanggal', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, date('d F Y', strtotime($formDetails->tanggal_kegiatan)), 0, 1);
-            
-            $pdf->Cell(40, 7, 'Lokasi', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, $formDetails->area_name, 0, 1);
-            
-            $pdf->Cell(40, 7, 'Shift', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, $formDetails->nama_shift . ' (' . $formDetails->jam_mulai . ' - ' . $formDetails->jam_selesai . ')', 0, 1);
-            
-            $pdf->Cell(40, 7, 'Personil', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, $formDetails->personel_names, 0, 1);
-            
-            // Add photos for each form data
-            foreach ($formData as $index => $data) {
-                $pdf->Ln(2);
-                
-                $pdf->SetFont('helvetica', 'B', 10);
-                $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
-                $pdf->SetFont('helvetica', '', 10);
-
-                // Define cell dimensions
-                $cellWidth = 60;
-                $cellHeight = 40; // Increased height to accommodate images
-                
-                // Start positions
-                $startX = $pdf->GetX();
-                $startY = $pdf->GetY();
-                
-                // Draw cells first
-                $pdf->Cell($cellWidth, $cellHeight, '', 1, 0);
-                $pdf->Cell($cellWidth, $cellHeight, '', 1, 0);
-                $pdf->Cell($cellWidth, $cellHeight, '', 1, 1);
-                
-                // Reset position to add images
-                $pdf->SetXY($startX, $startY);
-                
-                // Function to fit image within cell
-                $fitImageInCell = function($imagePath, $x, $y, $cellWidth, $cellHeight) use ($pdf) {
-                    if (file_exists($imagePath)) {
-                        $imgSize = getimagesize($imagePath);
-                        if ($imgSize) {
-                            $imgWidth = $imgSize[0];
-                            $imgHeight = $imgSize[1];
-                            
-                            // Calculate scaling ratio to fit image within cell (with margin)
-                            $margin = 2; // 2mm margin
-                            $maxWidth = $cellWidth - (2 * $margin);
-                            $maxHeight = $cellHeight - (2 * $margin);
-                            
-                            $widthRatio = $maxWidth / $imgWidth;
-                            $heightRatio = $maxHeight / $imgHeight;
-                            
-                            // Use the smaller ratio to ensure image fits both dimensions
-                            $ratio = min($widthRatio, $heightRatio);
-                            
-                            $newWidth = $imgWidth * $ratio;
-                            $newHeight = $imgHeight * $ratio;
-                            
-                            // Center image in cell
-                            $imageX = $x + (($cellWidth - $newWidth) / 2);
-                            $imageY = $y + (($cellHeight - $newHeight) / 2);
-                            
-                            $pdf->Image($imagePath, $imageX, $imageY, $newWidth, $newHeight);
-                        }
-                    }
-                };
-                
-                
-                // Add Foto Perangkat
-                $fitImageInCell('./uploads/' . $data->foto_perangkat, $startX, $startY, $cellWidth, $cellHeight);
-                
-                // Add Foto Lokasi
-                $fitImageInCell('./uploads/' . $data->foto_lokasi, $startX + $cellWidth, $startY, $cellWidth, $cellHeight);
-                
-                // Add Foto Teknisi
-                $fitImageInCell('./uploads/' . $data->foto_teknisi, $startX + (2 * $cellWidth), $startY, $cellWidth, $cellHeight);
-                
-                // Reset position for labels
-                $pdf->SetXY($startX, $startY + $cellHeight);
-                
-                // Descriptions with device name
-                $pdf->SetFont('helvetica', '', 8);
-                $pdf->Cell($cellWidth, 10, "Memastikan indikator access\npoint(" . $data->device_hidn_name . ")", 1, 0, 'C');
-                $pdf->Cell($cellWidth, 10, "Lokasi Perangkat Access Point\n(" . $data->device_hidn_name . ")", 1, 0, 'C');
-                $pdf->Cell($cellWidth, 10, "Hasil Speed Test Internet\n(" . $data->device_hidn_name . ")", 1, 1, 'C');
+            // For specialized daily forms, use a different layout
+            if ($isSpecialized) {
+                $this->generateSpecializedDailyReport($pdf, $formDetails, $formData, $questions);
+            } else {
+                // Original layout for non-specialized forms
+                $this->generateStandardReport($pdf, $formDetails, $formData, $questions);
             }
             
             // Output PDF
@@ -951,6 +1093,295 @@ class Activity extends CI_Controller
             log_message('error', 'Error generating PDF: ' . $e->getMessage());
             $this->session->set_flashdata('error', 'Failed to generate PDF: ' . $e->getMessage());
             redirect('activity');
+        }
+    }
+    
+    private function generateSpecializedDailyReport($pdf, $formDetails, $formData, $questions) {
+        // Determine total photos based on device ID
+        $totalPhotos = ($formDetails->sub_device_id == 267) ? 18 : 17;
+        $photosPerPage = 6; // 6 photos per page as requested
+        
+        // Process each form data entry
+        foreach ($formData as $dataIndex => $data) {
+            // Calculate total pages needed for this form data
+            $totalPages = ceil($totalPhotos / $photosPerPage);
+            
+            // Create pages for this form data entry
+            for ($page = 0; $page < $totalPages; $page++) {
+                // Add a new page for each set of 6 photos
+                $pdf->AddPage();
+                
+                // Create the header table with logos
+                $this->createPdfHeaderTable($pdf, $formDetails);
+                
+                // Calculate which photos to show on this page
+                $startIndex = $page * $photosPerPage;
+                $endIndex = min(($startIndex + $photosPerPage), $totalPhotos);
+                
+                // Define the cell dimensions
+                $cellWidth = 85;  // Width of each photo cell
+                $cellHeight = 60; // Height of each photo cell
+                $captionHeight = 10; // Height of the caption
+                
+                // Add the data item header/title
+                $pdf->SetFont('helvetica', 'B', 10);
+                $pdf->Cell(0, 7, 'Data ' . ($dataIndex + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
+                $pdf->Ln(2);
+                
+                // Position tracking for 2x3 grid (2 columns, 3 rows)
+                $currentRow = 0;
+                $currentCol = 0;
+                $startY = $pdf->GetY();
+                
+                // Create photo cells in a 2x3 grid
+                for ($i = $startIndex; $i < $endIndex; $i++) {
+                    // Calculate position for this cell
+                    $x = 15 + ($currentCol * $cellWidth);
+                    $y = $startY + ($currentRow * ($cellHeight + $captionHeight));
+                    
+                    // Set cursor position
+                    $pdf->SetXY($x, $y);
+                    
+                    // Determine photo field name
+                    $fieldName = $i < 3 ? 
+                        ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'][$i] : // Use existing names for first 3
+                        'foto_' . ($i + 1);
+                    
+                    // Draw photo cell border
+                    $pdf->Cell($cellWidth, $cellHeight, '', 1, 0);
+                    
+                    // Add photo if available
+                    if (!empty($data->$fieldName)) {
+                        $imgPath = './uploads/' . $data->$fieldName;
+                        if (file_exists($imgPath)) {
+                            // Calculate dimensions to fit the cell
+                            $imgSize = getimagesize($imgPath);
+                            if ($imgSize) {
+                                $imgWidth = $imgSize[0];
+                                $imgHeight = $imgSize[1];
+                                
+                                // Calculate scaling to fit
+                                $maxWidth = $cellWidth - 4; // 2px padding on each side
+                                $maxHeight = $cellHeight - 4; // 2px padding on each side
+                                
+                                $widthRatio = $maxWidth / $imgWidth;
+                                $heightRatio = $maxHeight / $imgHeight;
+                                $ratio = min($widthRatio, $heightRatio);
+                                
+                                $newWidth = $imgWidth * $ratio;
+                                $newHeight = $imgHeight * $ratio;
+                                
+                                // Center image in cell
+                                $imageX = $x + (($cellWidth - $newWidth) / 2);
+                                $imageY = $y + (($cellHeight - $newHeight) / 2);
+                                
+                                $pdf->Image($imgPath, $imageX, $imageY, $newWidth, $newHeight);
+                            }
+                        }
+                    }
+                    
+                    // Add caption below the photo
+                    $pdf->SetXY($x, $y + $cellHeight);
+                    $pdf->SetFont('helvetica', '', 8);
+                    
+                    // Get question/caption text
+                    $caption = isset($questions[$i]) ? $questions[$i]->question_text : 'Photo ' . ($i + 1);
+                    
+                    // Add caption with border
+                    $pdf->Cell($cellWidth, $captionHeight, $caption, 1, 0, 'L');
+                    
+                    // Move to next cell position
+                    $currentCol++;
+                    if ($currentCol >= 2) {
+                        $currentCol = 0;
+                        $currentRow++;
+                    }
+                }
+                
+                // Adjust position for the next content
+                $pdf->SetY($startY + (3 * ($cellHeight + $captionHeight)) + 10);
+            }
+        }
+    }
+    
+    private function createPdfHeaderTable($pdf, $formDetails) {
+        // Set font for header
+        $pdf->SetFont('helvetica', 'B', 10);
+        
+        // Table dimensions
+        $fullWidth = 180;
+        $logoWidth = 40;
+        $headerHeight = 25;
+        
+        // Create outer table border
+        $pdf->Rect(15, 15, $fullWidth, $headerHeight);
+        
+        // Add vertical lines to create 3 columns
+        $pdf->Line(15 + $logoWidth, 15, 15 + $logoWidth, 15 + $headerHeight); // After left logo
+        $pdf->Line(15 + $fullWidth - $logoWidth, 15, 15 + $fullWidth - $logoWidth, 15 + $headerHeight); // Before right logo
+        
+        // Add logos
+        $leftLogo = FCPATH . 'assets/images/logo.jpg';
+        $rightLogo = FCPATH . 'assets/images/logo-ias.jpg';
+        
+        // Add left logo
+        $pdf->Image($leftLogo, 17, 17, $logoWidth - 4, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        
+        // Add right logo
+        $pdf->Image($rightLogo, 15 + $fullWidth - $logoWidth + 2, 17, $logoWidth - 4, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        
+        // Add title in center column
+        $centerX = 15 + $logoWidth;
+        $centerWidth = $fullWidth - (2 * $logoWidth);
+        
+        $pdf->SetXY($centerX, 17);
+        $pdf->SetFont('helvetica', 'B', 11);
+        $pdf->Cell($centerWidth, 7, 'DOCUMENTATION REPORT', 0, 1, 'C');
+        $pdf->SetXY($centerX, 22);
+        $pdf->Cell($centerWidth, 7, 'PREVENTIVE MAINTENANCE ACTIVITY', 0, 1, 'C');
+        $pdf->SetXY($centerX, 27);
+        $pdf->Cell($centerWidth, 7, 'IT NON-PUBLIC SERVICE SYSTEM EQUIPMENT', 0, 1, 'C');
+        
+        // Reset position and font for details section
+        $pdf->SetXY(15, 45);
+        $pdf->SetFont('helvetica', '', 10);
+        
+        // Add activity information
+        $pdf->Cell(40, 7, 'Tanggal', 0, 0);
+        $pdf->Cell(5, 7, ':', 0, 0);
+        $pdf->Cell(0, 7, date('d F Y', strtotime($formDetails->tanggal_kegiatan)), 0, 1);
+        
+        $pdf->Cell(40, 7, 'Lokasi', 0, 0);
+        $pdf->Cell(5, 7, ':', 0, 0);
+        $pdf->Cell(0, 7, $formDetails->area_name, 0, 1);
+        
+        $pdf->Cell(40, 7, 'Shift', 0, 0);
+        $pdf->Cell(5, 7, ':', 0, 0);
+        $pdf->Cell(0, 7, $formDetails->nama_shift . ' (' . $formDetails->jam_mulai . ' - ' . $formDetails->jam_selesai . ')', 0, 1);
+        
+        $pdf->Cell(40, 7, 'Personil', 0, 0);
+        $pdf->Cell(5, 7, ':', 0, 0);
+        $pdf->Cell(0, 7, $formDetails->personel_names, 0, 1);
+        
+        // Add some space after the information
+        $pdf->Ln(5);
+    }
+    
+    private function generateStandardReport($pdf, $formDetails, $formData, $questions) {
+        // Add a page
+        $pdf->AddPage();
+        
+        // Create PDF header
+        $this->createPdfHeaderTable($pdf, $formDetails);
+        
+        // Add photos for each form data
+        foreach ($formData as $index => $data) {
+            $pdf->Ln(2);
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->Cell(0, 7, 'Data ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1, 'L');
+            $pdf->SetFont('helvetica', '', 10);
+            
+            // Determine number of photos based on report type
+            $photoFields = ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'];
+            $photoDescriptions = [];
+            
+            if ($formDetails->report_type === 'Harian' && count($questions) > 3) {
+                // For Harian form, add additional photo fields
+                for ($i = 4; $i <= count($questions); $i++) {
+                    $photoFields[] = 'foto_' . $i;
+                }
+                
+                // Prepare descriptions for each photo based on checklist questions
+                for ($i = 0; $i < count($questions); $i++) {
+                    if (isset($questions[$i])) {
+                        $photoDescriptions[] = $questions[$i]->question_text;
+                    } else {
+                        $photoDescriptions[] = 'Foto ' . ($i + 1);
+                    }
+                }
+            } else {
+                // Default descriptions for non-Harian forms
+                $photoDescriptions = [
+                    'Memastikan indikator access point',
+                    'Lokasi Perangkat Access Point',
+                    'Hasil Speed Test Internet'
+                ];
+            }
+            
+            // Photo layout settings
+            $photosPerRow = 3;
+            $cellWidth = 180 / $photosPerRow;
+            $cellHeight = 40;
+            
+            // Loop through available photos
+            for ($i = 0; $i < count($photoFields); $i += $photosPerRow) {
+                // Starting position for this row
+                $startX = $pdf->GetX();
+                $startY = $pdf->GetY();
+                
+                // Draw boxes for photos
+                for ($j = 0; $j < $photosPerRow && ($i + $j) < count($photoFields); $j++) {
+                    $pdf->Cell($cellWidth, $cellHeight, '', 1, 0);
+                }
+                $pdf->Ln();
+                
+                // Reset position to add images
+                $pdf->SetXY($startX, $startY);
+                
+                // Add images
+                for ($j = 0; $j < $photosPerRow && ($i + $j) < count($photoFields); $j++) {
+                    $field = $photoFields[$i + $j];
+                    
+                    if (!empty($data->$field)) {
+                        $imgPath = './uploads/' . $data->$field;
+                        if (file_exists($imgPath)) {
+                            // Adjust image to fit in cell
+                            $imgSize = getimagesize($imgPath);
+                            if ($imgSize) {
+                                $imgWidth = $imgSize[0];
+                                $imgHeight = $imgSize[1];
+                                
+                                $margin = 2;
+                                $maxWidth = $cellWidth - (2 * $margin);
+                                $maxHeight = $cellHeight - (2 * $margin);
+                                
+                                $widthRatio = $maxWidth / $imgWidth;
+                                $heightRatio = $maxHeight / $imgHeight;
+                                $ratio = min($widthRatio, $heightRatio);
+                                
+                                $newWidth = $imgWidth * $ratio;
+                                $newHeight = $imgHeight * $ratio;
+                                
+                                $imageX = $startX + ($j * $cellWidth) + (($cellWidth - $newWidth) / 2);
+                                $imageY = $startY + (($cellHeight - $newHeight) / 2);
+                                
+                                $pdf->Image($imgPath, $imageX, $imageY, $newWidth, $newHeight);
+                            }
+                        }
+                    }
+                    
+                    // Move to next column position
+                    $pdf->SetX($startX + ($j + 1) * $cellWidth);
+                }
+                
+                // Reset position to add labels
+                $pdf->SetXY($startX, $startY + $cellHeight);
+                $pdf->SetFont('helvetica', '', 8);
+                
+                // Add labels for each photo
+                for ($j = 0; $j < $photosPerRow && ($i + $j) < count($photoFields); $j++) {
+                    $description = isset($photoDescriptions[$i + $j]) ?
+                        $photoDescriptions[$i + $j] : 'Foto ' . ($i + $j + 1);
+                    
+                    $pdf->Cell($cellWidth, 5, $description, 'LBR', 0, 'C');
+                }
+                $pdf->Ln();
+                
+                // Add device name below each photo
+                $pdf->SetX($startX);
+                $pdf->SetFont('helvetica', 'B', 6);
+                $pdf->Ln(10); // Space for next row of photos
+            }
         }
     }
 
@@ -965,6 +1396,7 @@ class Activity extends CI_Controller
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
+                    sd.sub_device_name,
                     GROUP_CONCAT(DISTINCT ms.nama_pegawai) as personel_names
                 ')
                 ->from('activity_forms af')
@@ -973,6 +1405,7 @@ class Activity extends CI_Controller
                 ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
                 ->join('activity_personel apr', 'apr.activity_id = ap.id_activity')
                 ->join('ms_account ms', 'ms.id = apr.user_id')
+                ->join('ms_sub_device sd', 'sd.sub_device_id = af.sub_device_id') // Join with sub_device table
                 ->where('af.form_id', $id)
                 ->group_by('af.form_id')
                 ->get()
@@ -981,7 +1414,7 @@ class Activity extends CI_Controller
             if (!$formDetails) {
                 throw new Exception('Form details not found');
             }
-
+    
             // Get form data with answers
             $formData = $this->db->select('
                     afd.*,
@@ -992,14 +1425,12 @@ class Activity extends CI_Controller
                 ->where('afd.form_id', $id)
                 ->get()
                 ->result();
-
+    
             // Get checklist questions
-            $questions = $this->db->select('*')
-                ->from('device_checklist')
-                ->where('sub_device_id', $formDetails->sub_device_id)
-                ->order_by('question_number', 'ASC')
-                ->get()
-                ->result();
+            $questions = $this->ChecklistModel->get_checklist_questions(
+                $formDetails->sub_device_id, 
+                $formDetails->report_type
+            );
     
             if (empty($questions)) {
                 throw new Exception('No checklist questions found');
@@ -1026,11 +1457,11 @@ class Activity extends CI_Controller
             $pdf->Rect(55, 7, 0, 20);
             $pdf->Rect(155, 7, 0, 20);
             $pdf->Rect(195, 7, 0, 20);
-
+    
             // Logo kanan
             $image_file_right = FCPATH . 'assets/images/logo-ias.jpg';
             $pdf->Image($image_file_right, 163, 8, 25, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-
+    
             // Title untuk dokumen
             $pdf->SetY(7);
             $pdf->Cell(0, 5, 'CHECKLIST REPORT', 0, 1, 'C');
@@ -1042,61 +1473,74 @@ class Activity extends CI_Controller
             $pdf->SetFont('helvetica', 'B', 10);
             
             // Basic information
-            $pdf->Cell(40, 7, 'Tanggal', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, date('d F Y', strtotime($formDetails->tanggal_kegiatan)), 0, 1);
+            $pdf->Cell(40, 4, 'Tanggal', 0, 0);
+            $pdf->Cell(5, 4, ':', 0, 0);
+            $pdf->Cell(0, 4, date('d F Y', strtotime($formDetails->tanggal_kegiatan)), 0, 1);
+    
+            $pdf->Cell(40, 4, 'Lokasi', 0, 0);
+            $pdf->Cell(5, 4, ':', 0, 0);
+            $pdf->Cell(0, 4, $formDetails->area_name, 0, 1);
 
-            $pdf->Cell(40, 7, 'Lokasi', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, $formDetails->area_name, 0, 1);
-
-            $pdf->Cell(40, 7, 'Shift/Jam Kerja', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, $formDetails->nama_shift . ' (' . $formDetails->jam_mulai . ' - ' . $formDetails->jam_selesai . ')', 0, 1);
-
-            $pdf->Cell(40, 7, 'Personel', 0, 0);
-            $pdf->Cell(5, 7, ':', 0, 0);
-            $pdf->Cell(0, 7, $formDetails->personel_names, 0, 1);
-
+            $pdf->Cell(40, 4, 'Perangkat', 0, 0);
+            $pdf->Cell(5, 4, ':', 0, 0);
+            $pdf->Cell(0, 4, $formDetails->sub_device_name, 0, 1);
+    
+            $pdf->Cell(40, 4, 'Shift/Jam Kerja', 0, 0);
+            $pdf->Cell(5, 4, ':', 0, 0);
+            $pdf->Cell(0, 4, $formDetails->nama_shift . ' (' . $formDetails->jam_mulai . ' - ' . $formDetails->jam_selesai . ')', 0, 1);
+    
+            $pdf->Cell(40, 4, 'Personel', 0, 0);
+            $pdf->Cell(5, 4, ':', 0, 0);
+            $pdf->Cell(0, 4, $formDetails->personel_names, 0, 1);
+    
+            $pdf->Cell(40, 4, 'Jenis Report', 0, 0);
+            $pdf->Cell(5, 4, ':', 0, 0);
+            $pdf->Cell(0, 4, $formDetails->report_type, 0, 1);
+    
             // Add checklist tables for each data entry
             foreach ($formData as $index => $data) {
                 $pdf->Ln(5);
-                $pdf->SetFont('helvetica', 'B', 11);
-                $pdf->Cell(0, 7, 'Checklist ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->Cell(0, 5, 'Checklist ' . ($index + 1) . ' - ' . $data->device_hidn_name, 0, 1);
                 $jam_mulai = $data->jam_kegiatan;
                 $jam_selesai = $data->jam_selesai ? $data->jam_selesai : ''; // Cek jika jam_selesai ada
                 $format_jam = $jam_selesai ? $jam_mulai . ' s/d ' . $jam_selesai : $jam_mulai;
-                $pdf->Cell(0, 7, 'Jam Kegiatan: ' . $format_jam, 0, 1);
+                $pdf->Cell(0, 2, 'Jam Kegiatan: ' . $format_jam, 0, 1);
                 
                 // Table header
-                $pdf->SetFont('helvetica', 'B', 10);
-                $pdf->Cell(10, 7, 'No', 1, 0, 'C');
-                $pdf->Cell(100, 7, 'Item Check', 1, 0, 'C');
-                $pdf->Cell(30, 7, 'Status', 1, 1, 'C');
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->Cell(10, 5, 'No', 1, 0, 'C');
+                $pdf->Cell(130, 5, 'Item Check', 1, 0, 'C');
+                $pdf->Cell(20, 5, 'Status', 1, 1, 'C');
+                
+                // Parse tindakan JSON
+                $tindakan = json_decode($data->tindakan, true) ?: [];
                 
                 // Table content
-                $pdf->SetFont('helvetica', '', 10);
+                $pdf->SetFont('helvetica', '', 9);
                 foreach ($questions as $key => $question) {
-                    $pdf->Cell(10, 7, ($key + 1), 1, 0, 'C');
-                    $pdf->Cell(100, 7, $question->question_text, 1, 0, 'L');
+                    $questionNumber = $question->question_number;
+                    $pdf->Cell(10, 3, $questionNumber, 1, 0, 'C');
+                    $pdf->Cell(130, 3, $question->question_text, 1, 0, 'L');
                     
-                    // Get corresponding tindakan based on question number
-                    $tindakan = 'tindakan' . ($key + 1);
-                    $pdf->Cell(30, 7, $data->$tindakan, 1, 1, 'C');
+                    // Get corresponding tindakan value
+                    $tindakanValue = isset($tindakan[$questionNumber]) ? $tindakan[$questionNumber] : 'N/A';
+                    $pdf->Cell(20, 3, $tindakanValue, 1, 1, 'C');
                 }
                 
-                // Notes section below the table
+                // // Notes section below the table
                 $pdf->Ln(2);
-                $pdf->SetFont('helvetica', 'I', 10);
-                $pdf->Cell(20, 7, 'Catatan:', 0, 0);
-                $pdf->Cell(0, 7, $data->notes, 0, 1);
+                $pdf->SetFont('helvetica', 'I', 9);
+                $pdf->Cell(20, 5, 'Catatan:', 0, 0);
+                $pdf->Cell(0, 5, $data->notes, 0, 1);
             }
-
+    
             // Signature
             $pdf->Ln(5);
-            $pdf->Cell(90, 7, 'Pelaksana,', 0, 0, 'C');
-            $pdf->Cell(90, 7, 'Supervisor,', 0, 1, 'C');
-
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->Cell(90, 7, 'ANGKASA PURA INDONESIA', 0, 0, 'C');
+            $pdf->Cell(90, 7, 'IAS SUPPORT', 0, 1, 'C');
+    
             $pdf->Ln(12);
             $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
             $pdf->Cell(90, 7, '(.............................)', 0, 1, 'C');

@@ -56,14 +56,6 @@ class UserModel extends CI_Model {
         return $this->db->delete('ms_account');
     }
 
-    public function get_nama_pegawai_by_username($username) {
-        $this->db->select('*');
-        $this->db->from('ms_account');
-        $this->db->where('username', $username);
-        $query = $this->db->get();
-        
-        return $query->row_array();
-    }
 
     public function migrate_to_sha256() {
         // 1. Ambil semua user
