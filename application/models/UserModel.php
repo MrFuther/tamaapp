@@ -56,7 +56,6 @@ class UserModel extends CI_Model {
         return $this->db->delete('ms_account');
     }
 
-
     public function migrate_to_sha256() {
         // 1. Ambil semua user
         $users = $this->db->get('ms_account')->result();
