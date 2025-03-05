@@ -43,6 +43,13 @@
                         <span class="menu-title">Manage User</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('settings'); ?>">
+                        <i class="icon-head menu-icon"></i>
+                        <span class="menu-title">Settings</span>
+                        </a>
+                    </li>
                 <?php endif; ?>
             </ul>
         </nav>

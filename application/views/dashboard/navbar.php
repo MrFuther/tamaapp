@@ -17,6 +17,10 @@
               <i class="ti-user mx-0"></i> <?php echo $user['username']; ?>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+              <a class="dropdown-item" href="<?php echo base_url('settings'); ?>">
+                <i class="ti-settings text-primary"></i>
+                <span class="menu-title">Settings</span>
+              </a>
               <a class="dropdown-item" href="#" onclick="showLogoutConfirmation()">
                 <i class="ti-power-off text-primary"></i>
                 Logout
@@ -35,9 +39,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Konfirmasi Logout</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p>Apakah Anda yakin ingin logout?</p>

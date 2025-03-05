@@ -9,7 +9,7 @@ class Activity extends CI_Controller
         if(!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
-        $this->load->model(['ActivityModel', 'ChecklistModel']);
+        $this->load->model(['ActivityModel', 'ChecklistModel', 'Account_Model']);
         $this->load->library('upload'); // Load library untuk upload file
         $this->load->library('pdf');
         $this->load->library('pagination');
@@ -997,6 +997,35 @@ class Activity extends CI_Controller
     
         return ['valid' => true];
     }
+
+    public function approve_form($form_id, $signature_type = 'ap') {
+        // Check if user is logged in
+        if(!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
+        
+        // Get current user ID
+        $user_id = $this->session->userdata('user_id');
+        
+        // Check if user has a signature
+        $signature = $this->Account_Model->get_signature($user_id);
+        if(empty($signature)) {
+            $this->session->set_flashdata('error', 'You need to upload your signature before approving forms. Please go to Settings.');
+            redirect('activity');
+            return;
+        }
+        
+        // Approve the form with the specified signature type
+        $result = $this->ActivityModel->approve_form($form_id, $user_id, $signature_type);
+        
+        if($result) {
+            $this->session->set_flashdata('success', 'Form approved successfully with ' . ($signature_type == 'ap' ? 'AP' : 'IAS') . ' signature.');
+        } else {
+            $this->session->set_flashdata('error', 'Failed to approve form. Please try again.');
+        }
+        
+        redirect('activity');
+    }
     
     // Method to create upload directory if it doesn't exist
     private function ensure_upload_directory() {
@@ -1136,7 +1165,7 @@ class Activity extends CI_Controller
                 // Create photo cells in a 2x3 grid
                 for ($i = $startIndex; $i < $endIndex; $i++) {
                     // Calculate position for this cell
-                    $x = 15 + ($currentCol * $cellWidth);
+                    $x = 20 + ($currentCol * $cellWidth);
                     $y = $startY + ($currentRow * ($cellHeight + $captionHeight));
                     
                     // Set cursor position
@@ -1188,7 +1217,7 @@ class Activity extends CI_Controller
                     $caption = isset($questions[$i]) ? $questions[$i]->question_text : 'Photo ' . ($i + 1);
                     
                     // Add caption with border
-                    $pdf->MultiCell($cellWidth, $captionHeight, $caption, 1, 'L', false, 1);
+                    $pdf->MultiCell($cellWidth, $captionHeight, $caption, 1, 'C', false, 1);
                     
                     // Move to next cell position
                     $currentCol++;
@@ -1210,8 +1239,8 @@ class Activity extends CI_Controller
         
         // Table dimensions
         $fullWidth = 180;
-        $logoWidth = 40;
-        $headerHeight = 26;
+        $logoWidth = 35;
+        $headerHeight = 20;
         
         // Create outer table border
         $pdf->Rect(15, 15, $fullWidth, $headerHeight);
@@ -1228,7 +1257,7 @@ class Activity extends CI_Controller
         $pdf->Image($leftLogo, 17, 17, $logoWidth - 4, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
         
         // Add right logo
-        $pdf->Image($rightLogo, 15 + $fullWidth - $logoWidth + 2, 17, $logoWidth - 4, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        $pdf->Image($rightLogo, 19 + $fullWidth - $logoWidth + 2, 17, 25, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
         
         // Add title in center column
         $centerX = 15 + $logoWidth;
@@ -1264,7 +1293,7 @@ class Activity extends CI_Controller
         $pdf->Cell(0, 7, $formDetails->personel_names, 0, 1);
         
         // Add some space after the information
-        $pdf->Ln(5);
+        $pdf->Ln(3);
     }
     
     private function generateStandardReport($pdf, $formDetails, $formData, $questions) {
@@ -1310,23 +1339,14 @@ class Activity extends CI_Controller
                 // Determine photo fields and descriptions
                 $photoFields = ['foto_perangkat', 'foto_lokasi', 'foto_teknisi'];
                 
-                if ($formDetails->report_type === 'Harian' && count($questions) > 3) {
-                    // Prepare descriptions for each photo based on checklist questions
-                    $photoDescriptions = [];
-                    for ($i = 0; $i < count($photoFields); $i++) {
-                        if (isset($questions[$i])) {
-                            $photoDescriptions[] = $questions[$i]->question_text;
-                        } else {
-                            $photoDescriptions[] = 'Foto ' . ($i + 1);
-                        }
+                // Use questions from database for descriptions
+                $photoDescriptions = [];
+                for ($i = 0; $i < count($photoFields); $i++) {
+                    if (isset($questions[$i])) {
+                        $photoDescriptions[] = $questions[$i]->question_text;
+                    } else {
+                        $photoDescriptions[] = 'Foto ' . ($i + 1);
                     }
-                } else {
-                    // Default descriptions for non-Harian forms
-                    $photoDescriptions = [
-                        'Memastikan indikator access point',
-                        'Lokasi Perangkat Access Point',
-                        'Hasil Speed Test Internet'
-                    ];
                 }
                 
                 // Mulai menggambar kotak foto
@@ -1381,13 +1401,18 @@ class Activity extends CI_Controller
                     $x = $startX + ($j * $cellWidth);
                     $description = isset($photoDescriptions[$j]) ? $photoDescriptions[$j] : 'Foto ' . ($j + 1);
                     
-                    // Gunakan MultiCell dengan nilai height 0 untuk auto-fit content
+                    // Gunakan MultiCell dengan nilai height yang tetap untuk konsistensi
                     $pdf->SetXY($x, $captionY);
-                    $pdf->MultiCell($cellWidth, $captionHeight, $description, 'LBR', 'C', false, 0);
+                    $pdf->MultiCell($cellWidth, $captionHeight, $description, 1, 'C', false, 0);
                 }
                 
+                // Tambahkan device name di bawah caption
+                $deviceNameY = $captionY + $captionHeight;
+                $pdf->SetFont('helvetica', 'B', 6);
+                
                 // Perbarui posisi Y untuk device berikutnya
-                $yPos = $captionY + $captionHeight + $deviceSpacing;
+                $yPos = $deviceNameY + 4 + $deviceSpacing;
+                
             }
         }
     }
@@ -1432,7 +1457,10 @@ class Activity extends CI_Controller
                 ->where('afd.form_id', $id)
                 ->get()
                 ->result();
-    
+            
+            // Get approval status
+            $approval = $this->ActivityModel->get_form_approval_status($id);
+
             // Get checklist questions
             $questions = $this->ChecklistModel->get_checklist_questions(
                 $formDetails->sub_device_id, 
@@ -1442,7 +1470,7 @@ class Activity extends CI_Controller
             if (empty($questions)) {
                 throw new Exception('No checklist questions found');
             }
-    
+            
             // Create PDF
             $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
             $pdf->setPrintHeader(false);
@@ -1572,10 +1600,90 @@ class Activity extends CI_Controller
             $pdf->SetFont('helvetica', '', 9);
             $pdf->Cell(90, 7, 'ANGKASA PURA INDONESIA', 0, 0, 'C');
             $pdf->Cell(90, 7, 'IAS SUPPORT', 0, 1, 'C');
+
+            // Improved signature rendering
+            $signatureY = $pdf->GetY();
+            $signatureHeight = 25; // Increased height for better visibility
+            $signatureWidth = 40;
     
-            $pdf->Ln(12);
-            $pdf->Cell(90, 7, '(.............................)', 0, 0, 'C');
-            $pdf->Cell(91, 7, '(.............................)', 0, 1, 'C');
+            if($approval && $approval->is_approved_ap && !empty($approval->ap_signature)) {
+                $apSignatureImage = imagecreatefromstring($approval->ap_signature);
+                if ($apSignatureImage !== false) {
+                    // Get image dimensions
+                    $width = imagesx($apSignatureImage);
+                    $height = imagesy($apSignatureImage);
+    
+                    // Create a new true color image with transparency
+                    $cleanSignature = imagecreatetruecolor($width, $height);
+                    
+                    // Enable alpha blending and set alpha flag
+                    imagealphablending($cleanSignature, false);
+                    imagesavealpha($cleanSignature, true);
+                    
+                    // Fill the image with transparent background
+                    $transparent = imagecolorallocatealpha($cleanSignature, 255, 255, 255, 127);
+                    imagefill($cleanSignature, 0, 0, $transparent);
+    
+                    // Copy the signature, preserving transparency
+                    imagecopy($cleanSignature, $apSignatureImage, 0, 0, 0, 0, $width, $height);
+    
+                    // Temporary file to store clean signature
+                    $tempApSignature = tempnam(sys_get_temp_dir(), 'ap_signature') . '.png';
+                    imagepng($cleanSignature, $tempApSignature);
+                    
+                    // Add signature image
+                    $pdf->Image($tempApSignature, 40, $signatureY, $signatureWidth, $signatureHeight, 'PNG', '', '', true, 300, '', false, false, 0, false, false, false);
+                    
+                    // Clean up
+                    imagedestroy($apSignatureImage);
+                    imagedestroy($cleanSignature);
+                    unlink($tempApSignature);
+                }
+            }
+            
+            // Check for IAS signature 
+            if($approval && $approval->is_approved_ias && !empty($approval->ias_signature)) {
+                $iasSignatureImage = imagecreatefromstring($approval->ias_signature);
+                if ($iasSignatureImage !== false) {
+                    // Get image dimensions
+                    $width = imagesx($iasSignatureImage);
+                    $height = imagesy($iasSignatureImage);
+    
+                    // Create a new true color image with transparency
+                    $cleanSignature = imagecreatetruecolor($width, $height);
+                    
+                    // Enable alpha blending and set alpha flag
+                    imagealphablending($cleanSignature, false);
+                    imagesavealpha($cleanSignature, true);
+                    
+                    // Fill the image with transparent background
+                    $transparent = imagecolorallocatealpha($cleanSignature, 255, 255, 255, 127);
+                    imagefill($cleanSignature, 0, 0, $transparent);
+    
+                    // Copy the signature, preserving transparency
+                    imagecopy($cleanSignature, $iasSignatureImage, 0, 0, 0, 0, $width, $height);
+    
+                    // Temporary file to store clean signature
+                    $tempIasSignature = tempnam(sys_get_temp_dir(), 'ias_signature') . '.png';
+                    imagepng($cleanSignature, $tempIasSignature);
+                    
+                    // Add signature image
+                    $pdf->Image($tempIasSignature, 130, $signatureY, $signatureWidth, $signatureHeight, 'PNG', '', '', true, 300, '', false, false, 0, false, false, false);
+                    
+                    // Clean up
+                    imagedestroy($iasSignatureImage);
+                    imagedestroy($cleanSignature);
+                    unlink($tempIasSignature);
+                }
+            }
+            $pdf->Ln($signatureHeight); // Move down for names
+
+            // Display names for signatures
+            $ap_name = ($approval && $approval->is_approved_ap) ? '(' . $approval->ap_approver_name . ')' : '(............................)';
+            $ias_name = ($approval && $approval->is_approved_ias) ? '(' . $approval->ias_approver_name . ')' : '(............................)';
+
+            $pdf->Cell(90, 7, $ap_name, 0, 0, 'C'); 
+            $pdf->Cell(91, 7, $ias_name, 0, 1, 'C');
             
             // Output PDF
             $pdf->Output('checklist_pm_' . date('Y-m-d') . '.pdf', 'I');
