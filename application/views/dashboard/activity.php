@@ -896,10 +896,10 @@
                                         <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
                                             Delete
                                         </button>
-                                        <button class="btn btn-success btn-sm" onclick="window.location.href='<?= base_url('activity/printdokumentasi/') ?>${form.form_id}'" target="_blank">
+                                        <button class="btn btn-success btn-sm" onclick="window.open('<?= base_url('activity/printdokumentasi/') ?>${form.form_id}', '_blank')">
                                             <i class="fas fa-print"></i> Dokumentasi
                                         </button>
-                                        <button class="btn btn-primary btn-sm" onclick="window.location.href='<?= base_url('activity/printchecklist/') ?>${form.form_id}'">
+                                        <button class="btn btn-primary btn-sm" onclick="window.open('<?= base_url('activity/printchecklist/') ?>${form.form_id}', '_blank')">
                                             <i class="fas fa-print"></i> Checklist
                                         </button>
                                     </td>
