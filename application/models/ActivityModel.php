@@ -191,18 +191,16 @@ class ActivityModel extends CI_Model {
     }
     
     public function get_activity_forms($activity_id) {
-        $this->db->select('f.*, sd.sub_device_name, a.area_name');
-        $this->db->from('activity_forms f');
-        $this->db->join('ms_sub_device sd', 'sd.sub_device_id = f.sub_device_id');
-        $this->db->join('ms_area a', 'a.area_id = f.area_id');
-        $this->db->where('f.activity_id', $activity_id);
+        $this->db->select('af.form_id, af.activity_id, af.sub_device_id, af.area_id, 
+                         af.report_type, af.is_approved_ap, af.is_approved_ias, 
+                         af.approved_by_ap, af.approved_by_ias, 
+                         sd.sub_device_name, a.area_name')
+                 ->from('activity_forms af')
+                 ->join('ms_sub_device sd', 'sd.sub_device_id = af.sub_device_id')
+                 ->join('ms_area a', 'a.area_id = af.area_id')
+                 ->where('af.activity_id', $activity_id);
         
-        // Tambahkan log untuk debugging
-        $query = $this->db->get();
-        log_message('debug', 'SQL Query: ' . $this->db->last_query());
-        log_message('debug', 'Result: ' . json_encode($query->result()));
-        
-        return $query->result();
+        return $this->db->get()->result();
     }
 
     public function get_all_devices() {
@@ -305,6 +303,36 @@ class ActivityModel extends CI_Model {
         $query = $this->db->get();
         $result = $query->row();
         return $result->count;
+    }
+
+    public function approve_form($form_id, $user_id, $signature_type = 'ap') {
+        // Check if the form exists
+        $form = $this->db->get_where('activity_forms', ['form_id' => $form_id])->row();
+        if (!$form) {
+            return false;
+        }
+        
+        // Determine which field to update based on signature type
+        $field_to_update = ($signature_type == 'ap') ? 'approved_by_ap' : 'approved_by_ias';
+        $is_approved_field = ($signature_type == 'ap') ? 'is_approved_ap' : 'is_approved_ias';
+        
+        // Update the form with the approval
+        $this->db->where('form_id', $form_id);
+        return $this->db->update('activity_forms', [
+            $field_to_update => $user_id,
+            $is_approved_field => 1,
+            'approval_date_' . $signature_type => date('Y-m-d H:i:s')
+        ]);
+    }
+    
+    public function get_form_approval_status($form_id) {
+        $this->db->select('af.*, ap_user.nama_pegawai as ap_approver_name, ias_user.nama_pegawai as ias_approver_name, ap_user.signature as ap_signature, ias_user.signature as ias_signature')
+                ->from('activity_forms af')
+                ->join('ms_account ap_user', 'ap_user.id = af.approved_by_ap', 'left')
+                ->join('ms_account ias_user', 'ias_user.id = af.approved_by_ias', 'left')
+                ->where('af.form_id', $form_id);
+        
+        return $this->db->get()->row();
     }
 }
 ?>

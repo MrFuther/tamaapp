@@ -874,48 +874,102 @@
         return months[month];
     }
 
-    const loadFormData = (activityId) => {
-            $.ajax({
-                url: '<?= base_url("activity/get_activity_forms/") ?>' + activityId,
-                method: 'GET',
-                dataType: 'json',
-                success: function(forms) {
-                    var tbody = $('#formDataTable');
-                    tbody.empty();
-                    if (Array.isArray(forms)) {
-                        forms.forEach(function(form) {
-                            tbody.append(`
-                                <tr>
-                                    <td>${form.sub_device_name}</td>
-                                    <td>${form.area_name}</td>
-                                    <td>${form.report_type}</td>
-                                    <td>
-                                        <button class="btn btn-info btn-sm" onclick="viewData(${form.form_id})">
-                                            Data
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
-                                            Delete
-                                        </button>
-                                        <button class="btn btn-success btn-sm" onclick="window.open('<?= base_url('activity/printdokumentasi/') ?>${form.form_id}', '_blank')">
-                                            <i class="fas fa-print"></i> Dokumentasi
-                                        </button>
-                                        <button class="btn btn-primary btn-sm" onclick="window.open('<?= base_url('activity/printchecklist/') ?>${form.form_id}', '_blank')">
-                                            <i class="fas fa-print"></i> Checklist
-                                        </button>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        tbody.append('<tr><td colspan="4" class="text-center">No forms available</td></tr>');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error loading form data:', error);
-                    $('#formDataTable').html('<tr><td colspan="4" class="text-center">Error loading data</td></tr>');
-                }
-            });
+    const createApproveDropdown = (formId) => {
+        return `
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-signature me-1"></i>Approve
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="approveForm(${formId}, 'ap')">
+                        <i class="fas fa-signature me-1"></i>Approve as AP
+                    </a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="approveForm(${formId}, 'ias')">
+                        <i class="fas fa-signature me-1"></i>Approve as IAS
+                    </a></li>
+                </ul>
+            </div>
+        `;
     };
+
+    function loadFormData(activityId) {
+        const userRole = '<?= $this->session->userdata('role') ?>'; // Ambil role dari session
+
+        $.ajax({
+            url: '<?= base_url("activity/get_activity_forms/") ?>' + activityId,
+            method: 'GET',
+            dataType: 'json',
+            success: function(forms) {
+                var tbody = $('#formDataTable');
+                tbody.empty();
+                if (Array.isArray(forms) && forms.length > 0) {
+                    forms.forEach(function(form) {
+                        // Fungsi untuk menghasilkan tombol approve sesuai role
+                        function getApproveButtons(formId) {
+                            let approveButtons = '';
+                            
+                            if (userRole === 'admin') {
+                                // Admin bisa melihat semua tombol approve
+                                approveButtons = `
+                                    <button class="btn btn-warning btn-sm" onclick="approveForm(${formId}, 'ap')">
+                                        <i class="fas fa-signature me-1"></i>Approve as AP
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="approveForm(${formId}, 'ias')">
+                                        <i class="fas fa-signature me-1"></i>Approve as IAS
+                                    </button>
+                                `;
+                            } else if (userRole === 'management') {
+                                // Management hanya bisa approve AP
+                                approveButtons = `
+                                    <button class="btn btn-warning btn-sm" onclick="approveForm(${formId}, 'ap')">
+                                        <i class="fas fa-signature me-1"></i>Approve as AP
+                                    </button>
+                                `;
+                            } else if (['teknisi', 'supervisor'].includes(userRole)) {
+                                // Teknisi dan Supervisor hanya bisa approve IAS
+                                approveButtons = `
+                                    <button class="btn btn-warning btn-sm" onclick="approveForm(${formId}, 'ias')">
+                                        <i class="fas fa-signature me-1"></i>Approve as IAS
+                                    </button>
+                                `;
+                            }
+                            
+                            return approveButtons;
+                        }
+
+                        tbody.append(`
+                            <tr>
+                                <td>${form.sub_device_name}</td>
+                                <td>${form.area_name}</td>
+                                <td>${form.report_type}</td>
+                                <td>
+                                    <button class="btn btn-info btn-sm" onclick="viewData(${form.form_id})">
+                                        Data
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteForm(${form.form_id})">
+                                        Delete
+                                    </button>
+                                    ${getApproveButtons(form.form_id)}
+                                    <button class="btn btn-success btn-sm" onclick="window.open('<?= base_url('activity/printdokumentasi/') ?>${form.form_id}', '_blank')">
+                                        <i class="fas fa-print"></i> Dokumentasi
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="window.open('<?= base_url('activity/printchecklist/') ?>${form.form_id}', '_blank')">
+                                        <i class="fas fa-print"></i> Checklist
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="4" class="text-center">No forms available</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading form data:', error);
+                $('#formDataTable').html('<tr><td colspan="4" class="text-center">Error loading data</td></tr>');
+            }
+        });
+    }
 
     // View Data Functions
     const viewData = (formId) => {
@@ -1167,6 +1221,32 @@
         // Tambahkan header untuk notes dan aksi
         headerRow.append('<th>Notes</th>');
         headerRow.append('<th>Actions</th>');
+    }
+
+    function approveForm(formId, signatureType = 'ap') {
+        // First check if the user has a signature
+        $.ajax({
+            url: '<?= base_url("settings/check_signature") ?>',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.has_signature) {
+                    // If user has a signature, ask for confirmation
+                    let sigTitle = signatureType === 'ap' ? 'ANGKASA PURA INDONESIA' : 'IAS SUPPORT';
+                    if (confirm('Are you sure you want to approve this form as ' + sigTitle + '? Your digital signature will be attached to the checklist report.')) {
+                        window.location.href = '<?= base_url("activity/approve_form/") ?>' + formId + '/' + signatureType;
+                    }
+                } else {
+                    // If user doesn't have a signature, show the modal
+                    var signatureModal = new bootstrap.Modal(document.getElementById('signatureRequiredModal'));
+                    signatureModal.show();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error checking signature:', error);
+                alert('Could not verify signature. Please try again.');
+            }
+        });
     }
 
     // Device and Area Loading Functions

@@ -21,4 +21,5 @@ $route['get-sub-areas'] = 'activity/get_sub_areas';
 $route['activity/add_documentation'] = 'activity/add_documentation';
 $route['forbidden'] = 'errors/custom_forbidden';
 $route['404_override'] = 'errors/forbidden';
+$route['settings'] = 'settings/index';
 $route['translate_uri_dashes'] = FALSE;
