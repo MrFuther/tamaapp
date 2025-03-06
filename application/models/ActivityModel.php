@@ -326,10 +326,13 @@ class ActivityModel extends CI_Model {
     }
     
     public function get_form_approval_status($form_id) {
-        $this->db->select('af.*, ap_user.nama_pegawai as ap_approver_name, ias_user.nama_pegawai as ias_approver_name, ap_user.signature as ap_signature, ias_user.signature as ias_signature')
+        $this->db->select('af.*, ap.nama_pegawai as ap_approver_name, 
+                         ias.nama_pegawai as ias_approver_name, 
+                         ap.signature as ap_signature, 
+                         ias.signature as ias_signature')
                 ->from('activity_forms af')
-                ->join('ms_account ap_user', 'ap_user.id = af.approved_by_ap', 'left')
-                ->join('ms_account ias_user', 'ias_user.id = af.approved_by_ias', 'left')
+                ->join('ms_account ap', 'ap.id = af.approved_by_ap', 'left')
+                ->join('ms_account ias', 'ias.id = af.approved_by_ias', 'left')
                 ->where('af.form_id', $form_id);
         
         return $this->db->get()->row();
