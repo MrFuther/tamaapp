@@ -905,65 +905,6 @@
                 tbody.empty();
                 if (Array.isArray(forms) && forms.length > 0) {
                     forms.forEach(function(form) {
-                        // Fungsi untuk menghasilkan tombol approve sesuai role dan status approval
-                        function getApproveButtons(formId) {
-                            let approveButtons = '';
-                            
-                            // Check if form is already approved by AP and/or IAS
-                            // Using your database structure with is_approved_ap and is_approved_ias flags
-                            const apStatus = form.is_approved_ap == 1 || form.approved_by_ap ? true : false;
-                            const iasStatus = form.is_approved_ias == 1 || form.approved_by_ias ? true : false;
-                            const apApproverName = form.ap_approver_name || 'Unknown';
-                            const iasApproverName = form.ias_approver_name || 'Unknown';
-                            
-                            // Button for AP approval
-                            let apButton = '';
-                            if (apStatus) {
-                                // If already approved by AP, show approved text with approver name
-                                apButton = `
-                                    <button class="btn btn-success btn-sm" disabled>
-                                        <i class="fas fa-check-circle me-1"></i>Approved by AP: ${apApproverName}
-                                    </button>
-                                `;
-                            } else if (userRole === 'admin' || userRole === 'management') {
-                                // If not approved and user has AP approval rights (admin or management role)
-                                apButton = `
-                                    <button class="btn btn-warning btn-sm" onclick="approveForm(${formId}, 'ap')">
-                                        <i class="fas fa-signature me-1"></i>Approve as AP
-                                    </button>
-                                `;
-                            }
-                            
-                            // Button for IAS approval
-                            let iasButton = '';
-                            if (iasStatus) {
-                                // If already approved by IAS, show approved text with approver name
-                                iasButton = `
-                                    <button class="btn btn-success btn-sm" disabled>
-                                        <i class="fas fa-check-circle me-1"></i>Approved by IAS: ${iasApproverName}
-                                    </button>
-                                `;
-                            } else if (userRole === 'admin' || ['teknisi', 'supervisor'].includes(userRole)) {
-                                // If not approved and user has IAS approval rights (admin, teknisi, or supervisor role)
-                                iasButton = `
-                                    <button class="btn btn-warning btn-sm" onclick="approveForm(${formId}, 'ias')">
-                                        <i class="fas fa-signature me-1"></i>Approve as IAS
-                                    </button>
-                                `;
-                            }
-                            
-                            // Combine buttons based on role
-                            if (userRole === 'admin') {
-                                approveButtons = apButton + ' ' + iasButton;
-                            } else if (userRole === 'management') {
-                                approveButtons = apButton;
-                            } else if (['teknisi', 'supervisor'].includes(userRole)) {
-                                approveButtons = iasButton;
-                            }
-                            
-                            return approveButtons;
-                        }
-
                         tbody.append(`
                             <tr>
                                 <td>${form.sub_device_name}</td>
