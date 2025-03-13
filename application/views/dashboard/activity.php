@@ -261,8 +261,11 @@
                                     <div class="col-md-8 col-lg-10">
                                         <div class="d-flex flex-column flex-md-row">
                                         <span class="me-2 mb-1 mb-md-0">:</span>
-                                        <select class="form-control select2-single" name="area_id" required>
+                                        <select class="form-control select2-multiple" name="area_id[]" multiple="multiple" required>
                                             <option value="">Pilih Lokasi</option>
+                                            <?php foreach ($areas as $area): ?>
+                                            <option value="<?= $area->area_id ?>"><?= $area->area_name ?></option>
+                                            <?php endforeach; ?>
                                         </select>
                                         </div>
                                     </div>
@@ -536,6 +539,13 @@
         $('#dataModal').on('hidden.bs.modal', handleDataModalHidden);
         $('.select2').select2({
             placeholder: "Pilih Personel",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('.select2-multiple').select2({
+            dropdownParent: $('#formModal'),
+            placeholder: "Pilih Lokasi",
             allowClear: true,
             width: '100%'
         });
@@ -936,11 +946,10 @@
                             
                             return approveButtons;
                         }
-
                         tbody.append(`
                             <tr>
                                 <td>${form.sub_device_name}</td>
-                                <td>${form.area_name}</td>
+                                <td>${form.area_names}</td>
                                 <td>${form.report_type}</td>
                                 <td>
                                     <button class="btn btn-info btn-sm" onclick="viewData(${form.form_id})">

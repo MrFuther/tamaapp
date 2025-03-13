@@ -191,16 +191,29 @@ class ActivityModel extends CI_Model {
     }
     
     public function get_activity_forms($activity_id) {
-        $this->db->select('af.form_id, af.activity_id, af.sub_device_id, af.area_id, 
-                         af.report_type, af.is_approved_ap, af.is_approved_ias, 
+        $this->db->select('af.form_id, af.activity_id, af.sub_device_id, af.report_type, 
+                         af.is_approved_ap, af.is_approved_ias, 
                          af.approved_by_ap, af.approved_by_ias, 
-                         sd.sub_device_name, a.area_name')
-                 ->from('activity_forms af')
-                 ->join('ms_sub_device sd', 'sd.sub_device_id = af.sub_device_id')
-                 ->join('ms_area a', 'a.area_id = af.area_id')
-                 ->where('af.activity_id', $activity_id);
+                         sd.sub_device_name');
+        $this->db->from('activity_forms af');
+        $this->db->join('ms_sub_device sd', 'sd.sub_device_id = af.sub_device_id');
+        $this->db->where('af.activity_id', $activity_id);
         
-        return $this->db->get()->result();
+        $forms = $this->db->get()->result();
+        
+        // Ambil data area untuk setiap form
+        foreach ($forms as &$form) {
+            $form->areas = $this->get_form_areas($form->form_id);
+            
+            // Gabungkan nama area menjadi satu string
+            $area_names = array_map(function($area) {
+                return $area->area_name;
+            }, $form->areas);
+            
+            $form->area_names = implode(', ', $area_names);
+        }
+        
+        return $forms;
     }
 
     public function get_all_devices() {
@@ -215,8 +228,28 @@ class ActivityModel extends CI_Model {
         return $query->result();
     }
     
-    public function save_form($data) {
-        return $this->db->insert('activity_forms', $data);
+    public function save_form_areas($form_id, $area_ids) {
+        // Hapus data area yang ada terlebih dahulu
+        $this->db->delete('activity_form_areas', ['form_id' => $form_id]);
+        
+        // Insert data area baru
+        foreach ($area_ids as $area_id) {
+            $this->db->insert('activity_form_areas', [
+                'form_id' => $form_id,
+                'area_id' => $area_id
+            ]);
+        }
+        
+        return true;
+    }
+    
+    public function get_form_areas($form_id) {
+        $this->db->select('afa.area_id, a.area_name');
+        $this->db->from('activity_form_areas afa');
+        $this->db->join('ms_area a', 'a.area_id = afa.area_id');
+        $this->db->where('afa.form_id', $form_id);
+        
+        return $this->db->get()->result();
     }
     
     public function delete_form($form_id) {

@@ -310,9 +310,32 @@ class Activity extends CI_Controller
     }
     
     public function save_form() {
-        $data = $this->input->post();
-        $result = $this->ActivityModel->save_form($data);
-        echo json_encode(['status' => $result ? 'success' : 'error']);
+        $data = [
+            'activity_id' => $this->input->post('activity_id'),
+            'sub_device_id' => $this->input->post('sub_device_id'),
+            'report_type' => $this->input->post('report_type')
+        ];
+        
+        $area_ids = $this->input->post('area_id'); // Sekarang ini adalah array
+        
+        // Mulai transaksi
+        $this->db->trans_begin();
+        
+        try {
+            // Simpan data form
+            $this->db->insert('activity_forms', $data);
+            $form_id = $this->db->insert_id();
+            
+            // Simpan area-area yang dipilih
+            $this->ActivityModel->save_form_areas($form_id, $area_ids);
+            
+            $this->db->trans_commit();
+            echo json_encode(['status' => 'success']);
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Error saving form: ' . $e->getMessage());
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
     
     public function delete_form($form_id) {
@@ -1043,7 +1066,7 @@ class Activity extends CI_Controller
                     af.*,
                     ap.tanggal_kegiatan,
                     ap.kode_activity,
-                    ma.area_name,
+                    GROUP_CONCAT(DISTINCT ma.area_name) as area_name,
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
@@ -1051,7 +1074,8 @@ class Activity extends CI_Controller
                 ')
                 ->from('activity_forms af')
                 ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
-                ->join('ms_area ma', 'ma.area_id = af.area_id')
+                ->join('activity_form_areas afa', 'afa.form_id = af.form_id') // Join dengan tabel junction
+                ->join('ms_area ma', 'ma.area_id = afa.area_id') // Join menggunakan tabel junction
                 ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
                 ->join('activity_personel apr', 'apr.activity_id = ap.id_activity')
                 ->join('ms_account ms', 'ms.id = apr.user_id')
@@ -1419,12 +1443,12 @@ class Activity extends CI_Controller
 
     public function printchecklist($id) {
         try {
-            // Get main form details first
+            // Ambil detail formulir utama terlebih dahulu
             $formDetails = $this->db->select('
                     af.*,
                     ap.tanggal_kegiatan,
                     ap.kode_activity,
-                    ma.area_name,
+                    GROUP_CONCAT(DISTINCT ma.area_name) as area_name,
                     sk.nama_shift,
                     sk.jam_mulai,
                     sk.jam_selesai,
@@ -1433,18 +1457,19 @@ class Activity extends CI_Controller
                 ')
                 ->from('activity_forms af')
                 ->join('activity_pm ap', 'ap.id_activity = af.activity_id')
-                ->join('ms_area ma', 'ma.area_id = af.area_id')
+                ->join('activity_form_areas afa', 'afa.form_id = af.form_id') // Join dengan tabel junction
+                ->join('ms_area ma', 'ma.area_id = afa.area_id') // Join menggunakan tabel junction
                 ->join('shift_kerja sk', 'sk.id_shift = ap.shift_id')
                 ->join('activity_personel apr', 'apr.activity_id = ap.id_activity')
                 ->join('ms_account ms', 'ms.id = apr.user_id')
-                ->join('ms_sub_device sd', 'sd.sub_device_id = af.sub_device_id') // Join with sub_device table
+                ->join('ms_sub_device sd', 'sd.sub_device_id = af.sub_device_id')
                 ->where('af.form_id', $id)
                 ->group_by('af.form_id')
                 ->get()
                 ->row();
-            
+                
             if (!$formDetails) {
-                throw new Exception('Form details not found');
+                throw new Exception('Detail formulir tidak ditemukan');
             }
     
             // Get form data with answers
