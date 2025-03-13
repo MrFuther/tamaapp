@@ -304,21 +304,22 @@
                             </div>
                             </div>
                             <div class="mt-4">
-                            <h6>Data Form</h6>
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                    <th>Perangkat</th>
-                                    <th>Lokasi</th>
-                                    <th>Kelompok Laporan</th>
-                                    <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="formDataTable">
-                                </tbody>
-                                </table>
-                            </div>
+                                <h6>Data Form</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                        <th>Perangkat</th>
+                                        <th>Lokasi</th>
+                                        <th>Kelompok Laporan</th>
+                                        <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="formDataTable">
+                                        <!-- Data will be loaded here -->
+                                    </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         </div>

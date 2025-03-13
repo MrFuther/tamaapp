@@ -300,13 +300,23 @@ class Activity extends CI_Controller
     }
     
     public function get_activity_forms($activity_id) {
-        try {
-            $forms = $this->ActivityModel->get_activity_forms($activity_id);
-            echo json_encode($forms);
-        } catch (Exception $e) {
-            log_message('error', 'Error getting activity forms: ' . $e->getMessage());
-            echo json_encode([]);
-        }
+        // Updated select to match your database structure
+        $this->db->select('af.form_id, af.activity_id, af.sub_device_id, af.area_id, 
+                         af.report_type, af.is_approved_ap, af.is_approved_ias, 
+                         af.approved_by_ap, af.approved_by_ias, 
+                         sd.sub_device_name, a.area_name,
+                         ap.nama_pegawai as ap_approver_name, 
+                         ias.nama_pegawai as ias_approver_name')
+                 ->from('activity_forms af')
+                 ->join('ms_sub_device sd', 'sd.sub_device_id = af.sub_device_id')
+                 ->join('ms_area a', 'a.area_id = af.area_id')
+                 ->join('ms_account ap', 'ap.id = af.approved_by_ap', 'left')
+                 ->join('ms_account ias', 'ias.id = af.approved_by_ias', 'left')
+                 ->where('af.activity_id', $activity_id);
+        
+        $forms = $this->db->get()->result();
+        
+        echo json_encode($forms);
     }
     
     public function save_form() {
